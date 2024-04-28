@@ -1,11 +1,13 @@
 package com.back.cinetalk.user.dto;
 
 import com.back.cinetalk.user.entity.UserEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Schema(description = "User 데이터 담기는 DTO")
 @Data
 @Builder
 @NoArgsConstructor
