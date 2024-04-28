@@ -104,16 +104,17 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     public String getNickName(){
 
-        String[] fistname = {"멋있는","예쁜","화끈한","힙합멋쟁이","둥글둥글한","멍청한"};
-        String[] secondname = {"고래","사슴","사자","호랑이","맥주","윤석열"};
+        String[] fistname = {"멋있는", "예쁜", "화끈한", "힙합멋쟁이", "둥글둥글한", "멍청한", "밝은", "섹시한", "우아한", "긴장감있는", "유쾌한", "명랑한"};
+        String[] secondname =
+                {"고양이", "강아지", "거북이", "토끼", "뱀", "사자", "호랑이", "표범", "치타", "기린", "코끼리", "코뿔소", "하마", "악어",
+                        "펭귄", "부엉이", "올빼미", "곰", "돼지", "소", "닭", "독수리", "타조"};
+
 
         Random rand = new Random();
         int firstIndex = rand.nextInt(fistname.length);
         int secondIndex = rand.nextInt(secondname.length);
         int number = rand.nextInt(10000);
 
-        String nickname = fistname[firstIndex] + secondname[secondIndex] + number;
-
-        return nickname;
+        return fistname[firstIndex] + secondname[secondIndex] + number;
     }
 }
