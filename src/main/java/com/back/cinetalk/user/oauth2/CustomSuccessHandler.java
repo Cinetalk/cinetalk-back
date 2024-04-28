@@ -5,6 +5,7 @@ import com.back.cinetalk.user.dto.CustomOAuth2User;
 import com.back.cinetalk.user.dto.RefreshDTO;
 import com.back.cinetalk.user.entity.RefreshEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
+import com.back.cinetalk.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,16 +20,19 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Random;
 
 @Component
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final UserRepository userRepository;
 
-    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository) {
+    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -51,11 +55,26 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         //토큰 DB에 저장
         addRefreshEntity(email,refresh,86400000L);
 
+        String nickname = userRepository.findNicknameByEmail(email);
+
         //응답 설정
         //response.setHeader("access",access);
         response.addCookie(createCookie("refresh",refresh));
         response.setStatus(HttpStatus.OK.value());
-        response.sendRedirect("http://localhost:63342/front/index.html");
+
+        //닉네임이 존재할 경우
+        if(nickname == null){
+
+            String Newnickname = getNickName();
+
+            userRepository.updateNicknameByEmail(email,Newnickname);
+
+            response.sendRedirect("http://localhost:63342/front/index.html");
+        }
+        //닉네임이 존재하지 않을 경우
+        else{
+            response.sendRedirect("http://localhost:63342/front/index.html");
+        }
     }
 
     private Cookie createCookie(String key, String value){
@@ -81,5 +100,20 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         RefreshEntity refreshEntity = RefreshEntity.ToRefreshEntity(refreshDTO);
 
         refreshRepository.save(refreshEntity);
+    }
+
+    public String getNickName(){
+
+        String[] fistname = {"멋있는","예쁜","화끈한","힙합멋쟁이","둥글둥글한","멍청한"};
+        String[] secondname = {"고래","사슴","사자","호랑이","맥주","윤석열"};
+
+        Random rand = new Random();
+        int firstIndex = rand.nextInt(fistname.length);
+        int secondIndex = rand.nextInt(secondname.length);
+        int number = rand.nextInt(10000);
+
+        String nickname = fistname[firstIndex] + secondname[secondIndex] + number;
+
+        return nickname;
     }
 }
