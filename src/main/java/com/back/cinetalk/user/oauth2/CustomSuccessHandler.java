@@ -6,6 +6,7 @@ import com.back.cinetalk.user.dto.RefreshDTO;
 import com.back.cinetalk.user.entity.RefreshEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
+import com.back.cinetalk.user.service.NicknameGenerator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,11 +29,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
+    private final NicknameGenerator nicknameGenerator;
 
-    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository) {
+    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository, NicknameGenerator nicknameGenerator) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
         this.userRepository = userRepository;
+        this.nicknameGenerator = nicknameGenerator;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         //닉네임이 존재할 경우
         if(nickname == null){
 
-            String Newnickname = getNickName();
+            String Newnickname = nicknameGenerator.getNickname();
 
             userRepository.updateNicknameByEmail(email,Newnickname);
 
