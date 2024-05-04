@@ -72,7 +72,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             userRepository.updateNicknameByEmail(email,Newnickname);
 
-            response.sendRedirect("http://localhost:63342/front/index.html");
+            response.sendRedirect("http://localhost:63342/front/nickName.html");
         }
         //닉네임이 존재하지 않을 경우
         else{
@@ -103,21 +103,5 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         RefreshEntity refreshEntity = RefreshEntity.ToRefreshEntity(refreshDTO);
 
         refreshRepository.save(refreshEntity);
-    }
-
-    public String getNickName(){
-
-        String[] fistname = {"멋있는", "예쁜", "화끈한", "힙합멋쟁이", "둥글둥글한", "멍청한", "밝은", "섹시한", "우아한", "긴장감있는", "유쾌한", "명랑한"};
-        String[] secondname =
-                {"고양이", "강아지", "거북이", "토끼", "뱀", "사자", "호랑이", "표범", "치타", "기린", "코끼리", "코뿔소", "하마", "악어",
-                        "펭귄", "부엉이", "올빼미", "곰", "돼지", "소", "닭", "독수리", "타조"};
-
-
-        Random rand = new Random();
-        int firstIndex = rand.nextInt(fistname.length);
-        int secondIndex = rand.nextInt(secondname.length);
-        int number = rand.nextInt(10000);
-
-        return fistname[firstIndex] + secondname[secondIndex] + number;
     }
 }

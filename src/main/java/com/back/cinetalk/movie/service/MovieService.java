@@ -5,7 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +21,15 @@ import java.util.Map;
 
 @Service
 public class MovieService {
+
+    private final WebClient webClient;
+
+    private String key = "b0eaad9be154d293c5c38849e83705a7";
+
+    public MovieService(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl("http://www.kobis.or.kr/kobisopenapi/webservice")
+                .build();
+    }
 
     //TODO apiCall 하는 api
     public JsonNode CallAPI(String url) throws IOException {
@@ -97,5 +112,25 @@ public class MovieService {
         }
 
         return movie;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<?> MainList() {
+
+        Map<String, Object> responseBody = webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/rest/boxoffice/searchDailyBoxOfficeList.json")
+                        .queryParam("key", key)
+                        .queryParam("targetDt", "20240503")
+                        .build())
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+
+        Map<String,Object> result = (Map<String, Object>) responseBody.get("boxOfficeResult");
+
+        List<Map<String,Object>> list = (List<Map<String, Object>>) result.get("dailyBoxOfficeList");
+
+        // 성공 메시지 반환
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }
