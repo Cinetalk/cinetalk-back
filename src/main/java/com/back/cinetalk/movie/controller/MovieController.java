@@ -21,7 +21,7 @@ public class MovieController {
     @PostMapping("/list")
     public List<Map<String,Object>> list() throws IOException {
 
-        return movieService.list1();
+        return movieService.nowPlayingList();
     }
 
     @PostMapping("/MainList")
