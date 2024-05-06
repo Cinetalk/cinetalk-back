@@ -1,136 +1,115 @@
 package com.back.cinetalk.movie.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
+import com.back.cinetalk.movie.dto.MovieDTO;
+import com.back.cinetalk.movie.entity.MovieEntity;
+import com.back.cinetalk.movie.repository.MovieRepository;
+import com.back.cinetalk.user.dto.UserDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class MovieService {
 
-    private final WebClient webClient;
+    private final getNewMovie getNewMovie;
 
-    private String key = "b0eaad9be154d293c5c38849e83705a7";
+    private final MovieRepository movieRepository;
 
-    public MovieService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://www.kobis.or.kr/kobisopenapi/webservice")
-                .build();
+    @SuppressWarnings("unchecked")
+    public Map<String,Object> CallAPI(String url) throws IOException{
+
+        WebClient webClient = WebClient.create();
+
+        return (Map<String, Object>) webClient.get()
+                .uri(url)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhYTdkZDg2MGJkYzJmNzAwNDI2NjcwNmQ4ZGJhYzI1NSIsInN1YiI6IjY1OWJlMzI3YmQ1ODhiMjA5OThkNDI3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.TydEZPf9nrIucJSP8WIfQszoJzX9hXJXv2nNTaTIJo4")
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
     }
 
-    //TODO apiCall 하는 api
-    public JsonNode CallAPI(String url) throws IOException {
-        //1a4fdfbb72ca9489d8eb9487d7a4ccff4434ec32
-        OkHttpClient client = new OkHttpClient();
+    public List<Map<String, Object>> nowPlayingList() throws IOException {
 
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .addHeader("accept", "application/json")
-                .addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhYTdkZDg2MGJkYzJmNzAwNDI2NjcwNmQ4ZGJhYzI1NSIsInN1YiI6IjY1OWJlMzI3YmQ1ODhiMjA5OThkNDI3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.TydEZPf9nrIucJSP8WIfQszoJzX9hXJXv2nNTaTIJo4")
-                .build();
+        LocalDate today = LocalDate.now();
 
-        Response response = client.newCall(request).execute();
+        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        String jsonData = response.body().string();
+        //String yesterdayFormatted = today.format(formatter);
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        System.out.println(today);
 
-        JsonNode result = objectMapper.readTree(jsonData);
+        List<MovieEntity> lists = movieRepository.findByRegdate(today);
+
+        List<Map<String,Object>> result = new ArrayList<>();
+
+        if(lists.isEmpty()){
+
+            List<String> nowPlayingName = getNewMovie.MainList();
+
+            for (String query : nowPlayingName) {
+
+                Map<String,Object> map = getOneByName(query);
+
+                if(map != null){
+
+                    MovieDTO movieDTO = new MovieDTO();
+
+                    movieDTO.setMovie_id(String.valueOf(map.get("id")));
+                    movieDTO.setMovienm((String) map.get("title"));
+
+                    MovieEntity movieEntity = MovieEntity.ToMovieEntity(movieDTO);
+
+                    movieRepository.save(movieEntity);
+
+                    result.add(map);
+                }
+            }
+            //map.put("poster_path","https://image.tmdb.org/t/p/w500"+poster_path);
+        }else{
+
+            for (MovieEntity movieEntity : lists) {
+
+                result.add(getOneByID(movieEntity.getMovie_id()));
+            }
+        }
 
         return result;
     }
 
-    public List<Map<String,Object>> list1() throws IOException {
+    public Map<String, Object> getOneByName(String query) throws IOException {
 
-        String url = "https://api.themoviedb.org/3/movie/top_rated?language=ko-KR&page=1";
+        log.info("query : "+query);
 
-        JsonNode rootNode = CallAPI(url);
+        String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query="+query;
 
-        JsonNode resultsNode = rootNode.get("results");
+        Map<String, Object> responsebody = CallAPI(url);
 
-        List<Map<String,Object>> movie = new ArrayList<>();
+        List<Map<String,Object>> resultList = (List<Map<String, Object>>) responsebody.get("results");
 
-        if (resultsNode.isArray()) {
-            for (JsonNode movieNode : resultsNode) {
-                String title = movieNode.get("title").asText();
-                String overview = movieNode.get("overview").asText();
-                String id = movieNode.get("id").asText();
-                String poster_path = movieNode.get("poster_path").asText();
-                Map<String,Object> map = new HashMap<>();
-
-                map.put("title",title);
-                map.put("id",id);
-                map.put("overview",overview);
-                map.put("poster_path","https://image.tmdb.org/t/p/w500"+poster_path);
-
-                movie.add(map);
-            }
+        if(!resultList.isEmpty()){
+            return resultList.get(0);
+        }else {
+            return null;
         }
-
-        return movie;
     }
 
-    public List<Map<String,Object>> nowPlayingList() throws IOException {
+    public Map<String, Object> getOneByID(String movie_id) throws IOException {
 
-        String url = "https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1";
+        String url = "https://api.themoviedb.org/3/movie/"+movie_id+"?language=ko";
 
-        JsonNode rootNode = CallAPI(url);
-
-        JsonNode resultsNode = rootNode.get("results");
-
-        List<Map<String,Object>> movie = new ArrayList<>();
-
-        if (resultsNode.isArray()) {
-            for (JsonNode movieNode : resultsNode) {
-                String title = movieNode.get("title").asText();
-                String id = movieNode.get("id").asText();
-                String overview = movieNode.get("overview").asText();
-                String poster_path = movieNode.get("poster_path").asText();
-                Map<String,Object> map = new HashMap<>();
-
-                map.put("title",title);
-                map.put("id",id);
-                map.put("overview",overview);
-                map.put("poster_path","https://image.tmdb.org/t/p/w500"+poster_path);
-
-                movie.add(map);
-            }
-        }
-
-        return movie;
-    }
-
-    @SuppressWarnings("unchecked")
-    public ResponseEntity<?> MainList() {
-
-        Map<String, Object> responseBody = webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/rest/boxoffice/searchDailyBoxOfficeList.json")
-                        .queryParam("key", key)
-                        .queryParam("targetDt", "20240503")
-                        .build())
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
-
-        Map<String,Object> result = (Map<String, Object>) responseBody.get("boxOfficeResult");
-
-        List<Map<String,Object>> list = (List<Map<String, Object>>) result.get("dailyBoxOfficeList");
-
-        // 성공 메시지 반환
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return CallAPI(url);
     }
 }

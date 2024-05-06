@@ -2,7 +2,6 @@ package com.back.cinetalk.movie.controller;
 
 import com.back.cinetalk.movie.service.MovieService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,14 +18,14 @@ public class MovieController {
     private final MovieService movieService;
 
     @PostMapping("/list")
-    public List<Map<String,Object>> list() throws IOException {
+    public List<Map<String, Object>> list() throws IOException {
 
         return movieService.nowPlayingList();
     }
 
-    @PostMapping("/MainList")
-    public ResponseEntity<?> MainList(){
+    @PostMapping("/test")
+    public Map<String, Object> getSearchlist(String query) throws IOException {
 
-        return movieService.MainList();
+        return movieService.getOneByName(query);
     }
 }
