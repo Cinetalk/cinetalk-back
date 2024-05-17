@@ -4,7 +4,7 @@ on:
     types: [opend, synchronize, closed]
     branches: [main]
     paths:
-      - 'my-app/**'
+      - 'src/**'
 jobs:
   test:
     if: github.event.action == 'opened' || github.event.action == 'synchronize'
