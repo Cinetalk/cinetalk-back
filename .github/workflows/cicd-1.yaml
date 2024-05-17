@@ -1,7 +1,7 @@
 name: cicd-1
 on:
   pull_request:
-    types: [opened, synchronize, closed]
+    types: [opend, synchronize, closed]
     branches: [main]
     paths:
       - 'cinetalk-back/**'
@@ -10,17 +10,17 @@ jobs:
     if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
     steps:
-    - name: checkout
-      uses: action/checkout@v4
+      - name: checkout
+        uses: actions/checkout@v4
   image-build:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.mergerd == true
     runs-on: ubuntu-latest
     steps:
-    - name: checkout
-      uses: actions/checkout@v4
+      - name: checkout
+        uses: actions/checkout@v4
   deploy:
     runs-on: ubuntu-latest
     needs: [image-build]
     steps:
-    - name: checkout
-      uses: actions/checkout@v4
+      - name: checkout
+        uses: actions/checkout@v4
