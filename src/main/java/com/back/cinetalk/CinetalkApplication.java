@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 //
+// cicd 구성 중
 public class CinetalkApplication {
 
     public static void main(String[] args) {
