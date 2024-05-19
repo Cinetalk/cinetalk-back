@@ -1,44 +1,20 @@
-package com.back.cinetalk.movie.controller;
+package com.back.cinetalk.movie.service;
 
-import com.back.cinetalk.movie.service.MovieService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
-@RestController
-@RequestMapping("/movie")
-@RequiredArgsConstructor
-public class MovieController {
+@Component
+public class MainColorExtract {
 
-    private final MovieService movieService;
+    public String ColorExtract(String url) throws IOException {
 
-    @PostMapping("/list")
-    public List<Map<String, Object>> list() throws IOException {
-
-        return movieService.nowPlayingList();
-    }
-
-    @PostMapping("/test")
-    public Map<String, Object> getSearchlist(String query) throws IOException {
-
-        return movieService.getOneByName(query);
-    }
-
-    @PostMapping("/imagetest")
-    public String imagetest(@RequestParam(value = "url") String url)throws  Exception{
-
-        // 이미지 다운로드
+        System.out.println(url);
+        // 이미지 파일 로드
         BufferedImage image = ImageIO.read(new URL(url));
 
         // 이미지의 폭과 높이
