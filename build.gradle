@@ -2,10 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.4'
-    id 'war'
-}
-bootWar {
-    enabled =true
+    id 'jar'
 }
 
 group = 'com.example'
@@ -43,8 +40,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
-    // war 파일 배포 변경으로 tomcat 추가
-    implementation 'org.springframework.boot:spring-boot-starter-tomcat'
 }
 
 
