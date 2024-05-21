@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +41,21 @@ public class FindController {
     @ApiResponse(responseCode = "200",description = "연관 검색어 출력",content = @Content(schema = @Schema(implementation = HttpResponse.class)))
     public ResponseEntity<?> findText(@RequestParam(value = "query")String query) throws IOException {
 
-        Map<String, Object> oneByName = movieService.getOneByName(query);
-
         List<String> result = findService.findText(query);
+
+        return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+    @PostMapping("/findResult")
+    @Operation(summary = "검색 결과",description = "검색어를 기반으로 영화,리뷰를 불러오는 프로세스")
+    @ApiResponse(responseCode = "200",description = "결과 출력",content = @Content(schema = @Schema(implementation = HttpResponse.class)))
+    public ResponseEntity<?> findResult(@RequestParam(value = "query")String query) throws Exception {
+
+        List<Map<String, Object>> movielist = findService.MovieResult(query);
+
+        Map<String,Object> result = new HashMap<>();
+
+        result.put("movielist",movielist);
 
         return new ResponseEntity<>(result,HttpStatus.OK);
     }

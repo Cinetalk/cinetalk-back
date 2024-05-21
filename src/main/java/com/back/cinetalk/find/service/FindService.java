@@ -52,4 +52,15 @@ public class FindService {
 
         return returnList;
     }
+
+    public List<Map<String,Object>> MovieResult(String query)throws Exception{
+
+        String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query="+query;
+
+        Map<String, Object> list = movieService.CallAPI(url);
+
+        List<Map<String,Object>> resultlist = (List<Map<String, Object>>) list.get("results");
+
+        return resultlist;
+    }
 }
