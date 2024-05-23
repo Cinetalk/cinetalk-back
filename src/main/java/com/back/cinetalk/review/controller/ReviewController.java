@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/review")
 public class ReviewController {
 
-    @PostMapping("/save")
+/*    @PostMapping("/save")
     public ResponseEntity<?> ReviewSave(ReviewDTO reviewDTO){
 
 
 
-    }
+    }*/
 
 }
