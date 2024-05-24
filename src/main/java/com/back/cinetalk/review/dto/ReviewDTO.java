@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Schema(description = "리뷰 데이터 담기는 DTO")
@@ -26,7 +27,7 @@ public class ReviewDTO {
 
     private int content;
 
-    private LocalDate regdate;
+    private LocalDateTime regdate;
 
     public static ReviewDTO ToReviewDTO(ReviewEntity reviewEntity){
         return ReviewDTO.builder()
