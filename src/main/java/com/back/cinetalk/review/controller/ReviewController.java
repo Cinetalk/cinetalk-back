@@ -28,11 +28,12 @@ public class ReviewController {
     @PostMapping("/save")
     @Operation(summary = "리뷰 등록",description = "리뷰 등록하는 프로세스")
     @ApiResponse(responseCode = "200",description = "등록완료",
-                content = @Content(schema = @Schema(implementation = ReviewDTO.class
-                )))
+                content = @Content(schema = @Schema(implementation = ReviewDTO.class)))
     public ResponseEntity<?> ReviewSave(ReviewDTO reviewDTO){
 
-        return reviewService.reviewSave(reviewDTO);
+        reviewService.reviewSave(reviewDTO);
+
+        return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
 }

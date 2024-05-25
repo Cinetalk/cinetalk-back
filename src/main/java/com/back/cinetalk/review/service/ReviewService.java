@@ -14,12 +14,12 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    public ResponseEntity<?> reviewSave(ReviewDTO reviewDTO){
+    public void reviewSave(ReviewDTO reviewDTO){
 
         ReviewEntity reviewEntity= ReviewEntity.ToReviewEntity(reviewDTO);
 
         reviewRepository.save(reviewEntity);
-
-        return new ResponseEntity<>("success", HttpStatus.OK);
     }
+
+
 }
