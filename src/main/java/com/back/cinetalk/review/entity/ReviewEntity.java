@@ -7,7 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Table(name = "Review")
@@ -28,11 +29,11 @@ public class ReviewEntity {
 
     private int content;
 
-    private LocalDate regdate;
+    private LocalDateTime regdate;
 
     @PrePersist
     public void prePersist() {
-        this.regdate = LocalDate.now(); // 현재 날짜를 설정
+        this.regdate = LocalDateTime.now(); // 현재 날짜를 설정
     }
 
     public static ReviewEntity ToReviewEntity(ReviewDTO reviewDTO){

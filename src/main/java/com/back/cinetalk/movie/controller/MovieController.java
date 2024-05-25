@@ -1,11 +1,14 @@
 package com.back.cinetalk.movie.controller;
 
 import com.back.cinetalk.movie.service.MovieService;
+import com.back.cinetalk.review.dto.ReviewDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.coyote.Response;
+import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -24,6 +27,10 @@ public class MovieController {
     private final MovieService movieService;
 
     @PostMapping("/list")
+    @Operation(summary = "영화 리스트",description = "최신 영화 리스트")
+    @ApiResponse(responseCode = "200",description = "출력완료",
+            content = @Content(schema = @Schema(implementation = ResponseBody.class
+            )))
     public List<Map<String, Object>> list() throws IOException {
 
         return movieService.nowPlayingList();
