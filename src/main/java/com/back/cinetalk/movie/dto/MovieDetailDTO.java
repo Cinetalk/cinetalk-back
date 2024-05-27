@@ -37,4 +37,6 @@ public class MovieDetailDTO {
     private double score;           // 평점 (tmdb)
 
     private int runningTime;        // 러닝타임
+
+    private List<ImageDTO> imageDTOList;
 }

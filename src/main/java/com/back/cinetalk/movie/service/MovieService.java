@@ -118,27 +118,33 @@ public class MovieService {
     // 영화 상세 정보
     public MovieDetailDTO getMovieDetail(String movie_id) throws IOException {
 
-        String url = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=credits,release_dates&language=ko";
-        Map<String, Object> stringObjectMap = CallAPI(url);
+        String url1 = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=images,credits,release_dates&language=ko";
+        Map<String, Object> stringObjectMap1 = CallAPI(url1);
 
-        List<GenreDTO> genres = extractGenres((List<Map<String, Object>>) stringObjectMap.get("genres"));
-        List<CastDTO> cast = extractCast((List<Map<String, Object>>) ((Map<String, Object>) stringObjectMap.get("credits")).get("cast"));
-        List<CrewDTO> crew = extractCrew((List<Map<String, Object>>) ((Map<String, Object>) stringObjectMap.get("credits")).get("crew"));
-        String contentRating = extractContentRating(stringObjectMap);
+        List<GenreDTO> genreList = extractGenres((List<Map<String, Object>>) stringObjectMap1.get("genres"));
+        List<CastDTO> castList = extractCast((List<Map<String, Object>>) ((Map<String, Object>) stringObjectMap1.get("credits")).get("cast"));
+        List<CrewDTO> crewList = extractCrew((List<Map<String, Object>>) ((Map<String, Object>) stringObjectMap1.get("credits")).get("crew"));
+        String contentRating = extractContentRating(stringObjectMap1);
+
+        String url2 = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=images";
+        Map<String, Object> stringObjectMap2 = CallAPI(url2);
+
+        List<ImageDTO> imageList = extractImages((List<Map<String, Object>>) ((Map<String, Object>) stringObjectMap2.get("images")).get("backdrops"));
 
         return MovieDetailDTO.builder()
-                .posterImg((String) stringObjectMap.get("poster_path"))
-                .backGroundImg((String) stringObjectMap.get("backdrop_path"))
-                .title((String) stringObjectMap.get("title"))
-                .genreDTOList(genres)
-                .overview((String) stringObjectMap.get("overview"))
-                .castDTOList(cast)
-                .crewDTOList(crew)
-                .releaseDate((String) stringObjectMap.get("release_date"))
+                .posterImg((String) stringObjectMap1.get("poster_path"))
+                .backGroundImg((String) stringObjectMap1.get("backdrop_path"))
+                .title((String) stringObjectMap1.get("title"))
+                .genreDTOList(genreList)
+                .overview((String) stringObjectMap1.get("overview"))
+                .castDTOList(castList)
+                .crewDTOList(crewList)
+                .releaseDate((String) stringObjectMap1.get("release_date"))
                 .contentRating(contentRating)
-                .status((String) stringObjectMap.get("status"))
-                .score(Math.round((Double) stringObjectMap.get("vote_average") * 10) / 10.0)
-                .runningTime((Integer) stringObjectMap.get("runtime"))
+                .status((String) stringObjectMap1.get("status"))
+                .score(Math.round((Double) stringObjectMap1.get("vote_average") * 10) / 10.0)
+                .runningTime((Integer) stringObjectMap1.get("runtime"))
+                .imageDTOList(imageList)
                 .build();
     }
 
@@ -157,6 +163,12 @@ public class MovieService {
     private List<CrewDTO> extractCrew(List<Map<String, Object>> crewMapList) {
         return crewMapList.stream()
                 .map(this::mapToCrewDTO)
+                .collect(Collectors.toList());
+    }
+
+    private List<ImageDTO> extractImages(List<Map<String, Object>> imagesMapList) {
+        return imagesMapList.stream()
+                .map(this::mapToImageDTO)
                 .collect(Collectors.toList());
     }
 
@@ -186,9 +198,18 @@ public class MovieService {
                 .build();
     }
 
-    private String extractContentRating(Map<String, Object> stringObjectMap) {
+    private ImageDTO mapToImageDTO(Map<String, Object> imageMap) {
+        return ImageDTO.builder()
+                .filePath((String) imageMap.get("file_path"))
+                .aspectRatio((Double) imageMap.get("aspect_ratio"))
+                .height((Integer) imageMap.get("height"))
+                .width((Integer) imageMap.get("width"))
+                .build();
+    }
+
+    private String extractContentRating(Map<String, Object> stringObjectMap1) {
         // release_dates 키의 값 확인
-        Map<String, Object> releaseDatesMap = (Map<String, Object>) stringObjectMap.get("release_dates");
+        Map<String, Object> releaseDatesMap = (Map<String, Object>) stringObjectMap1.get("release_dates");
 
         if (releaseDatesMap == null) {
             return "";      // release_dates 데이터가 없는 경우
