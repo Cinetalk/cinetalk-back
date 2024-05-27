@@ -1,5 +1,6 @@
 package com.back.cinetalk.movie.controller;
 
+import com.back.cinetalk.movie.dto.MovieDetailDTO;
 import com.back.cinetalk.movie.service.MovieService;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,11 @@ public class MovieController {
     public Map<String, Object> getSearchlist(String query) throws IOException {
 
         return movieService.getOneByName(query);
+    }
+
+    @GetMapping("/{movie_id}")
+    public MovieDetailDTO getMovieDetails(@PathVariable String movie_id) throws IOException {
+        return movieService.getMovieDetail(movie_id);
     }
 
     @PostMapping("/imagetest")
