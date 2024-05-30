@@ -13,7 +13,7 @@ java {
 }
 jib {
     from {
-        image = 'openjdk:21-jre-slim'
+        image = 'openjdk:21-jdk-slim'
     }
     to {
         image = 'cinetalk-back'
@@ -43,12 +43,11 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    runtimeOnly 'com.h2database:h2'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     compileOnly 'org.projectlombok:lombok'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.1.2'
+    implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
