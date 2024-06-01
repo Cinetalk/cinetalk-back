@@ -4,6 +4,14 @@ import com.back.cinetalk.find.dto.FindDTO;
 import com.back.cinetalk.find.entity.FindEntity;
 import com.back.cinetalk.find.repository.FindRepository;
 import com.back.cinetalk.movie.service.MovieService;
+import com.back.cinetalk.review.dto.ReviewDTO;
+import com.back.cinetalk.review.entity.QReviewEntity;
+import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.review.repository.ReviewRepository;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +27,9 @@ import java.util.Map;
 public class FindService {
 
     private final FindRepository findRepository;
+    private final ReviewRepository reviewRepository;
     private final MovieService movieService;
+    private final JPAQueryFactory queryFactory;
 
 
     public ResponseEntity<?> WordSave(String keword){
@@ -62,5 +72,28 @@ public class FindService {
         List<Map<String,Object>> resultlist = (List<Map<String, Object>>) list.get("results");
 
         return resultlist;
+    }
+
+    public List<ReviewDTO> ReviewResult(String searchText) {
+
+        QReviewEntity review = QReviewEntity.reviewEntity;
+
+        BooleanExpression predicate = review.content.like("%" + searchText + "%");
+
+        List<ReviewEntity>  result = queryFactory.selectFrom(review)
+                .where(predicate)
+                .orderBy(review.regdate.asc())
+                .fetch();
+
+        List<ReviewDTO> returnList = new ArrayList<>();
+
+        for (ReviewEntity reviewEntity : result) {
+
+            ReviewDTO dto = ReviewDTO.ToReviewDTO(reviewEntity);
+
+            returnList.add(dto);
+        }
+
+        return returnList;
     }
 }
