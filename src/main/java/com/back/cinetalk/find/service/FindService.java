@@ -74,11 +74,11 @@ public class FindService {
         return resultlist;
     }
 
-    public List<ReviewDTO> ReviewResult(String searchText) {
+    public List<ReviewDTO> ReviewResult(String query) {
 
         QReviewEntity review = QReviewEntity.reviewEntity;
 
-        BooleanExpression predicate = review.content.like("%" + searchText + "%");
+        BooleanExpression predicate = review.content.like("%" + query + "%");
 
         List<ReviewEntity>  result = queryFactory.selectFrom(review)
                 .where(predicate)
