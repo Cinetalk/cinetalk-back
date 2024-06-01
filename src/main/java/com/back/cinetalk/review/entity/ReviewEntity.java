@@ -23,11 +23,13 @@ public class ReviewEntity {
 
     private int movie_id;
 
-    private int member_id;
+    private String movie_name;
 
-    private int star;
+    private int user_id;
 
-    private int content;
+    private Double star;
+
+    private String content;
 
     private LocalDateTime regdate;
 
@@ -40,7 +42,8 @@ public class ReviewEntity {
         return ReviewEntity.builder()
                 .id(reviewDTO.getId())
                 .movie_id(reviewDTO.getMovie_id())
-                .member_id(reviewDTO.getMember_id())
+                .movie_name(reviewDTO.getMovie_name())
+                .user_id(reviewDTO.getUser_id())
                 .star(reviewDTO.getStar())
                 .content(reviewDTO.getContent())
                 .regdate(reviewDTO.getRegdate())

@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.http.HttpResponse;
@@ -51,12 +48,22 @@ public class FindController {
     @ApiResponse(responseCode = "200",description = "결과 출력",content = @Content(schema = @Schema(implementation = HttpResponse.class)))
     public ResponseEntity<?> findResult(@RequestParam(value = "query")String query) throws Exception {
 
-        List<Map<String, Object>> movielist = findService.MovieResult(query);
-
         Map<String,Object> result = new HashMap<>();
 
+
+        List<Map<String, Object>> movielist = findService.MovieResult(query);
         result.put("movielist",movielist);
 
+
+
         return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+    @GetMapping("/findReview")
+    @Operation(summary = "(검색)리뷰 조회",description = "검색어에 따른 리뷰 조회 프로세스")
+    public ResponseEntity<?> ReviewSearch(@RequestParam(value = "query")String query){
+
+
+        return new ResponseEntity<>("succcess",HttpStatus.OK);
     }
 }
