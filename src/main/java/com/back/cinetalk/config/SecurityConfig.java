@@ -111,7 +111,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/login", "/join","/reissue","/movie/**","/find/**").permitAll()
+                        .requestMatchers("/login", "/join","/reissue","/movie/**","/find/**","/review/**").permitAll()
                         .requestMatchers("/user").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated());
