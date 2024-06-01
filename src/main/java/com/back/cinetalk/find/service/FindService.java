@@ -4,6 +4,8 @@ import com.back.cinetalk.find.dto.FindDTO;
 import com.back.cinetalk.find.entity.FindEntity;
 import com.back.cinetalk.find.repository.FindRepository;
 import com.back.cinetalk.movie.service.MovieService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,6 @@ public class FindService {
 
     private final FindRepository findRepository;
     private final MovieService movieService;
-
 
     public ResponseEntity<?> WordSave(String keword){
 
@@ -63,4 +64,5 @@ public class FindService {
 
         return resultlist;
     }
+
 }

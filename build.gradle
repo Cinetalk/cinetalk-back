@@ -11,11 +11,6 @@ java {
     sourceCompatibility = '21'
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
 apply plugin: 'war'
 
 repositories {
@@ -48,3 +43,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+compileJava {
+    options.annotationProcessorPath = configurations.annotationProcessor
+}
