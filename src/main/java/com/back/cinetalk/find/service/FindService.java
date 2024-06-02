@@ -7,11 +7,8 @@ import com.back.cinetalk.movie.service.MovieService;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
-import com.back.cinetalk.review.repository.ReviewRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +24,6 @@ import java.util.Map;
 public class FindService {
 
     private final FindRepository findRepository;
-    private final ReviewRepository reviewRepository;
     private final MovieService movieService;
     private final JPAQueryFactory queryFactory;
 
