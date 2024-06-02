@@ -1,15 +1,35 @@
 package com.back.cinetalk.movie.service;
 
 import com.back.cinetalk.movie.dto.MovieDTO;
+import com.back.cinetalk.movie.dto.ReviewByUserDTO;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
+import com.back.cinetalk.rate.entity.QRateEntity;
+import com.back.cinetalk.rereview.entity.QReReviewEntity;
+import com.back.cinetalk.review.dto.ReviewDTO;
+import com.back.cinetalk.review.entity.QReviewEntity;
+import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.user.entity.QUserEntity;
+import com.back.cinetalk.user.jwt.JWTUtil;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +41,8 @@ public class MovieMainService {
     private final getNewMovie getNewMovie;
     private final MovieRepository movieRepository;
     private final CallAPI callAPI;
+    public final JWTUtil jwtUtil;
+    private final JPAQueryFactory queryFactory;
 
     public List<Map<String, Object>> nowPlayingList() throws IOException {
 
@@ -87,5 +109,56 @@ public class MovieMainService {
         String url = "https://api.themoviedb.org/3/movie/" + movie_id + "?language=ko";
 
         return callAPI.callAPI(url);
+    }
+
+    public List<Map<String,Object>> ReviewByUser(HttpServletRequest request) throws IOException {
+
+        String accessToken= request.getHeader("access");
+
+        String email = jwtUtil.getEmail(accessToken);
+
+        QReviewEntity review = QReviewEntity.reviewEntity;
+        QUserEntity user = QUserEntity.userEntity;
+        QReReviewEntity reReview = QReReviewEntity.reReviewEntity;
+        QRateEntity rate = QRateEntity.rateEntity;
+
+        List<Tuple> result = queryFactory
+                .select(review,
+                        JPAExpressions.select(reReview.count()).from(reReview).where(reReview.review_id.eq(review.id.intValue())),
+                        JPAExpressions.select(rate.count()).from(rate).where(rate.review_id.eq(review.id.intValue()))
+                )
+                .from(review)
+                .leftJoin(user).on(review.user_id.eq(user.id.intValue()))
+                .where(user.email.eq(email))
+                .orderBy(review.regdate.asc())
+                .fetch();
+
+        List<Map<String,Object>> resultlist = new ArrayList<>();
+
+        for (Tuple tuple : result) {
+
+            Map<String,Object> resultMap = new HashMap<>();
+
+            ReviewDTO reviewDTO = ReviewDTO.ToReviewDTO(tuple.get(review));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
+            String formattedDate = reviewDTO.getRegdate().format(formatter);
+            Long reReviewCount = tuple.get(1, Long.class);
+            Long rateCount = tuple.get(2, Long.class);
+            Map<String, Object> oneByID = getOneByID(String.valueOf(reviewDTO.getMovie_id()));
+            String poster = (String) oneByID.get("poster_path");
+
+            resultMap.put("review_id",reviewDTO.getId());
+            resultMap.put("movie_id",reviewDTO.getMovie_id());
+            resultMap.put("user_id",reviewDTO.getUser_id());
+            resultMap.put("star",reviewDTO.getStar());
+            resultMap.put("content",reviewDTO.getContent());
+            resultMap.put("reReviewCount",reReviewCount);
+            resultMap.put("likeCount",rateCount);
+            resultMap.put("poster",poster);
+
+            resultlist.add(resultMap);
+        }
+
+        return resultlist;
     }
 }
