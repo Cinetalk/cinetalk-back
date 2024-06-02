@@ -8,12 +8,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 
+//사진 url 입력시 바이트별로 rgb값의 평균값을 hex색상코드로 반환 함수 --김태욱
 @Component
 public class MainColorExtract {
 
     public String ColorExtract(String url) throws IOException {
-
-        System.out.println(url);
+        
         // 이미지 파일 로드
         BufferedImage image = ImageIO.read(new URL(url));
 

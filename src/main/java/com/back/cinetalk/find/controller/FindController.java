@@ -1,7 +1,7 @@
 package com.back.cinetalk.find.controller;
 
 import com.back.cinetalk.find.service.FindService;
-import com.back.cinetalk.movie.service.MovieService;
+import com.back.cinetalk.movie.service.MovieDetailService;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class FindController {
 
     private final FindService findService;
-    private final MovieService movieService;
+    private final MovieDetailService movieDetailService;
 
     @PostMapping("/findSave")
     @Operation(summary = "검색어 저장",description = "인기 검색어 순위를 위한 검색어 저장 프로세스")
