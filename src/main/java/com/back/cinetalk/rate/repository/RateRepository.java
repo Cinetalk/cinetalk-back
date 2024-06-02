@@ -1,4 +1,4 @@
-package com.back.cinetalk.review.repository;
+package com.back.cinetalk.rate.repository;
 
 import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
@@ -7,6 +7,6 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , QuerydslPredicateExecutor<ReviewEntity> {
+public interface RateRepository extends JpaRepository<RateEntity, Long> , QuerydslPredicateExecutor<RateEntity> {
 
 }
