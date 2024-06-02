@@ -3,13 +3,15 @@ package com.back.cinetalk.find.service;
 import com.back.cinetalk.find.dto.FindDTO;
 import com.back.cinetalk.find.entity.FindEntity;
 import com.back.cinetalk.find.repository.FindRepository;
-import com.back.cinetalk.movie.service.MovieService;
+import com.back.cinetalk.movie.service.CallAPI;
+import com.back.cinetalk.movie.service.MovieDetailService;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Call;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ import java.util.Map;
 public class FindService {
 
     private final FindRepository findRepository;
-    private final MovieService movieService;
+    private final CallAPI callAPI;
     private final JPAQueryFactory queryFactory;
 
 
@@ -45,7 +47,7 @@ public class FindService {
 
         String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query="+query;
 
-        Map<String, Object> list = movieService.CallAPI(url);
+        Map<String, Object> list = callAPI.callAPI(url);
 
         List<Map<String,Object>> resultlist = (List<Map<String, Object>>) list.get("results");
 
@@ -63,7 +65,7 @@ public class FindService {
 
         String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query="+query;
 
-        Map<String, Object> list = movieService.CallAPI(url);
+        Map<String, Object> list = callAPI.callAPI(url);
 
         List<Map<String,Object>> resultlist = (List<Map<String, Object>>) list.get("results");
 
