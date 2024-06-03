@@ -31,10 +31,22 @@ public class MovieDetailService {
         List<CrewDTO> crewList = extractCrew((List<Map<String, Object>>) ((Map<String, Object>) stringObjectMap1.get("credits")).get("crew"));
         String contentRating = extractContentRating(stringObjectMap1);
 
+
         String url2 = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=images";
         Map<String, Object> stringObjectMap2 = callAPI.callAPI(url2);
-
         List<ImageDTO> imageList = extractImages((List<Map<String, Object>>) ((Map<String, Object>) stringObjectMap2.get("images")).get("backdrops"));
+
+        String language = "ko";
+        String url3 = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=videos&language=" + language;
+        Map<String, Object> stringObjectMap3 = callAPI.callAPI(url3);
+        List<String> videoList = extractVideoKeys((Map<String, Object>) stringObjectMap3.get("videos"));
+
+        if (videoList.isEmpty()) {
+            language = "en";
+            url3 = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=videos&language=" + language;
+            stringObjectMap3 = callAPI.callAPI(url3);
+            videoList = extractVideoKeys((Map<String, Object>) stringObjectMap3.get("videos"));
+        }
 
         return MovieDetailDTO.builder()
                 .posterImg("https://image.tmdb.org/t/p/original" + stringObjectMap1.get("poster_path"))
@@ -50,6 +62,7 @@ public class MovieDetailService {
                 .score(Math.round((Double) stringObjectMap1.get("vote_average") * 10) / 10.0)
                 .runningTime((Integer) stringObjectMap1.get("runtime"))
                 .imageDTOList(imageList)
+                .videoList(videoList)
                 .build();
     }
 
@@ -90,7 +103,7 @@ public class MovieDetailService {
                 .name((String) castMap.get("name"))
                 .character((String) castMap.get("character"))
                 .order((Integer) castMap.get("order"))
-                .profilePath(castMap.get("profile_path") == null? null : "https://image.tmdb.org/t/p/original" + castMap.get("profile_path"))
+                .profilePath(castMap.get("profile_path") == null ? null : "https://image.tmdb.org/t/p/original" + castMap.get("profile_path"))
                 .build();
     }
 
@@ -99,7 +112,7 @@ public class MovieDetailService {
                 .id((Integer) crewMap.get("id"))
                 .name((String) crewMap.get("name"))
                 .job((String) crewMap.get("job"))
-                .profilePath(crewMap.get("profile_path") == null? null : "https://image.tmdb.org/t/p/original" + crewMap.get("profile_path"))
+                .profilePath(crewMap.get("profile_path") == null ? null : "https://image.tmdb.org/t/p/original" + crewMap.get("profile_path"))
                 .build();
     }
 
@@ -143,6 +156,22 @@ public class MovieDetailService {
         }
 
         return ""; // 한국(KR)의 연령제한 데이터가 없는 경우
+    }
+
+    private List<String> extractVideoKeys(Map<String, Object> videosMap) {
+        if (videosMap == null) {
+            return List.of();
+        }
+
+        List<Map<String, Object>> results = (List<Map<String, Object>>) videosMap.get("results");
+
+        if (results == null || results.isEmpty()) {
+            return List.of();
+        }
+
+        return results.stream()
+                .map(video -> (String) video.get("key"))
+                .collect(Collectors.toList());
     }
 
 }

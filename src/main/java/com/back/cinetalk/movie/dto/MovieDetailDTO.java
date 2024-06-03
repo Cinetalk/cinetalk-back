@@ -39,4 +39,6 @@ public class MovieDetailDTO {
     private int runningTime;        // 러닝타임
 
     private List<ImageDTO> imageDTOList;
+
+    private List<String> videoList;
 }
