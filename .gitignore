@@ -36,9 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-## yml 파일 secret info
-*.yml
-application.yml
-
 ###
+
 .env
