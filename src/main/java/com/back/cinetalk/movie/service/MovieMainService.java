@@ -44,6 +44,11 @@ public class MovieMainService {
     public final JWTUtil jwtUtil;
     private final JPAQueryFactory queryFactory;
 
+    QReviewEntity review = QReviewEntity.reviewEntity;
+    QUserEntity user = QUserEntity.userEntity;
+    QReReviewEntity reReview = QReReviewEntity.reReviewEntity;
+    QRateEntity rate = QRateEntity.rateEntity;
+
     public List<Map<String, Object>> nowPlayingList() throws IOException {
 
         LocalDate today = LocalDate.now();
@@ -117,11 +122,6 @@ public class MovieMainService {
 
         String email = jwtUtil.getEmail(accessToken);
 
-        QReviewEntity review = QReviewEntity.reviewEntity;
-        QUserEntity user = QUserEntity.userEntity;
-        QReReviewEntity reReview = QReReviewEntity.reReviewEntity;
-        QRateEntity rate = QRateEntity.rateEntity;
-
         List<Tuple> result = queryFactory
                 .select(review,
                         JPAExpressions.select(reReview.count()).from(reReview).where(reReview.review_id.eq(review.id.intValue())),
@@ -158,5 +158,34 @@ public class MovieMainService {
         }
 
         return resultlist;
+    }
+
+    public List<Map<String,Object>> HidingPiece(){
+
+        List<Tuple> movielist = queryFactory
+                .select(review.count(),review.movie_id)
+                .from(review)
+                .groupBy(review.movie_id)
+                .orderBy(review.count().desc())
+                .orderBy(review.movie_id.asc())
+                .fetch();
+
+        for (Tuple tuple : movielist) {
+
+            int movieid = tuple.get(1,Integer.class);
+
+            Tuple result = (Tuple) queryFactory
+                    .select(review,
+                            JPAExpressions.select(rate.count()).from(rate).where(rate.review_id.eq(review.id.intValue()).and(rate.rate.eq(1))),
+                            JPAExpressions.select(reReview.count()).from(reReview).where(reReview.review_id.eq(review.id.intValue()))
+                    )
+                    .from(review)
+                    .where(review.movie_id.eq(movieid))
+                    .orderBy(JPAExpressions.select(rate.count()).from(rate).where(rate.rate.eq(1).and(rate.review_id.eq(review.id.intValue()))).exists().desc())
+                    .fetch();
+        }
+
+
+        return null;
     }
 }

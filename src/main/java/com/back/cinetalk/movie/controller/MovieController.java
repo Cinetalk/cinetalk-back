@@ -58,15 +58,9 @@ public class MovieController {
         return new ResponseEntity<>(maps, HttpStatus.OK);
     }
 
-
-
-
-
     @GetMapping("/imagecolor")
     public String imagecolor(@RequestParam(value = "url") String url)throws  Exception{
 
         return mainColorExtract.ColorExtract(url);
     }
-
-
 }
