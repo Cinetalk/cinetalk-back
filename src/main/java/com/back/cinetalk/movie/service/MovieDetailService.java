@@ -37,8 +37,8 @@ public class MovieDetailService {
         List<ImageDTO> imageList = extractImages((List<Map<String, Object>>) ((Map<String, Object>) stringObjectMap2.get("images")).get("backdrops"));
 
         return MovieDetailDTO.builder()
-                .posterImg((String) stringObjectMap1.get("poster_path"))
-                .backGroundImg((String) stringObjectMap1.get("backdrop_path"))
+                .posterImg("https://image.tmdb.org/t/p/original" + stringObjectMap1.get("poster_path"))
+                .backGroundImg("https://image.tmdb.org/t/p/original" + stringObjectMap1.get("backdrop_path"))
                 .title((String) stringObjectMap1.get("title"))
                 .genreDTOList(genreList)
                 .overview((String) stringObjectMap1.get("overview"))
@@ -90,7 +90,7 @@ public class MovieDetailService {
                 .name((String) castMap.get("name"))
                 .character((String) castMap.get("character"))
                 .order((Integer) castMap.get("order"))
-                .profilePath((String) castMap.get("profile_path"))
+                .profilePath(castMap.get("profile_path") == null? null : "https://image.tmdb.org/t/p/original" + castMap.get("profile_path"))
                 .build();
     }
 
@@ -99,13 +99,13 @@ public class MovieDetailService {
                 .id((Integer) crewMap.get("id"))
                 .name((String) crewMap.get("name"))
                 .job((String) crewMap.get("job"))
-                .profilePath((String) crewMap.get("profile_path"))
+                .profilePath(crewMap.get("profile_path") == null? null : "https://image.tmdb.org/t/p/original" + crewMap.get("profile_path"))
                 .build();
     }
 
     private ImageDTO mapToImageDTO(Map<String, Object> imageMap) {
         return ImageDTO.builder()
-                .filePath((String) imageMap.get("file_path"))
+                .filePath("https://image.tmdb.org/t/p/original" + imageMap.get("file_path"))
                 .aspectRatio((Double) imageMap.get("aspect_ratio"))
                 .height((Integer) imageMap.get("height"))
                 .width((Integer) imageMap.get("width"))
