@@ -1,5 +1,6 @@
 package com.back.cinetalk.review.entity;
 
+import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewEntity {
+public class ReviewEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,13 +32,6 @@ public class ReviewEntity {
 
     private String content;
 
-    private LocalDateTime regdate;
-
-    @PrePersist
-    public void prePersist() {
-        this.regdate = LocalDateTime.now(); // 현재 날짜를 설정
-    }
-
     public static ReviewEntity ToReviewEntity(ReviewDTO reviewDTO){
         return ReviewEntity.builder()
                 .id(reviewDTO.getId())
@@ -46,7 +40,6 @@ public class ReviewEntity {
                 .user_id(reviewDTO.getUser_id())
                 .star(reviewDTO.getStar())
                 .content(reviewDTO.getContent())
-                .regdate(reviewDTO.getRegdate())
                 .build();
     }
 }

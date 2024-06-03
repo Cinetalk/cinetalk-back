@@ -20,13 +20,11 @@ public class FindDTO {
 
     private String keword;
 
-    private LocalDate regdate;
 
     public static FindDTO ToFindDTO(FindEntity findEntity){
         return FindDTO.builder()
                 .id(findEntity.getId())
                 .keword(findEntity.getKeword())
-                .regdate(findEntity.getRegdate())
                 .build();
     }
 }

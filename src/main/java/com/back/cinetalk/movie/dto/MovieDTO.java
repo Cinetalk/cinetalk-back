@@ -22,14 +22,11 @@ public class MovieDTO {
 
     private String movienm;
 
-    private LocalDate regdate;
-
     public static MovieDTO ToMovieDTO(MovieEntity movieEntity){
         return MovieDTO.builder()
                 .id(movieEntity.getId())
                 .movie_id(movieEntity.getMovie_id())
                 .movienm(movieEntity.getMovienm())
-                .regdate(movieEntity.getRegdate())
                 .build();
     }
 }

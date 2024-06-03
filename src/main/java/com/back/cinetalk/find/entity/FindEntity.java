@@ -1,5 +1,6 @@
 package com.back.cinetalk.find.entity;
 
+import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.find.dto.FindDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FindEntity {
+public class FindEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,16 +26,10 @@ public class FindEntity {
 
     private LocalDate regdate;
 
-    @PrePersist
-    public void prePersist() {
-        this.regdate = LocalDate.now(); // 현재 날짜를 설정
-    }
-
     public static FindEntity ToFindEntity(FindDTO findDTO){
         return FindEntity.builder()
                 .id(findDTO.getId())
                 .keword(findDTO.getKeword())
-                .regdate(findDTO.getRegdate())
                 .build();
     }
 }
