@@ -25,15 +25,12 @@ public class ReReviewDTO {
 
     private String content;
 
-    private LocalDateTime regdate;
-
     public static ReReviewDTO ToReReviewDTO(ReReviewEntity rereviewEntity){
         return ReReviewDTO.builder()
                 .id(rereviewEntity.getId())
                 .review_id(rereviewEntity.getReview_id())
                 .user_id(rereviewEntity.getUser_id())
                 .content(rereviewEntity.getContent())
-                .regdate(rereviewEntity.getRegdate())
                 .build();
     }
 }

@@ -130,7 +130,7 @@ public class MovieMainService {
                 .from(review)
                 .leftJoin(user).on(review.user_id.eq(user.id.intValue()))
                 .where(user.email.eq(email))
-                .orderBy(review.regdate.asc())
+                .orderBy(review.createdAt.asc())
                 .fetch();
 
         List<Map<String,Object>> resultlist = new ArrayList<>();
@@ -140,8 +140,6 @@ public class MovieMainService {
             Map<String,Object> resultMap = new HashMap<>();
 
             ReviewDTO reviewDTO = ReviewDTO.ToReviewDTO(tuple.get(review));
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
-            String formattedDate = reviewDTO.getRegdate().format(formatter);
             Long reReviewCount = tuple.get(1, Long.class);
             Long rateCount = tuple.get(2, Long.class);
             Map<String, Object> oneByID = getOneByID(String.valueOf(reviewDTO.getMovie_id()));

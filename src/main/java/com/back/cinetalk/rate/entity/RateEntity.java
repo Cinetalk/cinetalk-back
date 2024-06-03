@@ -1,5 +1,6 @@
 package com.back.cinetalk.rate.entity;
 
+import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.rate.dto.RateDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RateEntity {
+public class RateEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
