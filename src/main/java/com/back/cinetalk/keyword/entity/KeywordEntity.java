@@ -1,8 +1,11 @@
 package com.back.cinetalk.keyword.entity;
 
+import com.back.cinetalk.config.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -11,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KeywordEntity {
+public class KeywordEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +25,4 @@ public class KeywordEntity {
     private String keyword;
 
     private int count;
-
-    public void updateCount(int count) {
-        this.count += count;
-    }
 }

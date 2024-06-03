@@ -4,14 +4,12 @@ import com.back.cinetalk.find.dto.FindDTO;
 import com.back.cinetalk.find.entity.FindEntity;
 import com.back.cinetalk.find.repository.FindRepository;
 import com.back.cinetalk.movie.service.CallAPI;
-import com.back.cinetalk.movie.service.MovieDetailService;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Call;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -78,9 +76,9 @@ public class FindService {
 
         BooleanExpression predicate = review.content.like("%" + query + "%");
 
-        List<ReviewEntity>  result = queryFactory.selectFrom(review)
+        List<ReviewEntity> result = queryFactory.selectFrom(review)
                 .where(predicate)
-                .orderBy(review.regdate.asc())
+                .orderBy(review.createdAt.asc())
                 .fetch();
 
         List<ReviewDTO> returnList = new ArrayList<>();

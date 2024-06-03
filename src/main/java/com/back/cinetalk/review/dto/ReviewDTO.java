@@ -29,8 +29,6 @@ public class ReviewDTO {
 
     private String content;
 
-    private LocalDateTime regdate;
-
     public static ReviewDTO ToReviewDTO(ReviewEntity reviewEntity){
         return ReviewDTO.builder()
                 .id(reviewEntity.getId())
@@ -39,7 +37,6 @@ public class ReviewDTO {
                 .user_id(reviewEntity.getUser_id())
                 .star(reviewEntity.getStar())
                 .content(reviewEntity.getContent())
-                .regdate(reviewEntity.getRegdate())
                 .build();
     }
 }

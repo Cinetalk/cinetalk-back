@@ -26,7 +26,7 @@ public class MovieMainService {
 
         LocalDate today = LocalDate.now();
 
-        List<MovieEntity> lists = movieRepository.findByRegdate(today);
+        List<MovieEntity> lists = movieRepository.findByCreatedAt(today.atStartOfDay());
 
         List<Map<String, Object>> result = new ArrayList<>();
 
