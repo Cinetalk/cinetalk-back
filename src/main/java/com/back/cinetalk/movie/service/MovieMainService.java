@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -46,25 +47,36 @@ public class MovieMainService {
 
     public List<Map<String, Object>> nowPlayingList() throws IOException {
 
-        LocalDate today = LocalDate.now();
 
-        List<MovieEntity> lists = movieRepository.findByCreatedAt(today.atStartOfDay());
+        MovieEntity time = movieRepository.findFirstByOrderByCreatedAtAsc();
+
+        LocalDate createdAt = time.getCreatedAt().toLocalDate();
+        LocalDate nowDate = LocalDate.now();
+
+        Duration duration = Duration.between(createdAt.atStartOfDay(), nowDate.atStartOfDay());
+        long days = duration.toDays();
 
         List<Map<String, Object>> result = new ArrayList<>();
 
-        if (lists.isEmpty()) {
+        log.info("diffOfDay: "+days);
 
-            List<String> nowPlayingName = getNewMovie.MainList();
-            for (String query : nowPlayingName) {
+        if(days>6){
 
-                Map<String, Object> map = getOneByName(query);
+            movieRepository.deleteAll();
+
+            List<Map<String,Object>> list = getNewMovie.MainList();
+
+            for (Map<String,Object> info:list) {
+
+                Map<String, Object> map = getOneByName((String) info.get("movieNm"));
 
                 if (map != null) {
 
                     MovieDTO movieDTO = new MovieDTO();
 
-                    movieDTO.setMovie_id(String.valueOf(map.get("id")));
+                    movieDTO.setMovie_id((Integer) map.get("id"));
                     movieDTO.setMovienm((String) map.get("title"));
+                    movieDTO.setAudiAcc(Integer.parseInt((String)info.get("audiAcc")));
 
                     MovieEntity movieEntity = MovieEntity.ToMovieEntity(movieDTO);
 
@@ -73,14 +85,16 @@ public class MovieMainService {
                     result.add(map);
                 }
             }
-            //map.put("poster_path","https://image.tmdb.org/t/p/w500"+poster_path);
-        } else {
+        }else{
 
-            for (MovieEntity movieEntity : lists) {
-                result.add(getOneByID(movieEntity.getMovie_id()));
+            List<MovieEntity> list = movieRepository.findAll();
+
+            for (MovieEntity movieEntity:list) {
+                int movieId = movieEntity.getMovie_id();
+
+                result.add(getOneByID(movieId));
             }
         }
-
         return result;
     }
 
@@ -92,20 +106,18 @@ public class MovieMainService {
 
         Map<String, Object> responsebody = callAPI.callAPI(url);
 
-        log.info("responsebody = " + responsebody);
+
         List<Map<String, Object>> resultList = (List<Map<String, Object>>) responsebody.get("results");
 
-        log.info("resultList = " + resultList);
         if (!resultList.isEmpty()) {
-            
-            log.info("resultList.get(0) = " + resultList.get(0));
+
             return resultList.get(0);
         } else {
             return null;
         }
     }
 
-    public Map<String, Object> getOneByID(String movie_id) throws IOException {
+    public Map<String, Object> getOneByID(int movie_id) throws IOException {
 
         String url = "https://api.themoviedb.org/3/movie/" + movie_id + "?language=ko";
 
@@ -138,7 +150,7 @@ public class MovieMainService {
             ReviewDTO reviewDTO = ReviewDTO.ToReviewDTO(tuple.get(review));
             Long reReviewCount = tuple.get(1, Long.class);
             Long rateCount = tuple.get(2, Long.class);
-            Map<String, Object> oneByID = getOneByID(String.valueOf(reviewDTO.getMovie_id()));
+            Map<String, Object> oneByID = getOneByID(reviewDTO.getMovie_id());
             String poster = (String) oneByID.get("poster_path");
 
             resultMap.put("review_id",reviewDTO.getId());
@@ -194,7 +206,7 @@ public class MovieMainService {
                     .fetchFirst();
 
             ReviewDTO reviewDTO = ReviewDTO.ToReviewDTO(result.get(review));
-            Map<String, Object> oneByID = getOneByID(String.valueOf(movieid));
+            Map<String, Object> oneByID = getOneByID(movieid);
 
             Map<String,Object> map = new HashMap<>();
 
