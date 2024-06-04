@@ -1,21 +1,17 @@
 package com.back.cinetalk.movie.service;
 
 import com.back.cinetalk.movie.dto.MovieDTO;
-import com.back.cinetalk.movie.dto.ReviewByUserDTO;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.rate.entity.QRateEntity;
 import com.back.cinetalk.rereview.entity.QReReviewEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
-import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,6 +38,11 @@ public class MovieMainService {
     private final CallAPI callAPI;
     public final JWTUtil jwtUtil;
     private final JPAQueryFactory queryFactory;
+
+    QReviewEntity review = QReviewEntity.reviewEntity;
+    QUserEntity user = QUserEntity.userEntity;
+    QReReviewEntity reReview = QReReviewEntity.reReviewEntity;
+    QRateEntity rate = QRateEntity.rateEntity;
 
     public List<Map<String, Object>> nowPlayingList() throws IOException {
 
@@ -97,7 +97,8 @@ public class MovieMainService {
 
         log.info("resultList = " + resultList);
         if (!resultList.isEmpty()) {
-            System.out.println("resultList.get(0) = " + resultList.get(0));
+            
+            log.info("resultList.get(0) = " + resultList.get(0));
             return resultList.get(0);
         } else {
             return null;
@@ -116,11 +117,6 @@ public class MovieMainService {
         String accessToken= request.getHeader("access");
 
         String email = jwtUtil.getEmail(accessToken);
-
-        QReviewEntity review = QReviewEntity.reviewEntity;
-        QUserEntity user = QUserEntity.userEntity;
-        QReReviewEntity reReview = QReReviewEntity.reReviewEntity;
-        QRateEntity rate = QRateEntity.rateEntity;
 
         List<Tuple> result = queryFactory
                 .select(review,
@@ -155,6 +151,65 @@ public class MovieMainService {
             resultMap.put("poster",poster);
 
             resultlist.add(resultMap);
+        }
+
+        return resultlist;
+    }
+
+    public List<Map<String,Object>> HidingPiece() throws IOException {
+
+        List<Tuple> movielist = queryFactory
+                .select(review.count(),review.movie_id)
+                .from(review)
+                .groupBy(review.movie_id)
+                .orderBy(review.count().desc())
+                .orderBy(review.movie_id.asc())
+                .limit(10)
+                .fetch();
+
+        List<Map<String,Object>> resultlist = new ArrayList<>();
+
+        for (Tuple tuple : movielist) {
+
+            int movieid = tuple.get(1,Integer.class);
+
+            NumberTemplate<Long> rateCountSubquery = Expressions.numberTemplate(Long.class,
+                    "(select count(*) from RateEntity where rate = 1 and review_id = {0})", review.id);
+
+            NumberTemplate<Long> reReviewCountSubquery = Expressions.numberTemplate(Long.class,
+                    "(select count(*) from ReReviewEntity where review_id = {0})", review.id);
+
+            NumberTemplate<Double> avgStarSubquery = Expressions.numberTemplate(Double.class,
+                    "(select ROUND(avg(star), 1) from ReviewEntity where movie_id = {0})", movieid);
+
+            Tuple result = queryFactory
+                    .select(review,
+                            rateCountSubquery.as("rateCount"),
+                            reReviewCountSubquery.as("reReviewCount"),
+                            avgStarSubquery.as("avgStar"))
+                    .from(review)
+                    .where(review.movie_id.eq(movieid))
+                    .orderBy(rateCountSubquery.desc())
+                    .limit(1)
+                    .fetchFirst();
+
+            ReviewDTO reviewDTO = ReviewDTO.ToReviewDTO(result.get(review));
+            Map<String, Object> oneByID = getOneByID(String.valueOf(movieid));
+
+            Map<String,Object> map = new HashMap<>();
+
+            LocalDateTime createdAt = result.get(review).getCreatedAt();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
+            String formattedDate = createdAt.format(formatter);
+
+            map.put("reviewData",reviewDTO);
+            map.put("regDate",formattedDate);
+            map.put("likeCount",result.get(1,Long.class));
+            map.put("rereviewCount",result.get(2,Long.class));
+            map.put("StarAvg",result.get(3,Double.class));
+            map.put("movieposter","https://image.tmdb.org/t/p/original"+(String)oneByID.get("poster_path"));
+
+            resultlist.add(map);
         }
 
         return resultlist;

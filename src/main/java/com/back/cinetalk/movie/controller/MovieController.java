@@ -1,7 +1,6 @@
 package com.back.cinetalk.movie.controller;
 
 import com.back.cinetalk.movie.dto.MovieDetailDTO;
-import com.back.cinetalk.movie.dto.ReviewByUserDTO;
 import com.back.cinetalk.movie.service.MainColorExtract;
 import com.back.cinetalk.movie.service.MovieMainService;
 import com.back.cinetalk.movie.service.MovieDetailService;
@@ -10,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,15 +56,17 @@ public class MovieController {
         return new ResponseEntity<>(maps, HttpStatus.OK);
     }
 
+    @GetMapping("/HidingPiece")
+    public ResponseEntity<?> HidingPiece() throws IOException {
 
+        List<Map<String, Object>> maps = movieMainService.HidingPiece();
 
-
+        return new ResponseEntity<>(maps, HttpStatus.OK);
+    }
 
     @GetMapping("/imagecolor")
     public String imagecolor(@RequestParam(value = "url") String url)throws  Exception{
 
         return mainColorExtract.ColorExtract(url);
     }
-
-
 }
