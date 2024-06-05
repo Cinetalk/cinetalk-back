@@ -231,15 +231,28 @@ public class MovieMainService {
 
     public List<Map<String,Object>> MentionKeword(){
 
-        String strToAnalyze = "인생이 야발 준나게 인생이 아주 그냥 인생이 아오 웡카쩔어 ㅋㅋㅋㅋㅋ그랭그랭 엉엉 담에보자인생웡카 어쩌구 복합명사는 인생은 웡카가.";
+        //오늘날짜 설정
+        String formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        String strToAnalyze1 = "웡카 라는 영화에 대해서 설명해보겠습니다.웡카는 진짜 존나 재미없어요.나는 시팔 찰리의 초콜릿공장같은걸 원했는데 시팔 이건 그냥 애들 쳐보라고 만든 영화잖아요.";
+        //오늘 자 리뷰 가져오기
+        List<String> reviewList = queryFactory
+                .select(review.content)
+                .from(review)
+                .where(
+                        Expressions.dateTemplate(LocalDate.class, "DATE({0})", review.createdAt).eq(LocalDate.parse(formattedDate)))
+                .fetch();
 
+
+        String Review = "";
+        //리뷰 직렬화
+        for (String content:reviewList) {
+            Review = Review+content;
+        }
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
 
         // 형태소 분석 후 리스트 생성
-        List<Token> tokenList = komoran.analyze(strToAnalyze1).getTokenList();
+        List<Token> tokenList = komoran.analyze(Review).getTokenList();
 
         Map<String, Integer> morphPosCountMap = new HashMap<>();
 
@@ -259,15 +272,16 @@ public class MovieMainService {
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .toList();
 
+        //키워드 5개만 추리기
+        if (sortedEntries.size() > 5) {
+            sortedEntries = sortedEntries.subList(0, 5);
+        }
 
         List<Map<String,Object>> resultlist = new ArrayList<>();
-        // 정렬된 Map으로 returnMap 구성
 
         for (Map.Entry<String, Integer> entry : sortedEntries) {
 
             String morph = entry.getKey().split("/")[0];
-            log.info(morph);
-
 
 
         }

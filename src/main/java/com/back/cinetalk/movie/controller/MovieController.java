@@ -74,6 +74,8 @@ public class MovieController {
     @GetMapping("/MentionKeword")
     public ResponseEntity<?> MentionKeword(){
 
+        movieMainService.MentionKeword();
+
         return new ResponseEntity<>("",HttpStatus.OK);
     }
 
