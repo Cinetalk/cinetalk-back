@@ -7,6 +7,7 @@ import com.back.cinetalk.rate.entity.QRateEntity;
 import com.back.cinetalk.rereview.entity.QReReviewEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
+import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.querydsl.core.Tuple;
@@ -15,6 +16,9 @@ import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
+import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
+import kr.co.shineware.nlp.komoran.core.Komoran;
+import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,10 +28,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -36,6 +37,7 @@ public class MovieMainService {
 
     private final getNewMovie getNewMovie;
     private final MovieRepository movieRepository;
+    private final ReviewRepository reviewRepository;
     private final CallAPI callAPI;
     public final JWTUtil jwtUtil;
     private final JPAQueryFactory queryFactory;
@@ -225,5 +227,53 @@ public class MovieMainService {
         }
 
         return resultlist;
+    }
+
+    public List<Map<String,Object>> MentionKeword(){
+
+        String strToAnalyze = "인생이 야발 준나게 인생이 아주 그냥 인생이 아오 웡카쩔어 ㅋㅋㅋㅋㅋ그랭그랭 엉엉 담에보자인생웡카 어쩌구 복합명사는 인생은 웡카가.";
+
+        String strToAnalyze1 = "웡카 라는 영화에 대해서 설명해보겠습니다.웡카는 진짜 존나 재미없어요.나는 시팔 찰리의 초콜릿공장같은걸 원했는데 시팔 이건 그냥 애들 쳐보라고 만든 영화잖아요.";
+
+
+        Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
+
+        // 형태소 분석 후 리스트 생성
+        List<Token> tokenList = komoran.analyze(strToAnalyze1).getTokenList();
+
+        Map<String, Integer> morphPosCountMap = new HashMap<>();
+
+        //단어선정 및 개수 세는 작업
+        for (Token token : tokenList) {
+            String pos = token.getPos();
+            String morph = token.getMorph();
+
+            if (pos.contains("NN") && morph.length() > 1) {
+                String key = morph + "/" + pos;
+                morphPosCountMap.put(key, morphPosCountMap.getOrDefault(key, 0) + 1);
+            }
+        }
+
+        // Map을 많이 나온 단어갯수 기준으로 내림차순 정렬
+        List<Map.Entry<String, Integer>> sortedEntries = morphPosCountMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .toList();
+
+
+        List<Map<String,Object>> resultlist = new ArrayList<>();
+        // 정렬된 Map으로 returnMap 구성
+
+        for (Map.Entry<String, Integer> entry : sortedEntries) {
+
+            String morph = entry.getKey().split("/")[0];
+            log.info(morph);
+
+
+
+        }
+
+
+
+        return null;
     }
 }
