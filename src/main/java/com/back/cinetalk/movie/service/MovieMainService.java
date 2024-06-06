@@ -7,6 +7,7 @@ import com.back.cinetalk.rate.entity.QRateEntity;
 import com.back.cinetalk.rereview.entity.QReReviewEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
+import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
@@ -23,12 +24,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -283,11 +286,42 @@ public class MovieMainService {
 
             String morph = entry.getKey().split("/")[0];
 
+            List<Tuple> result = queryFactory
+                    .select(review,user.nickname
+                    )
+                    .from(review)
+                    .leftJoin(user).on(review.user_id.eq(user.id.intValue()))
+                    .where(review.content.like("%"+morph+"%"))
+                    .orderBy(review.createdAt.asc())
+                    .fetch();
 
+            List<Map<String,Object>> reviewlist = new ArrayList<>();
+
+            for (Tuple tuple:result) {
+
+                Map<String,Object> reviewMap = new HashMap<>();
+
+                ReviewDTO reviewDTO = ReviewDTO.ToReviewDTO(tuple.get(review));
+
+                String nickname = tuple.get(1, String.class);
+
+                reviewMap.put("review",reviewDTO);
+                reviewMap.put("nickname",nickname);
+
+                reviewlist.add(reviewMap);
+            }
+
+
+            Map<String,Object> resultMap = new HashMap<>();
+
+            resultMap.put("keword",morph);
+            resultMap.put("reviewList",reviewList);
+
+            resultlist.add(resultMap);
         }
 
 
 
-        return null;
+        return resultlist;
     }
 }

@@ -74,9 +74,9 @@ public class MovieController {
     @GetMapping("/MentionKeword")
     public ResponseEntity<?> MentionKeword(){
 
-        movieMainService.MentionKeword();
+        List<Map<String, Object>> list = movieMainService.MentionKeword();
 
-        return new ResponseEntity<>("",HttpStatus.OK);
+        return new ResponseEntity<>(list,HttpStatus.OK);
     }
 
     @GetMapping("/imagecolor")
