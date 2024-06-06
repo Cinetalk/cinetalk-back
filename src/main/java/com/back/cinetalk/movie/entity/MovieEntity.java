@@ -22,15 +22,18 @@ public class MovieEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String movie_id;
+    private int movie_id;
 
     private String movienm;
+
+    private int audiAcc;
 
     public static MovieEntity ToMovieEntity(MovieDTO movieDTO){
         return MovieEntity.builder()
                 .id(movieDTO.getId())
                 .movie_id(movieDTO.getMovie_id())
                 .movienm(movieDTO.getMovienm())
+                .audiAcc(movieDTO.getAudiAcc())
                 .build();
     }
 }
