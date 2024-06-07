@@ -2,7 +2,8 @@ package com.back.cinetalk.find.controller;
 
 import com.back.cinetalk.find.service.FindService;
 import com.back.cinetalk.movie.service.MovieDetailService;
-import com.back.cinetalk.review.dto.ReviewDTO;
+import com.back.cinetalk.review.dto.ReviewRequestDTO;
+import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -61,7 +62,7 @@ public class FindController {
 
 
         //리뷰 결과 정렬
-        List<ReviewDTO> reviewlist = findService.ReviewResult(query);
+        List<ReviewResponseDTO> reviewlist = findService.ReviewResult(query);
         if (reviewlist.size() > 16) {
             reviewlist = reviewlist.subList(0, 16);
         }
@@ -84,7 +85,7 @@ public class FindController {
     @Operation(summary = "(검색)리뷰 조회",description = "검색어에 따른 모든 리뷰 조회 프로세스")
     public ResponseEntity<?> findReview(@RequestParam(value = "query")String query){
 
-        List<ReviewDTO> reviewlist = findService.ReviewResult(query);
+        List<ReviewResponseDTO> reviewlist = findService.ReviewResult(query);
 
         return new ResponseEntity<>(reviewlist,HttpStatus.OK);
     }

@@ -2,14 +2,11 @@ package com.back.cinetalk.rereview.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.rereview.dto.ReReviewDTO;
-import com.back.cinetalk.review.dto.ReviewDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter

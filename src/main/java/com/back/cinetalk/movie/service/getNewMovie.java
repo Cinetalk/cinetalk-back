@@ -6,6 +6,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class getNewMovie {
                 .build();
     }
     @SuppressWarnings("unchecked")
-    public List<String> MainList() {
+    public List<Map<String,Object>> MainList() {
 
         LocalDate yesterday = LocalDate.now().minusDays(1);
 
@@ -42,11 +43,18 @@ public class getNewMovie {
 
         List<Map<String,Object>> list = (List<Map<String, Object>>) result.get("dailyBoxOfficeList");
 
-        List<String> resultlist = new ArrayList<>();
+        List<Map<String,Object>> resultlist = new ArrayList<>();
 
         for (Map<String,Object> map : list) {
 
-            resultlist.add((String) map.get("movieNm"));
+            HashMap<String, Object> resultmap = new HashMap<>();
+
+            resultmap.put("movieNm",map.get("movieNm"));
+            resultmap.put("audiAcc",map.get("audiAcc"));
+
+            //System.out.println(map.get("audiAcc"));
+
+            resultlist.add(resultmap);
         }
 
         // 성공 메시지 반환
