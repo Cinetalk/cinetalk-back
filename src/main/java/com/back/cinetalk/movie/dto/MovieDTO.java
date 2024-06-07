@@ -18,7 +18,7 @@ public class MovieDTO {
 
     private Long id;
 
-    private int movie_id;
+    private Long movieId;
 
     private String movienm;
 
@@ -27,7 +27,7 @@ public class MovieDTO {
     public static MovieDTO ToMovieDTO(MovieEntity movieEntity){
         return MovieDTO.builder()
                 .id(movieEntity.getId())
-                .movie_id(movieEntity.getMovie_id())
+                .movieId(movieEntity.getMovieId())
                 .movienm(movieEntity.getMovienm())
                 .audiAcc(movieEntity.getAudiAcc())
                 .build();

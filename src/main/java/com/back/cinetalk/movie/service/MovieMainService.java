@@ -5,9 +5,9 @@ import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.rate.entity.QRateEntity;
 import com.back.cinetalk.rereview.entity.QReReviewEntity;
-import com.back.cinetalk.review.dto.ReviewDTO;
+import com.back.cinetalk.review.dto.ReviewRequestDTO;
+import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
-import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -63,15 +62,15 @@ public class MovieMainService {
 
         List<Map<String, Object>> result = new ArrayList<>();
 
-        log.info("diffOfDay: "+days);
+        log.info("diffOfDay: " + days);
 
-        if(days>6){
+        if (days > 6) {
 
             movieRepository.deleteAll();
 
-            List<Map<String,Object>> list = getNewMovie.MainList();
+            List<Map<String, Object>> list = getNewMovie.MainList();
 
-            for (Map<String,Object> info:list) {
+            for (Map<String, Object> info : list) {
 
                 Map<String, Object> map = getOneByName((String) info.get("movieNm"));
 
@@ -79,9 +78,9 @@ public class MovieMainService {
 
                     MovieDTO movieDTO = new MovieDTO();
 
-                    movieDTO.setMovie_id((Integer) map.get("id"));
+                    movieDTO.setMovieId((Long) map.get("id"));
                     movieDTO.setMovienm((String) map.get("title"));
-                    movieDTO.setAudiAcc(Integer.parseInt((String)info.get("audiAcc")));
+                    movieDTO.setAudiAcc(Integer.parseInt((String) info.get("audiAcc")));
 
                     MovieEntity movieEntity = MovieEntity.ToMovieEntity(movieDTO);
 
@@ -90,12 +89,12 @@ public class MovieMainService {
                     result.add(map);
                 }
             }
-        }else{
+        } else {
 
             List<MovieEntity> list = movieRepository.findAll();
 
-            for (MovieEntity movieEntity:list) {
-                int movieId = movieEntity.getMovie_id();
+            for (MovieEntity movieEntity : list) {
+                Long movieId = movieEntity.getMovieId();
 
                 result.add(getOneByID(movieId));
             }
@@ -122,16 +121,16 @@ public class MovieMainService {
         }
     }
 
-    public Map<String, Object> getOneByID(int movie_id) throws IOException {
+    public Map<String, Object> getOneByID(Long movie_id) throws IOException {
 
         String url = "https://api.themoviedb.org/3/movie/" + movie_id + "?language=ko";
 
         return callAPI.callAPI(url);
     }
 
-    public List<Map<String,Object>> ReviewByUser(HttpServletRequest request) throws IOException {
+    public List<Map<String, Object>> ReviewByUser(HttpServletRequest request) throws IOException {
 
-        String accessToken= request.getHeader("access");
+        String accessToken = request.getHeader("access");
 
         String email = jwtUtil.getEmail(accessToken);
 
@@ -141,31 +140,31 @@ public class MovieMainService {
                         JPAExpressions.select(rate.count()).from(rate).where(rate.review_id.eq(review.id.intValue()))
                 )
                 .from(review)
-                .leftJoin(user).on(review.user_id.eq(user.id.intValue()))
+                .leftJoin(user).on(review.userId.eq(user.id.longValue()))
                 .where(user.email.eq(email))
                 .orderBy(review.createdAt.asc())
                 .fetch();
 
-        List<Map<String,Object>> resultlist = new ArrayList<>();
+        List<Map<String, Object>> resultlist = new ArrayList<>();
 
         for (Tuple tuple : result) {
 
-            Map<String,Object> resultMap = new HashMap<>();
+            Map<String, Object> resultMap = new HashMap<>();
 
-            ReviewDTO reviewDTO = ReviewDTO.ToReviewDTO(tuple.get(review));
+            ReviewResponseDTO reviewResponseDTO = ReviewResponseDTO.toReviewResponseDTO(Objects.requireNonNull(tuple.get(review)));
             Long reReviewCount = tuple.get(1, Long.class);
             Long rateCount = tuple.get(2, Long.class);
-            Map<String, Object> oneByID = getOneByID(reviewDTO.getMovie_id());
+            Map<String, Object> oneByID = getOneByID(reviewResponseDTO.getMovieId());
             String poster = (String) oneByID.get("poster_path");
 
-            resultMap.put("review_id",reviewDTO.getId());
-            resultMap.put("movie_id",reviewDTO.getMovie_id());
-            resultMap.put("user_id",reviewDTO.getUser_id());
-            resultMap.put("star",reviewDTO.getStar());
-            resultMap.put("content",reviewDTO.getContent());
-            resultMap.put("reReviewCount",reReviewCount);
-            resultMap.put("likeCount",rateCount);
-            resultMap.put("poster",poster);
+            resultMap.put("review_id", reviewResponseDTO.getId());
+            resultMap.put("movie_id", reviewResponseDTO.getMovieId());
+            resultMap.put("user_id", reviewResponseDTO.getUserId());
+            resultMap.put("star", reviewResponseDTO.getStar());
+            resultMap.put("content", reviewResponseDTO.getContent());
+            resultMap.put("reReviewCount", reReviewCount);
+            resultMap.put("likeCount", rateCount);
+            resultMap.put("poster", poster);
 
             resultlist.add(resultMap);
         }
@@ -173,22 +172,22 @@ public class MovieMainService {
         return resultlist;
     }
 
-    public List<Map<String,Object>> HidingPiece() throws IOException {
+    public List<Map<String, Object>> HidingPiece() throws IOException {
 
         List<Tuple> movielist = queryFactory
-                .select(review.count(),review.movie_id)
+                .select(review.count(), review.movieId)
                 .from(review)
-                .groupBy(review.movie_id)
+                .groupBy(review.movieId)
                 .orderBy(review.count().desc())
-                .orderBy(review.movie_id.asc())
+                .orderBy(review.movieId.asc())
                 .limit(10)
                 .fetch();
 
-        List<Map<String,Object>> resultlist = new ArrayList<>();
+        List<Map<String, Object>> resultlist = new ArrayList<>();
 
         for (Tuple tuple : movielist) {
 
-            int movieid = tuple.get(1,Integer.class);
+            Long movieid = tuple.get(1, Long.class);
 
             NumberTemplate<Long> rateCountSubquery = Expressions.numberTemplate(Long.class,
                     "(select count(*) from RateEntity where rate = 1 and review_id = {0})", review.id);
@@ -205,26 +204,26 @@ public class MovieMainService {
                             reReviewCountSubquery.as("reReviewCount"),
                             avgStarSubquery.as("avgStar"))
                     .from(review)
-                    .where(review.movie_id.eq(movieid))
+                    .where(review.movieId.eq(movieid))
                     .orderBy(rateCountSubquery.desc())
                     .limit(1)
                     .fetchFirst();
 
-            ReviewDTO reviewDTO = ReviewDTO.ToReviewDTO(result.get(review));
+            ReviewResponseDTO reviewResponseDTO = ReviewResponseDTO.toReviewResponseDTO(Objects.requireNonNull(result.get(review)));
             Map<String, Object> oneByID = getOneByID(movieid);
 
-            Map<String,Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             LocalDateTime createdAt = result.get(review).getCreatedAt();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
             String formattedDate = createdAt.format(formatter);
 
-            map.put("reviewData",reviewDTO);
-            map.put("regDate",formattedDate);
-            map.put("likeCount",result.get(1,Long.class));
-            map.put("rereviewCount",result.get(2,Long.class));
-            map.put("StarAvg",result.get(3,Double.class));
-            map.put("movieposter","https://image.tmdb.org/t/p/original"+(String)oneByID.get("poster_path"));
+            map.put("reviewData", reviewResponseDTO);
+            map.put("regDate", formattedDate);
+            map.put("likeCount", result.get(1, Long.class));
+            map.put("rereviewCount", result.get(2, Long.class));
+            map.put("StarAvg", result.get(3, Double.class));
+            map.put("movieposter", "https://image.tmdb.org/t/p/original" + (String) oneByID.get("poster_path"));
 
             resultlist.add(map);
         }
@@ -232,7 +231,7 @@ public class MovieMainService {
         return resultlist;
     }
 
-    public List<Map<String,Object>> MentionKeword(){
+    public List<Map<String, Object>> MentionKeword() {
 
         //오늘날짜 설정
         String formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -248,8 +247,8 @@ public class MovieMainService {
 
         String Review = "";
         //리뷰 직렬화
-        for (String content:reviewList) {
-            Review = Review+content;
+        for (String content : reviewList) {
+            Review = Review + content;
         }
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
@@ -280,46 +279,45 @@ public class MovieMainService {
             sortedEntries = sortedEntries.subList(0, 5);
         }
 
-        List<Map<String,Object>> resultlist = new ArrayList<>();
+        List<Map<String, Object>> resultlist = new ArrayList<>();
 
         for (Map.Entry<String, Integer> entry : sortedEntries) {
 
             String morph = entry.getKey().split("/")[0];
 
             List<Tuple> result = queryFactory
-                    .select(review,user.nickname
+                    .select(review, user.nickname
                     )
                     .from(review)
-                    .leftJoin(user).on(review.user_id.eq(user.id.intValue()))
-                    .where(review.content.like("%"+morph+"%"))
+                    .leftJoin(user).on(review.userId.eq(user.id.longValue()))
+                    .where(review.content.like("%" + morph + "%"))
                     .orderBy(review.createdAt.asc())
                     .fetch();
 
-            List<Map<String,Object>> reviewlist = new ArrayList<>();
+            List<Map<String, Object>> reviewlist = new ArrayList<>();
 
-            for (Tuple tuple:result) {
+            for (Tuple tuple : result) {
 
-                Map<String,Object> reviewMap = new HashMap<>();
+                Map<String, Object> reviewMap = new HashMap<>();
 
-                ReviewDTO reviewDTO = ReviewDTO.ToReviewDTO(tuple.get(review));
+                ReviewResponseDTO reviewResponseDTO = ReviewResponseDTO.toReviewResponseDTO(Objects.requireNonNull(tuple.get(review)));
 
                 String nickname = tuple.get(1, String.class);
 
-                reviewMap.put("review",reviewDTO);
-                reviewMap.put("nickname",nickname);
+                reviewMap.put("review", reviewResponseDTO);
+                reviewMap.put("nickname", nickname);
 
                 reviewlist.add(reviewMap);
             }
 
 
-            Map<String,Object> resultMap = new HashMap<>();
+            Map<String, Object> resultMap = new HashMap<>();
 
-            resultMap.put("keword",morph);
-            resultMap.put("reviewList",reviewList);
+            resultMap.put("keword", morph);
+            resultMap.put("reviewList", reviewList);
 
             resultlist.add(resultMap);
         }
-
 
 
         return resultlist;

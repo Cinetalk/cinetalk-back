@@ -1,25 +1,37 @@
 package com.back.cinetalk.review.service;
 
-import com.back.cinetalk.review.dto.ReviewDTO;
+import com.back.cinetalk.review.dto.ReviewRequestDTO;
+import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
+import com.back.cinetalk.user.entity.UserEntity;
+import com.back.cinetalk.user.jwt.JWTUtil;
+import com.back.cinetalk.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
+    private final JWTUtil jwtUtil;
 
-    public void reviewSave(ReviewDTO reviewDTO){
+    public ReviewEntity reviewSave(HttpServletRequest request, Long movieId, ReviewRequestDTO reviewRequestDTO) {
 
-        ReviewEntity reviewEntity= ReviewEntity.ToReviewEntity(reviewDTO);
+//        String email = jwtUtil.getEmail(request.getHeader("access"));
+//        UserEntity user = userRepository.findByEmail(email);
 
-        reviewRepository.save(reviewEntity);
+        ReviewEntity review = ReviewEntity.builder()
+                .movieId(movieId)
+//                .userId(user.getId())
+                .userId(1L)
+                .star(reviewRequestDTO.getStar())
+                .content(reviewRequestDTO.getContent())
+                .build();
+
+        return reviewRepository.save(review);
     }
 }

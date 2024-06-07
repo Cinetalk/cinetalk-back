@@ -113,7 +113,7 @@ public class SecurityConfig {
                         .requestMatchers("/user","/movie/ReviewByUser").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/login", "/join","/reissue","/movie/**","/find/**", "keywords/**","/review/**").permitAll()
+                        .requestMatchers("/login", "/join","/reissue","/movie/**","/find/**", "keywords/**","/reviews/**").permitAll()
                         .anyRequest().authenticated());
 
 

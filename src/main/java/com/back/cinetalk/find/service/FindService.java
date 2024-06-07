@@ -4,7 +4,8 @@ import com.back.cinetalk.find.dto.FindDTO;
 import com.back.cinetalk.find.entity.FindEntity;
 import com.back.cinetalk.find.repository.FindRepository;
 import com.back.cinetalk.movie.service.CallAPI;
-import com.back.cinetalk.review.dto.ReviewDTO;
+import com.back.cinetalk.review.dto.ReviewRequestDTO;
+import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -70,7 +71,7 @@ public class FindService {
         return resultlist;
     }
 
-    public List<ReviewDTO> ReviewResult(String query) {
+    public List<ReviewResponseDTO> ReviewResult(String query) {
 
         QReviewEntity review = QReviewEntity.reviewEntity;
 
@@ -81,11 +82,11 @@ public class FindService {
                 .orderBy(review.createdAt.asc())
                 .fetch();
 
-        List<ReviewDTO> returnList = new ArrayList<>();
+        List<ReviewResponseDTO> returnList = new ArrayList<>();
 
         for (ReviewEntity reviewEntity : result) {
 
-            ReviewDTO dto = ReviewDTO.ToReviewDTO(reviewEntity);
+            ReviewResponseDTO dto = ReviewResponseDTO.toReviewResponseDTO(reviewEntity);
 
             returnList.add(dto);
         }

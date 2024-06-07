@@ -1,14 +1,13 @@
 package com.back.cinetalk.review.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
-import com.back.cinetalk.review.dto.ReviewDTO;
+import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import jakarta.persistence.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -22,24 +21,16 @@ public class ReviewEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int movie_id;
+    @Column(name = "movie_id")
+    private Long movieId;
 
-    private String movie_name;
+    // id가 있는데 movieName 필요 없을거같음
 
-    private int user_id;
+    @Column(name = "user_id")
+    private Long userId;
 
     private Double star;
 
     private String content;
 
-    public static ReviewEntity ToReviewEntity(ReviewDTO reviewDTO){
-        return ReviewEntity.builder()
-                .id(reviewDTO.getId())
-                .movie_id(reviewDTO.getMovie_id())
-                .movie_name(reviewDTO.getMovie_name())
-                .user_id(reviewDTO.getUser_id())
-                .star(reviewDTO.getStar())
-                .content(reviewDTO.getContent())
-                .build();
-    }
 }
