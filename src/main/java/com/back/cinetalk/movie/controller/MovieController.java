@@ -74,7 +74,13 @@ public class MovieController {
     @GetMapping("/MentionKeword")
     public ResponseEntity<?> MentionKeword(){
 
+        long startTime = System.currentTimeMillis();
+
         List<Map<String, Object>> list = movieMainService.MentionKeword();
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        System.out.println("MentionKeyword method execution time: " + duration + " milliseconds");
 
         return new ResponseEntity<>(list,HttpStatus.OK);
     }
