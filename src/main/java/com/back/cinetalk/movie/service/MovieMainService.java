@@ -22,6 +22,8 @@ import kr.co.shineware.nlp.komoran.core.Komoran;
 import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -230,7 +232,7 @@ public class MovieMainService {
         return resultlist;
     }
 
-    public List<Map<String, Object>> MentionKeword() {
+    public ResponseEntity<?> MentionKeword() {
 
         //오늘날짜 설정
         String formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -246,17 +248,21 @@ public class MovieMainService {
                 .fetch();
 
 
-        String Review = "";
+        StringBuilder Review = new StringBuilder("");
         //리뷰 직렬화
         for (String content : reviewList) {
-            Review = Review + content;
+            Review.append(content);
         }
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
 
+        if(Review.isEmpty()){
+
+            return new ResponseEntity<>("ReviewNull",HttpStatus.OK);
+        }
 
         // 형태소 분석 후 리스트 생성
-        List<Token> tokenList = komoran.analyze(Review).getTokenList();
+        List<Token> tokenList = komoran.analyze(Review.toString()).getTokenList();
 
         Map<String, Integer> morphPosCountMap = new HashMap<>();
 
@@ -322,6 +328,6 @@ public class MovieMainService {
         }
 
 
-        return resultlist;
+        return new ResponseEntity<>(resultlist,HttpStatus.OK);
     }
 }

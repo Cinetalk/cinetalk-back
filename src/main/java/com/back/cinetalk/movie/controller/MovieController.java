@@ -69,7 +69,7 @@ public class MovieController {
 
         long startTime = System.currentTimeMillis();
 
-        List<Map<String, Object>> list = movieMainService.MentionKeword();
+        ResponseEntity<?> list = movieMainService.MentionKeword();
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
