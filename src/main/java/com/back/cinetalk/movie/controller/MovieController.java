@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/movie")
 @RequiredArgsConstructor
@@ -69,13 +71,13 @@ public class MovieController {
 
         long startTime = System.currentTimeMillis();
 
-        ResponseEntity<?> list = movieMainService.MentionKeword();
+        ResponseEntity<?> list = movieMainService.MentionKeyword();
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        System.out.println("MentionKeyword method execution time: " + duration + " milliseconds");
+        log.info("MentionKeyword method execution time: " + duration + " milliseconds");
 
-        return new ResponseEntity<>(list,HttpStatus.OK);
+        return list;
     }
 
     @GetMapping("/imagecolor")
