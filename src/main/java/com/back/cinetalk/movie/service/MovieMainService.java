@@ -22,6 +22,8 @@ import kr.co.shineware.nlp.komoran.core.Komoran;
 import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -39,7 +41,6 @@ public class MovieMainService {
 
     private final getNewMovie getNewMovie;
     private final MovieRepository movieRepository;
-    private final ReviewRepository reviewRepository;
     private final CallAPI callAPI;
     public final JWTUtil jwtUtil;
     private final JPAQueryFactory queryFactory;
@@ -78,7 +79,7 @@ public class MovieMainService {
 
                     MovieDTO movieDTO = new MovieDTO();
 
-                    movieDTO.setMovieId((Long) map.get("id"));
+                    movieDTO.setMovieId((Integer) map.get("id"));
                     movieDTO.setMovienm((String) map.get("title"));
                     movieDTO.setAudiAcc(Integer.parseInt((String) info.get("audiAcc")));
 
@@ -94,9 +95,9 @@ public class MovieMainService {
             List<MovieEntity> list = movieRepository.findAll();
 
             for (MovieEntity movieEntity : list) {
-                Long movieId = movieEntity.getMovieId();
+                int movieId = movieEntity.getMovieId();
 
-                result.add(getOneByID(movieId));
+                result.add(getOneByID((long) movieId));
             }
         }
         return result;
@@ -140,7 +141,7 @@ public class MovieMainService {
                         JPAExpressions.select(rate.count()).from(rate).where(rate.review_id.eq(review.id.intValue()))
                 )
                 .from(review)
-                .leftJoin(user).on(review.userId.eq(user.id.longValue()))
+                .leftJoin(user).on(review.userId.eq(user.id))
                 .where(user.email.eq(email))
                 .orderBy(review.createdAt.asc())
                 .fetch();
@@ -196,7 +197,7 @@ public class MovieMainService {
                     "(select count(*) from ReReviewEntity where review_id = {0})", review.id);
 
             NumberTemplate<Double> avgStarSubquery = Expressions.numberTemplate(Double.class,
-                    "(select ROUND(avg(star), 1) from ReviewEntity where movie_id = {0})", movieid);
+                    "(select ROUND(avg(star), 1) from ReviewEntity where movieId = {0})", movieid);
 
             Tuple result = queryFactory
                     .select(review,
@@ -231,10 +232,12 @@ public class MovieMainService {
         return resultlist;
     }
 
-    public List<Map<String, Object>> MentionKeword() {
+    public ResponseEntity<?> MentionKeword() {
 
         //오늘날짜 설정
         String formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        log.info("RegDate :"+formattedDate);
 
         //오늘 자 리뷰 가져오기
         List<String> reviewList = queryFactory
@@ -245,16 +248,21 @@ public class MovieMainService {
                 .fetch();
 
 
-        String Review = "";
+        StringBuilder Review = new StringBuilder("");
         //리뷰 직렬화
         for (String content : reviewList) {
-            Review = Review + content;
+            Review.append(content);
         }
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
 
+        if(Review.isEmpty()){
+
+            return new ResponseEntity<>("ReviewNull",HttpStatus.OK);
+        }
+
         // 형태소 분석 후 리스트 생성
-        List<Token> tokenList = komoran.analyze(Review).getTokenList();
+        List<Token> tokenList = komoran.analyze(Review.toString()).getTokenList();
 
         Map<String, Integer> morphPosCountMap = new HashMap<>();
 
@@ -320,6 +328,6 @@ public class MovieMainService {
         }
 
 
-        return resultlist;
+        return new ResponseEntity<>(resultlist,HttpStatus.OK);
     }
 }
