@@ -329,4 +329,9 @@ public class MovieMainService {
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
+
+    public long TotalReviewCount(){
+
+        return reviewRepository.count();
+    }
 }
