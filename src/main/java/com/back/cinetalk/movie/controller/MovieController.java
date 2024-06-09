@@ -4,6 +4,7 @@ import com.back.cinetalk.movie.dto.MovieDetailDTO;
 import com.back.cinetalk.movie.service.MainColorExtract;
 import com.back.cinetalk.movie.service.MovieMainService;
 import com.back.cinetalk.movie.service.MovieDetailService;
+import com.back.cinetalk.review.repository.ReviewRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -78,6 +79,12 @@ public class MovieController {
         log.info("MentionKeyword method execution time: " + duration + " milliseconds");
 
         return list;
+    }
+
+    @GetMapping("/TotalReviewCount")
+    public ResponseEntity<?> TotalReviewCount(){
+
+        return new ResponseEntity<>(movieMainService.TotalReviewCount(),HttpStatus.OK);
     }
 
     @GetMapping("/imagecolor")
