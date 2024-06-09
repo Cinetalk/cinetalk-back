@@ -6,29 +6,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewResponseDTO {
 
-    private Long id;
+    Long reviewId;
 
-    private Long movieId;
-
-    private Long userId;
-
-    private Double star;
-
-    private String content;
+    LocalDateTime createdAt;
 
     public static ReviewResponseDTO toReviewResponseDTO(ReviewEntity reviewEntity){
         return ReviewResponseDTO.builder()
-                .id(reviewEntity.getId())
-                .movieId(reviewEntity.getMovieId())
-                .userId(reviewEntity.getUserId())
-                .star(reviewEntity.getStar())
-                .content(reviewEntity.getContent())
+                .reviewId(reviewEntity.getId())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
