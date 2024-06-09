@@ -5,10 +5,8 @@ import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.rate.entity.QRateEntity;
 import com.back.cinetalk.rereview.entity.QReReviewEntity;
-import com.back.cinetalk.review.dto.ReviewRequestDTO;
-import com.back.cinetalk.review.dto.ReviewResponseDTO;
+import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
-import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.querydsl.core.Tuple;
@@ -152,17 +150,17 @@ public class MovieMainService {
 
             Map<String, Object> resultMap = new HashMap<>();
 
-            ReviewResponseDTO reviewResponseDTO = ReviewResponseDTO.toReviewResponseDTO(Objects.requireNonNull(tuple.get(review)));
+            ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(tuple.get(review)));
             Long reReviewCount = tuple.get(1, Long.class);
             Long rateCount = tuple.get(2, Long.class);
-            Map<String, Object> oneByID = getOneByID(reviewResponseDTO.getMovieId());
+            Map<String, Object> oneByID = getOneByID(reviewDTO.getMovieId());
             String poster = (String) oneByID.get("poster_path");
 
-            resultMap.put("review_id", reviewResponseDTO.getId());
-            resultMap.put("movie_id", reviewResponseDTO.getMovieId());
-            resultMap.put("user_id", reviewResponseDTO.getUserId());
-            resultMap.put("star", reviewResponseDTO.getStar());
-            resultMap.put("content", reviewResponseDTO.getContent());
+            resultMap.put("review_id", reviewDTO.getId());
+            resultMap.put("movie_id", reviewDTO.getMovieId());
+            resultMap.put("user_id", reviewDTO.getUserId());
+            resultMap.put("star", reviewDTO.getStar());
+            resultMap.put("content", reviewDTO.getContent());
             resultMap.put("reReviewCount", reReviewCount);
             resultMap.put("likeCount", rateCount);
             resultMap.put("poster", poster);
@@ -210,7 +208,7 @@ public class MovieMainService {
                     .limit(1)
                     .fetchFirst();
 
-            ReviewResponseDTO reviewResponseDTO = ReviewResponseDTO.toReviewResponseDTO(Objects.requireNonNull(result.get(review)));
+            ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(result.get(review)));
             Map<String, Object> oneByID = getOneByID(movieid);
 
             Map<String, Object> map = new HashMap<>();
@@ -219,7 +217,7 @@ public class MovieMainService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
             String formattedDate = createdAt.format(formatter);
 
-            map.put("reviewData", reviewResponseDTO);
+            map.put("reviewData", reviewDTO);
             map.put("regDate", formattedDate);
             map.put("likeCount", result.get(1, Long.class));
             map.put("rereviewCount", result.get(2, Long.class));
@@ -308,11 +306,11 @@ public class MovieMainService {
 
                 Map<String, Object> reviewMap = new HashMap<>();
 
-                ReviewResponseDTO reviewResponseDTO = ReviewResponseDTO.toReviewResponseDTO(Objects.requireNonNull(tuple.get(review)));
+                ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(tuple.get(review)));
 
                 String nickname = tuple.get(1, String.class);
 
-                reviewMap.put("review", reviewResponseDTO);
+                reviewMap.put("review", reviewDTO);
                 reviewMap.put("nickname", nickname);
 
                 reviewlist.add(reviewMap);
