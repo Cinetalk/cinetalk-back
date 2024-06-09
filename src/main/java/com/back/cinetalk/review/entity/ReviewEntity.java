@@ -3,7 +3,6 @@ package com.back.cinetalk.review.entity;
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import jakarta.persistence.*;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +23,7 @@ public class ReviewEntity extends BaseEntity {
     @Column(name = "movie_id")
     private Long movieId;
 
-    // id가 있는데 movieName 필요 없을거같음
+    private String movienm;
 
     @Column(name = "user_id")
     private Long userId;
@@ -32,5 +31,10 @@ public class ReviewEntity extends BaseEntity {
     private Double star;
 
     private String content;
+
+    public void update(ReviewRequestDTO reviewRequestDTO) {
+        this.star = reviewRequestDTO.getStar();
+        this.content = reviewRequestDTO.getContent();
+    }
 
 }
