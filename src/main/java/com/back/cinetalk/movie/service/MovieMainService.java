@@ -77,7 +77,7 @@ public class MovieMainService {
 
                     MovieDTO movieDTO = new MovieDTO();
 
-                    movieDTO.setMovieId((Long) map.get("id"));
+                    movieDTO.setMovieId((Integer) map.get("id"));
                     movieDTO.setMovienm((String) map.get("title"));
                     movieDTO.setAudiAcc(Integer.parseInt((String) info.get("audiAcc")));
 
@@ -93,9 +93,9 @@ public class MovieMainService {
             List<MovieEntity> list = movieRepository.findAll();
 
             for (MovieEntity movieEntity : list) {
-                Long movieId = movieEntity.getMovieId();
+                int movieId = movieEntity.getMovieId();
 
-                result.add(getOneByID(movieId));
+                result.add(getOneByID((long) movieId));
             }
         }
         return result;
@@ -253,6 +253,7 @@ public class MovieMainService {
         }
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
+
 
         // 형태소 분석 후 리스트 생성
         List<Token> tokenList = komoran.analyze(Review).getTokenList();
