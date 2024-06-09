@@ -6,9 +6,13 @@ import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.rate.entity.QRateEntity;
 import com.back.cinetalk.rereview.entity.QReReviewEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
+import com.back.cinetalk.review.dto.ReviewRequestDTO;
+import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
+import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
+import com.querydsl.core.QueryFactory;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
@@ -28,9 +32,12 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,6 +49,7 @@ public class MovieMainService {
     private final CallAPI callAPI;
     public final JWTUtil jwtUtil;
     private final JPAQueryFactory queryFactory;
+    private final ReviewRepository reviewRepository;
 
     QReviewEntity review = QReviewEntity.reviewEntity;
     QUserEntity user = QUserEntity.userEntity;
@@ -230,23 +238,27 @@ public class MovieMainService {
         return resultlist;
     }
 
-    public ResponseEntity<?> MentionKeword() {
+    public ResponseEntity<?> MentionKeyword() {
 
-        //오늘날짜 설정
-        String formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        // 오늘 날짜 설정
+        LocalDate currentDate = LocalDate.now();
 
-        log.info("RegDate :"+formattedDate);
+        log.info("RegDate :" + currentDate);
 
-        //오늘 자 리뷰 가져오기
+        // 오늘 자 리뷰 가져오기
         List<String> reviewList = queryFactory
                 .select(review.content)
                 .from(review)
-                .where(
-                        Expressions.dateTemplate(LocalDate.class, "DATE({0})", review.createdAt).eq(LocalDate.parse(formattedDate)))
+                // review.createdAt의 날짜 부분만 비교하기 위해 LocalDate로 변환 후 비교
+                .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX)))
                 .fetch();
 
+        if(reviewList.isEmpty()){
 
-        StringBuilder Review = new StringBuilder("");
+            return new ResponseEntity<>("",HttpStatus.OK);
+        }
+
+        StringBuilder Review = new StringBuilder();
         //리뷰 직렬화
         for (String content : reviewList) {
             Review.append(content);
@@ -254,56 +266,53 @@ public class MovieMainService {
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
 
-        if(Review.isEmpty()){
-
-            return new ResponseEntity<>("ReviewNull",HttpStatus.OK);
-        }
-
-        // 형태소 분석 후 리스트 생성
-        List<Token> tokenList = komoran.analyze(Review.toString()).getTokenList();
-
-        Map<String, Integer> morphPosCountMap = new HashMap<>();
-
-        //단어선정 및 개수 세는 작업
-        for (Token token : tokenList) {
-            String pos = token.getPos();
-            String morph = token.getMorph();
-
-            if (pos.contains("NN") && morph.length() > 1) {
-                String key = morph + "/" + pos;
-                morphPosCountMap.put(key, morphPosCountMap.getOrDefault(key, 0) + 1);
+        // 형태소 분석 및 단어 추출 - 알고리즘 최적화
+        List<String> morphList = new ArrayList<>();
+        for (String reviewContent : reviewList) {
+            List<Token> tokenList = komoran.analyze(reviewContent).getTokenList();
+            for (Token token : tokenList) {
+                String pos = token.getPos();
+                String morph = token.getMorph();
+                if (pos.contains("NN") && morph.length() > 1) {
+                    morphList.add(morph);
+                }
             }
         }
 
-        // Map을 많이 나온 단어갯수 기준으로 내림차순 정렬
-        List<Map.Entry<String, Integer>> sortedEntries = morphPosCountMap.entrySet().stream()
+        // 단어 빈도수 계산
+        Map<String, Integer> morphCountMap = new HashMap<>();
+        for (String morph : morphList) {
+            morphCountMap.put(morph, morphCountMap.getOrDefault(morph, 0) + 1);
+        }
+
+        // 단어 빈도수를 기준으로 내림차순 정렬
+        List<Map.Entry<String, Integer>> sortedEntries = morphCountMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .toList();
+                .collect(Collectors.toList());
 
         //키워드 5개만 추리기
         if (sortedEntries.size() > 5) {
             sortedEntries = sortedEntries.subList(0, 5);
         }
 
-        List<Map<String, Object>> resultlist = new ArrayList<>();
+        List<Map<String, Object>> resultList = new ArrayList<>();
 
         for (Map.Entry<String, Integer> entry : sortedEntries) {
+            String keyword = entry.getKey();
 
-            String morph = entry.getKey().split("/")[0];
-
-            List<Tuple> result = queryFactory
-                    .select(review, user.nickname
-                    )
+            // 리뷰 검색 - 쿼리 최적화
+            List<Tuple> reviewTuples = queryFactory
+                    .select(review, user.nickname)
                     .from(review)
                     .leftJoin(user).on(review.userId.eq(user.id.longValue()))
-                    .where(review.content.like("%" + morph + "%"))
+                    .where(review.content.like("%" + keyword + "%"))
                     .orderBy(review.createdAt.asc())
+                    .limit(10)
                     .fetch();
 
-            List<Map<String, Object>> reviewlist = new ArrayList<>();
+            List<Map<String, Object>> reviewListMap = new ArrayList<>();
 
-            for (Tuple tuple : result) {
-
+            for (Tuple tuple : reviewTuples) {
                 Map<String, Object> reviewMap = new HashMap<>();
 
                 ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(tuple.get(review)));
@@ -312,20 +321,20 @@ public class MovieMainService {
 
                 reviewMap.put("review", reviewDTO);
                 reviewMap.put("nickname", nickname);
-
-                reviewlist.add(reviewMap);
+                reviewListMap.add(reviewMap);
             }
 
-
             Map<String, Object> resultMap = new HashMap<>();
-
-            resultMap.put("keword", morph);
-            resultMap.put("reviewList", reviewList);
-
-            resultlist.add(resultMap);
+            resultMap.put("keyword", keyword);
+            resultMap.put("reviewList", reviewListMap);
+            resultList.add(resultMap);
         }
 
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(resultlist,HttpStatus.OK);
+    public long TotalReviewCount(){
+
+        return reviewRepository.count();
     }
 }
