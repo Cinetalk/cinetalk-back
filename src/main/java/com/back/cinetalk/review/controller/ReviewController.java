@@ -1,8 +1,6 @@
 package com.back.cinetalk.review.controller;
 
-import com.back.cinetalk.review.dto.ReviewRequestDTO;
-import com.back.cinetalk.review.dto.ReviewResponseDTO;
-import com.back.cinetalk.review.dto.StateRes;
+import com.back.cinetalk.review.dto.*;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,8 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,6 +30,15 @@ public class ReviewController {
 
         ReviewEntity reviewEntity = reviewService.saveReview(request, movieId, reviewRequestDTO);
         return ReviewResponseDTO.toReviewResponseDTO(reviewEntity);
+    }
+
+    @GetMapping("/{movieId}")
+    @Operation(summary = "특정 영화의 리뷰 목록 조회 API", description = "특정 영화 리뷰들의 목록을 조회하는 API이며, 페이징을 포함합니다.")
+    public ReviewPreViewListDTO getReviewListByStore(@PathVariable(name = "movieId") Long movieId,
+                                                     @RequestParam(name = "page") Integer page) {
+
+        Page<ReviewEntity> reviewList = reviewService.getReviewList(movieId, page);
+        return ReviewPreViewListDTO.toReviewPreViewListDTO(reviewList);
     }
 
     @PatchMapping("/{reviewId}")

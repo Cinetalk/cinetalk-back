@@ -32,9 +32,12 @@ public class ReviewEntity extends BaseEntity {
 
     private String content;
 
+    private boolean spoiler;
+
     public void update(ReviewRequestDTO reviewRequestDTO) {
         this.star = reviewRequestDTO.getStar();
         this.content = reviewRequestDTO.getContent();
+        this.spoiler = reviewRequestDTO.isSpoiler();
     }
 
 }

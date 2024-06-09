@@ -9,6 +9,8 @@ import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,9 +37,15 @@ public class ReviewService {
                 .userId(user.getId())
                 .star(reviewRequestDTO.getStar())
                 .content(reviewRequestDTO.getContent())
+                .spoiler(reviewRequestDTO.isSpoiler())
                 .build();
 
         return reviewRepository.save(review);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReviewEntity> getReviewList(Long movieId, Integer page) {
+        return reviewRepository.findAllByMovieId(movieId, PageRequest.of(page, 10));
     }
 
     @Transactional
@@ -71,4 +79,5 @@ public class ReviewService {
         reviewRepository.delete(reviewEntity);
         return new StateRes(true);
     }
+
 }
