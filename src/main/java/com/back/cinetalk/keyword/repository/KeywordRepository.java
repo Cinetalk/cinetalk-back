@@ -2,15 +2,21 @@ package com.back.cinetalk.keyword.repository;
 
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 
-public interface KeywordRepository extends JpaRepository<KeywordEntity, Long> {
+@Repository
+public interface KeywordRepository extends JpaRepository<KeywordEntity, Long>, KeywordRepositoryCustom {
 
-    List<KeywordEntity> findAllByMovieIdOrderByCountDesc(String movieId);
-
-    KeywordEntity findByKeywordAndMovieId(String keyword, String movieId);
-
+    @Query("SELECT DISTINCT k.keyword FROM KeywordEntity k " +
+            "WHERE k.movieId = :movieId " +
+            "GROUP BY k.keyword " +
+            "ORDER BY MAX(k.createdAt) DESC " +
+            "LIMIT 4")
+    List<String> findDistinctKeywordsByMovieIdOrderByCreatedAtDesc(@Param("movieId") Long movieId);
 }
+
