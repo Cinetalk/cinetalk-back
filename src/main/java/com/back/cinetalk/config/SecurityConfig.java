@@ -69,8 +69,8 @@ public class SecurityConfig {
                         CorsConfiguration configuration = new CorsConfiguration();
 
                         //configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));  // <--cors 건드려줄 부분
-                        configuration.setAllowedOrigins(Collections.singletonList("*"));  // <--cors 건드려줄 부분
                         configuration.setAllowedMethods(Collections.singletonList("*"));
+                        configuration.addAllowedOriginPattern("*"); // cors 지정시 삭제해야할 부분
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
                         configuration.setMaxAge(3600L);
