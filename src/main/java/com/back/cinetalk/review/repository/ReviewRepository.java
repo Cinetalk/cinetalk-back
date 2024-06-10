@@ -1,6 +1,5 @@
 package com.back.cinetalk.review.repository;
 
-import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,9 +8,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , QuerydslPredicateExecutor<ReviewEntity> {
+public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , QuerydslPredicateExecutor<ReviewEntity>, ReviewRepositoryCustom {
 
    boolean existsByUserIdAndMovieId(Long userId, Long movieId);
-
-   Page<ReviewEntity> findAllByMovieId(Long movieId, Pageable pageable);
 }
