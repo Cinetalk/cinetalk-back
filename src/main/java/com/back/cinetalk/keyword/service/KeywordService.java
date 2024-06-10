@@ -1,8 +1,12 @@
 package com.back.cinetalk.keyword.service;
 
 import com.back.cinetalk.keyword.dto.KeywordRequestDTO;
+import com.back.cinetalk.keyword.dto.KeywordResponseDTO;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.keyword.repository.KeywordRepository;
+import com.back.cinetalk.user.jwt.JWTUtil;
+import com.back.cinetalk.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,30 +19,29 @@ import java.util.List;
 public class KeywordService {
 
     private final KeywordRepository keywordRepository;
+    private final UserRepository userRepository;
+    private final JWTUtil jwtUtil;
 
     @Transactional
-    public KeywordEntity create(KeywordRequestDTO keywordRequestDTO, String movieId) {
+    public KeywordEntity create(HttpServletRequest request, KeywordRequestDTO keywordRequestDTO, Long movieId) {
         // 로그인 검사 로직
+//        String email = jwtUtil.getEmail(request.getHeader("access"));
+//        UserEntity user = userRepository.findByEmail(email);
 
-        KeywordEntity keywordEntity = keywordRepository.findByKeywordAndMovieId(keywordRequestDTO.getKeyword(), movieId);
-
-        System.out.println("keywordEntity = " + keywordEntity);
-
-        if (keywordEntity != null) {
-            keywordEntity.setCount(keywordEntity.getCount() + 1);
-            return keywordEntity;
-        } else {
-            return keywordRepository.save(KeywordEntity.builder()
+        return keywordRepository.save(KeywordEntity.builder()
                     .movieId(movieId)
                     .keyword(keywordRequestDTO.getKeyword())
                     .count(1)
                     .build());
-        }
     }
 
     @Transactional(readOnly = true)
-    public List<KeywordEntity> getKeywordList(String movieId) {
+    public List<KeywordResponseDTO> getTopKeywordListByMovie(Long movieId) {
+        return keywordRepository.findKeywordsOrderByCountDesc(movieId);
+    }
 
-        return keywordRepository.findAllByMovieIdOrderByCountDesc(movieId);
+    @Transactional(readOnly = true)
+    public List<String> getLatestMentionedKeywordListByMovie(Long movieId) {
+        return keywordRepository.findDistinctKeywordsByMovieIdOrderByCreatedAtDesc(movieId);
     }
 }
