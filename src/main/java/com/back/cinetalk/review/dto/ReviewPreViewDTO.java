@@ -5,29 +5,21 @@ import com.back.cinetalk.user.repository.UserRepository;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class ReviewPreViewDTO {
 
-    Long userId;
+    String nickName;
 
     Double star;
 
     String content;
 
-    LocalDate createdAt;
+    LocalDateTime createdAt;
 
     boolean spoiler;
-
-    public static ReviewPreViewDTO toReviewPreViewDTO(ReviewEntity reviewEntity) {
-        return ReviewPreViewDTO.builder()
-                .userId(reviewEntity.getUserId())
-                .star(reviewEntity.getStar())
-                .createdAt(reviewEntity.getCreatedAt().toLocalDate())
-                .content(reviewEntity.getContent())
-                .build();
-    }
 }

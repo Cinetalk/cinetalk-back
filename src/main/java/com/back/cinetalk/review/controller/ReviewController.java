@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/reviews")
 
@@ -37,9 +39,10 @@ public class ReviewController {
     public ReviewPreViewListDTO getReviewListByStore(@PathVariable(name = "movieId") Long movieId,
                                                      @RequestParam(name = "page") Integer page) {
 
-        Page<ReviewEntity> reviewList = reviewService.getReviewList(movieId, page);
+        Page<ReviewPreViewDTO> reviewList = reviewService.getReviewList(movieId, page);
         return ReviewPreViewListDTO.toReviewPreViewListDTO(reviewList);
     }
+
 
     @PatchMapping("/{reviewId}")
     @Operation(summary = "리뷰 수정 API", description = "리뷰를 수정하는 프로세스")
