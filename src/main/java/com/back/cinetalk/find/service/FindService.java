@@ -28,11 +28,11 @@ public class FindService {
     private final JPAQueryFactory queryFactory;
 
 
-    public ResponseEntity<?> WordSave(String keword){
+    public ResponseEntity<?> WordSave(String findword){
 
         FindDTO findDTO = new FindDTO();
 
-        findDTO.setKeword(keword);
+        findDTO.setFindword(findword);
 
         FindEntity findEntity = FindEntity.ToFindEntity(findDTO);
 

@@ -19,17 +19,17 @@ public class ReReviewDTO {
 
     private Long id;
 
-    private int review_id;
+    private Long reviewId;
 
-    private int user_id;
+    private Long userId;
 
     private String content;
 
     public static ReReviewDTO ToReReviewDTO(ReReviewEntity rereviewEntity){
         return ReReviewDTO.builder()
                 .id(rereviewEntity.getId())
-                .review_id(rereviewEntity.getReview_id())
-                .user_id(rereviewEntity.getUser_id())
+                .reviewId(rereviewEntity.getReviewId())
+                .userId(rereviewEntity.getUserId())
                 .content(rereviewEntity.getContent())
                 .build();
     }

@@ -85,7 +85,7 @@ public class MovieMainService {
 
                     MovieDTO movieDTO = new MovieDTO();
 
-                    movieDTO.setMovieId((Integer) map.get("id"));
+                    movieDTO.setMovieId((Long) map.get("id"));
                     movieDTO.setMovienm((String) map.get("title"));
                     movieDTO.setAudiAcc(Integer.parseInt((String) info.get("audiAcc")));
 
@@ -101,9 +101,9 @@ public class MovieMainService {
             List<MovieEntity> list = movieRepository.findAll();
 
             for (MovieEntity movieEntity : list) {
-                int movieId = movieEntity.getMovieId();
+                Long movieId = movieEntity.getMovieId();
 
-                result.add(getOneByID((long) movieId));
+                result.add(getOneByID(movieId));
             }
         }
         return result;
@@ -143,8 +143,8 @@ public class MovieMainService {
 
         List<Tuple> result = queryFactory
                 .select(review,
-                        JPAExpressions.select(reReview.count()).from(reReview).where(reReview.review_id.eq(review.id.intValue())),
-                        JPAExpressions.select(rate.count()).from(rate).where(rate.review_id.eq(review.id.intValue()))
+                        JPAExpressions.select(reReview.count()).from(reReview).where(reReview.reviewId.eq(review.id)),
+                        JPAExpressions.select(rate.count()).from(rate).where(rate.reviewId.eq(review.id))
                 )
                 .from(review)
                 .leftJoin(user).on(review.userId.eq(user.id))
@@ -197,10 +197,10 @@ public class MovieMainService {
             Long movieid = tuple.get(1, Long.class);
 
             NumberTemplate<Long> rateCountSubquery = Expressions.numberTemplate(Long.class,
-                    "(select count(*) from RateEntity where rate = 1 and review_id = {0})", review.id);
+                    "(select count(*) from RateEntity where rate = 1 and reviewId = {0})", review.id);
 
             NumberTemplate<Long> reReviewCountSubquery = Expressions.numberTemplate(Long.class,
-                    "(select count(*) from ReReviewEntity where review_id = {0})", review.id);
+                    "(select count(*) from ReReviewEntity where reviewId = {0})", review.id);
 
             NumberTemplate<Double> avgStarSubquery = Expressions.numberTemplate(Double.class,
                     "(select ROUND(avg(star), 1) from ReviewEntity where movieId = {0})", movieid);

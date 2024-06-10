@@ -18,13 +18,13 @@ public class FindDTO {
 
     private Long id;
 
-    private String keword;
+    private String findword;
 
 
     public static FindDTO ToFindDTO(FindEntity findEntity){
         return FindDTO.builder()
                 .id(findEntity.getId())
-                .keword(findEntity.getKeword())
+                .findword(findEntity.getFindword())
                 .build();
     }
 }

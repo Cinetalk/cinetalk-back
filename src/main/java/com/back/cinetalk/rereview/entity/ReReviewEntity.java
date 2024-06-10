@@ -20,17 +20,17 @@ public class ReReviewEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int review_id;
+    private Long reviewId;
 
-    private int user_id;
+    private Long userId;
 
     private String content;
 
     public static ReReviewEntity ToReReviewEntity(ReReviewDTO rereviewDTO){
         return ReReviewEntity.builder()
                 .id(rereviewDTO.getId())
-                .review_id(rereviewDTO.getReview_id())
-                .user_id(rereviewDTO.getUser_id())
+                .reviewId(rereviewDTO.getReviewId())
+                .userId(rereviewDTO.getUserId())
                 .content(rereviewDTO.getContent())
                 .build();
     }

@@ -20,12 +20,10 @@ public class ReviewEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "movie_id")
     private Long movieId;
 
     private String movienm;
 
-    @Column(name = "user_id")
     private Long userId;
 
     private Double star;

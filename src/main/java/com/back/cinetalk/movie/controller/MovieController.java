@@ -31,7 +31,7 @@ public class MovieController {
 
     @GetMapping("/{movie_id}")
     @Operation(summary = "영화 상세정보 ",description = "영화 상세정보 api")
-    public MovieDetailDTO getMovieDetails(@PathVariable String movie_id) throws IOException {
+    public MovieDetailDTO getMovieDetails(@PathVariable(name = "movie_id") String movie_id) throws IOException {
         return movieDetailService.getMovieDetail(movie_id);
     }
 

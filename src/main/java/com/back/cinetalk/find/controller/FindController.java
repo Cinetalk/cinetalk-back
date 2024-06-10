@@ -24,14 +24,13 @@ import java.util.Map;
 public class FindController {
 
     private final FindService findService;
-    private final MovieDetailService movieDetailService;
 
     @PostMapping("/findSave")
     @Operation(summary = "검색어 저장",description = "인기 검색어 순위를 위한 검색어 저장 프로세스")
     @ApiResponse(responseCode = "200",description = "저장완료",content = @Content(schema = @Schema(implementation = HttpResponse.class)))
-    public ResponseEntity<?> WordSave(@RequestParam(value = "keword") String keword){
+    public ResponseEntity<?> WordSave(@RequestParam(value = "findword") String findword){
 
-        return findService.WordSave(keword);
+        return findService.WordSave(findword);
     }
 
     @GetMapping("/findText")
