@@ -1,5 +1,7 @@
 package com.back.cinetalk.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -11,6 +13,10 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Arrays;
 
 @Configuration
+@OpenAPIDefinition(servers = {
+        @Server(url = "https://cinetalk.kro.kr", description = "https"),
+        @Server(url = "http://localhost:8089", description = "local"),
+})
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI(){
@@ -25,7 +31,9 @@ public class SwaggerConfig {
     }
 
     private Info apiInfo() {
+
         return new Info()
+
                 .title("Cinetalk-Server API 명세서")
                 .description("")
                 .version("1.0.0");
