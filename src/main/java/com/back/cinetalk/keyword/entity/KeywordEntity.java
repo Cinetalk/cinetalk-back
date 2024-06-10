@@ -20,7 +20,9 @@ public class KeywordEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String movieId;
+    private Long movieId;
+
+//    private Long userId;
 
     private String keyword;
 

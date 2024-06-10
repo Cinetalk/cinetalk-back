@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class KeywordResponseDTO {
 
-    @NotBlank
     private String keyword;
 
     private int count;
