@@ -19,14 +19,15 @@ import java.util.Arrays;
 })
 public class SwaggerConfig {
     @Bean
-    public OpenAPI openAPI(){
+    public OpenAPI openAPI() {
         SecurityScheme securityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
-                .in(SecurityScheme.In.HEADER).name("Authorization");
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");
+                .type(SecurityScheme.Type.APIKEY)
+                .in(SecurityScheme.In.HEADER)
+                .name("access");
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList("AccessToken");
 
         return new OpenAPI()
-                .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
+                .components(new Components().addSecuritySchemes("AccessToken", securityScheme))
                 .security(Arrays.asList(securityRequirement));
     }
 

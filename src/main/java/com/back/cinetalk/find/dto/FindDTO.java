@@ -20,7 +20,6 @@ public class FindDTO {
 
     private String findword;
 
-
     public static FindDTO ToFindDTO(FindEntity findEntity){
         return FindDTO.builder()
                 .id(findEntity.getId())

@@ -24,8 +24,6 @@ public class FindEntity extends BaseEntity {
 
     private String findword;
 
-    private LocalDate regdate;
-
     public static FindEntity ToFindEntity(FindDTO findDTO){
         return FindEntity.builder()
                 .id(findDTO.getId())
