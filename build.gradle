@@ -9,6 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '21'
+    targetCompatibility = '21'
 }
 
 configurations {
@@ -47,3 +48,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+bootJar {
+    archiveFileName = 'app.jar'
+}

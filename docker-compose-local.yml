@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  cinetalk-back-redis:
+    container_name: cinetalk-back-redis
+    build:
+      dockerfile: Dockerfile
+      context: ./redis
+    image: kallis0926/cinetalk-back-redis
+    ports:
+      - "6379:6379"
+  cinetalk-back-database:
+    container_name: cinetalk-back-database
+    build:
+      dockerfile: Dockerfile
+      context: ./database
+    image: kallis0926/cinetalk-back-database
+    environment:
+      - MARIADB_DATABASE=pharmacy-recommendation
+      - MARIADB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - ./database/config:/etc/mysql/conf.d
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+
+# 이거 왜 안돼
