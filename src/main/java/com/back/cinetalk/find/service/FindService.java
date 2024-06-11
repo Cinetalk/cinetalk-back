@@ -2,6 +2,7 @@ package com.back.cinetalk.find.service;
 
 import com.back.cinetalk.find.dto.FindDTO;
 import com.back.cinetalk.find.entity.FindEntity;
+import com.back.cinetalk.find.entity.QFindEntity;
 import com.back.cinetalk.find.repository.FindRepository;
 import com.back.cinetalk.movie.service.CallAPI;
 import com.back.cinetalk.review.dto.ReviewDTO;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -91,5 +94,21 @@ public class FindService {
         }
 
         return returnList;
+    }
+
+    public ResponseEntity<?> PopularFind(){
+
+        QFindEntity find = QFindEntity.findEntity;
+
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7).with(LocalTime.MIDNIGHT);
+
+        List<String> list = queryFactory.select(find.findword).from(find)
+                .where(find.createdAt.gt(sevenDaysAgo))
+                .groupBy(find.findword)
+                .orderBy(find.count().desc(), find.createdAt.asc(), find.findword.asc())
+                .limit(10)
+                .fetch();
+
+        return new ResponseEntity<>(list,HttpStatus.OK);
     }
 }
