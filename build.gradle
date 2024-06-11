@@ -2,7 +2,6 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.4'
-    id 'com.google.cloud.tools.jib' version '3.2.0'
 }
 
 group = 'com.example'
@@ -10,25 +9,6 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '21'
-}
-jib {
-    from {
-        image = 'openjdk:21-jre-slim'
-    }
-    to {
-        image = 'cinetalk-back'
-        tags = ['0.0.1']
-    }
-    container {
-        mainClass = 'com.back.cinetalk.CinetalkApplication'
-        creationTime = 'USE_CURRENT_TIMESTAMP'
-        format = 'OCI'
-        volumes = ['/var/tmp']
-        entrypoint = ['java'
-        , '-cp', '/app/resources:/app/classes:/app/libs/*'
-                      , 'com.back.cinetalk.CinetalkApplication' ]
-
-    }
 }
 
 configurations {
