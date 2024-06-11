@@ -87,4 +87,11 @@ public class FindController {
 
         return new ResponseEntity<>(reviewlist,HttpStatus.OK);
     }
+
+    @GetMapping("/PopularFind")
+    @Operation(summary = "인기 검색어",description = "오늘을 포함한 7일 동안의 인기검색어 리스트")
+    public ResponseEntity<?> PopularFind(){
+
+        return findService.PopularFind();
+    }
 }
