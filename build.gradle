@@ -11,6 +11,9 @@ java {
     sourceCompatibility = '21'
     targetCompatibility = '21'
 }
+bootJar {
+    archiveFileName = 'app.jar'
+}
 
 configurations {
     compileOnly {
