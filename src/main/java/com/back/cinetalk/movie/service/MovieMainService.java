@@ -1,5 +1,6 @@
 package com.back.cinetalk.movie.service;
 
+import com.back.cinetalk.movie.dto.MentionKeywordDTO;
 import com.back.cinetalk.movie.dto.MovieDTO;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
@@ -14,6 +15,7 @@ import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.querydsl.core.QueryFactory;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.JPAExpressions;
@@ -264,44 +266,38 @@ public class MovieMainService {
             Review.append(content);
         }
 
-        Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
+        Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
 
         // 형태소 분석 및 단어 추출 - 알고리즘 최적화
-        List<String> morphList = new ArrayList<>();
-        for (String reviewContent : reviewList) {
-            List<Token> tokenList = komoran.analyze(reviewContent).getTokenList();
-            for (Token token : tokenList) {
-                String pos = token.getPos();
-                String morph = token.getMorph();
-                if (pos.contains("NN") && morph.length() > 1) {
-                    morphList.add(morph);
-                }
+        Map<String, Integer> wordFrequency = new HashMap<>();
+
+        List<Token> tokenList = komoran.analyze(String.valueOf(Review)).getTokenList();
+
+        for (Token token : tokenList) {
+            String pos = token.getPos();
+            String morph = token.getMorph();
+            if (pos.contains("NN") && morph.length() > 1) {
+                // 단어가 이미 존재하면 빈도수를 증가시키고, 없으면 새로운 키로 추가
+                wordFrequency.put(morph, wordFrequency.getOrDefault(morph, 0) + 1);
             }
         }
 
-        // 단어 빈도수 계산
-        Map<String, Integer> morphCountMap = new HashMap<>();
-        for (String morph : morphList) {
-            morphCountMap.put(morph, morphCountMap.getOrDefault(morph, 0) + 1);
-        }
-
-        // 단어 빈도수를 기준으로 내림차순 정렬
-        List<Map.Entry<String, Integer>> sortedEntries = morphCountMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .toList();
+        // 빈도순으로 정렬
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
+        sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         for (int i = 0; i<5; i++) {
 
-            Map.Entry<String, Integer> entry = sortedEntries.get(i);
+            Map.Entry<String, Integer> entry = sortedList.get(i);
 
             String keyword = entry.getKey();
 
             // 리뷰 검색 - 쿼리 최적화
-            List<Tuple> reviewTuples = queryFactory
-                    .select(review, user.nickname)
+            List<MentionKeywordDTO> reviewTuples = queryFactory
+                    .select(Projections.constructor(MentionKeywordDTO.class,review.as("reviewinfo"), user.nickname))
                     .from(review)
                     .leftJoin(user).on(review.userId.eq(user.id.longValue()))
                     .where(review.content.like("%" + keyword + "%"))
@@ -309,6 +305,8 @@ public class MovieMainService {
                     .limit(10)
                     .fetch();
 
+
+            /*
             List<Map<String, Object>> reviewListMap = new ArrayList<>();
 
             for (Tuple tuple : reviewTuples) {
@@ -322,10 +320,11 @@ public class MovieMainService {
                 reviewMap.put("nickname", nickname);
                 reviewListMap.add(reviewMap);
             }
+            */
 
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("keyword", keyword);
-            resultMap.put("reviewList", reviewListMap);
+            resultMap.put("reviewList", reviewTuples);
             resultList.add(resultMap);
         }
 
