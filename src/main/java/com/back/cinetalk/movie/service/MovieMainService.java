@@ -288,16 +288,15 @@ public class MovieMainService {
         // 단어 빈도수를 기준으로 내림차순 정렬
         List<Map.Entry<String, Integer>> sortedEntries = morphCountMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toList());
+                .toList();
 
-        //키워드 5개만 추리기
-        if (sortedEntries.size() > 5) {
-            sortedEntries = sortedEntries.subList(0, 5);
-        }
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
-        for (Map.Entry<String, Integer> entry : sortedEntries) {
+        for (int i = 0; i<5; i++) {
+
+            Map.Entry<String, Integer> entry = sortedEntries.get(i);
+
             String keyword = entry.getKey();
 
             // 리뷰 검색 - 쿼리 최적화
