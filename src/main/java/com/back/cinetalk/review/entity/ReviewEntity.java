@@ -1,12 +1,17 @@
 package com.back.cinetalk.review.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
+import com.back.cinetalk.rereview.entity.ReReviewEntity;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
+import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,17 +25,22 @@ public class ReviewEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
     private Long movieId;
 
     private String movienm;
-
-    private Long userId;
 
     private Double star;
 
     private String content;
 
     private boolean spoiler;
+
+    @OneToMany(mappedBy = "review")
+    private List<ReReviewEntity> reReviewEntityList = new ArrayList<ReReviewEntity>();
 
     public void update(ReviewRequestDTO reviewRequestDTO) {
         this.star = reviewRequestDTO.getStar();

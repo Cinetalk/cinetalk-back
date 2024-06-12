@@ -2,6 +2,8 @@ package com.back.cinetalk.rereview.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.rereview.dto.ReReviewDTO;
+import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,18 +22,22 @@ public class ReReviewEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long reviewId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private ReviewEntity review;
 
     private String content;
 
-    public static ReReviewEntity ToReReviewEntity(ReReviewDTO rereviewDTO){
-        return ReReviewEntity.builder()
-                .id(rereviewDTO.getId())
-                .reviewId(rereviewDTO.getReviewId())
-                .userId(rereviewDTO.getUserId())
-                .content(rereviewDTO.getContent())
-                .build();
-    }
+//    public static ReReviewEntity ToReReviewEntity(ReReviewDTO rereviewDTO){
+//        return ReReviewEntity.builder()
+//                .id(rereviewDTO.getId())
+//                .reviewId(rereviewDTO.getReviewId())
+//                .userId(rereviewDTO.getUserId())
+//                .content(rereviewDTO.getContent())
+//                .build();
+//    }
 }
