@@ -40,7 +40,7 @@ public class ReviewService {
         ReviewEntity review = ReviewEntity.builder()
                 .movieId(movieId)
 //                .movienm()
-                .userId(user.getId())
+                .user(user)
                 .star(reviewRequestDTO.getStar())
                 .content(reviewRequestDTO.getContent())
                 .spoiler(reviewRequestDTO.isSpoiler())
@@ -62,7 +62,7 @@ public class ReviewService {
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
 
-        if (!user.getId().equals(reviewEntity.getUserId())) {
+        if (!user.equals(reviewEntity.getUser())) {
             throw new SecurityException("리뷰를 수정할 권한이 없습니다.");
         }
 
@@ -78,7 +78,7 @@ public class ReviewService {
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
 
-        if (!user.getId().equals(reviewEntity.getUserId())) {
+        if (!user.equals(reviewEntity.getUser())) {
             throw new SecurityException("리뷰를 수정할 권한이 없습니다.");
         }
 

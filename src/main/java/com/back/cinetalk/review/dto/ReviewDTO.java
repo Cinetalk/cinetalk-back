@@ -28,7 +28,7 @@ public class ReviewDTO {
         return ReviewDTO.builder()
                 .id(reviewEntity.getId())
                 .movieId(reviewEntity.getMovieId())
-                .userId(reviewEntity.getUserId())
+                .userId(reviewEntity.getUser().getId())
                 .star(reviewEntity.getStar())
                 .content(reviewEntity.getContent())
                 .spoiler(reviewEntity.isSpoiler())

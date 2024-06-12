@@ -38,7 +38,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         reviewEntity.createdAt,
                         reviewEntity.spoiler))
                 .from(reviewEntity)
-                .leftJoin(userEntity).on(reviewEntity.userId.eq(userEntity.id))
+                .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
                 .where(reviewEntity.movieId.eq(movieId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
