@@ -32,7 +32,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         List<ReviewPreViewDTO> results = queryFactory
                 .select(Projections.constructor(
                         ReviewPreViewDTO.class,
-                        userEntity.nickname,
+                        reviewEntity.user.nickname,
                         reviewEntity.star,
                         reviewEntity.content,
                         reviewEntity.createdAt,

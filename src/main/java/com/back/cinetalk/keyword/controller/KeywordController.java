@@ -22,13 +22,13 @@ public class KeywordController {
 
     private final KeywordService keywordService;
 
-    @PostMapping("/{movieId}")
+    @PostMapping("/{movieId}/save")
     @Operation(summary = "특정 영화의 키워드 등록 API", description = "특정 영화의 키워드를 등록하는 API 입니다.")
     public KeywordResponseDTO createKeyword(HttpServletRequest request,
                                             @PathVariable Long movieId,
                                             @RequestBody @Valid KeywordRequestDTO keywordRequestDTO) {
 
-        KeywordEntity keywordEntity = keywordService.create(request, keywordRequestDTO, movieId);
+        KeywordEntity keywordEntity = keywordService.create(request, movieId, keywordRequestDTO);
         return KeywordResponseDTO.toKeywordResponseDTO(keywordEntity);
     }
 
