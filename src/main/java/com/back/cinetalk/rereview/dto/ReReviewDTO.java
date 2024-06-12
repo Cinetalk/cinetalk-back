@@ -25,12 +25,12 @@ public class ReReviewDTO {
 
     private String content;
 
-    public static ReReviewDTO ToReReviewDTO(ReReviewEntity rereviewEntity){
-        return ReReviewDTO.builder()
-                .id(rereviewEntity.getId())
-                .reviewId(rereviewEntity.getReviewId())
-                .userId(rereviewEntity.getUserId())
-                .content(rereviewEntity.getContent())
-                .build();
-    }
+//    public static ReReviewDTO ToReReviewDTO(ReReviewEntity rereviewEntity){
+//        return ReReviewDTO.builder()
+//                .id(rereviewEntity.getId())
+//                .reviewId(rereviewEntity.getReviewId())
+//                .userId(rereviewEntity.getUserId())
+//                .content(rereviewEntity.getContent())
+//                .build();
+//    }
 }

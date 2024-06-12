@@ -143,11 +143,11 @@ public class MovieMainService {
 
         List<Tuple> result = queryFactory
                 .select(review,
-                        JPAExpressions.select(reReview.count()).from(reReview).where(reReview.reviewId.eq(review.id)),
+                        JPAExpressions.select(reReview.count()).from(reReview).where(reReview.review.eq(review)),
                         JPAExpressions.select(rate.count()).from(rate).where(rate.reviewId.eq(review.id))
                 )
                 .from(review)
-                .leftJoin(user).on(review.userId.eq(user.id))
+                .leftJoin(user).on(review.user.eq(user))
                 .where(user.email.eq(email))
                 .orderBy(review.createdAt.asc())
                 .fetch();
@@ -304,7 +304,7 @@ public class MovieMainService {
             List<Tuple> reviewTuples = queryFactory
                     .select(review, user.nickname)
                     .from(review)
-                    .leftJoin(user).on(review.userId.eq(user.id.longValue()))
+                    .leftJoin(user).on(review.user.eq(user))
                     .where(review.content.like("%" + keyword + "%"))
                     .orderBy(review.createdAt.asc())
                     .limit(10)

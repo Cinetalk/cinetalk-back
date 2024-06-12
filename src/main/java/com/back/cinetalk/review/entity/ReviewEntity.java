@@ -3,6 +3,7 @@ package com.back.cinetalk.review.entity;
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.rereview.entity.ReReviewEntity;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
+import com.back.cinetalk.review_genre.ReviewGenreEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -41,6 +42,9 @@ public class ReviewEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "review")
     private List<ReReviewEntity> reReviewEntityList = new ArrayList<ReReviewEntity>();
+
+    @OneToMany(mappedBy = "review")
+    private List<ReviewGenreEntity> reviewGenreEntityList = new ArrayList<ReviewGenreEntity>();
 
     public void update(ReviewRequestDTO reviewRequestDTO) {
         this.star = reviewRequestDTO.getStar();
