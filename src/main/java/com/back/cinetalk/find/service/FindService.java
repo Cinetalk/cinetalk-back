@@ -1,6 +1,7 @@
 package com.back.cinetalk.find.service;
 
 import com.back.cinetalk.find.dto.FindDTO;
+import com.back.cinetalk.find.dto.FindReviewDTO;
 import com.back.cinetalk.find.entity.FindEntity;
 import com.back.cinetalk.find.entity.QFindEntity;
 import com.back.cinetalk.find.repository.FindRepository;
@@ -8,6 +9,7 @@ import com.back.cinetalk.movie.service.CallAPI;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.user.dto.UserDTO;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +75,7 @@ public class FindService {
         return resultlist;
     }
 
-    public List<ReviewDTO> ReviewResult(String query) {
+    public List<FindReviewDTO> ReviewResult(String query) {
 
         QReviewEntity review = QReviewEntity.reviewEntity;
 
@@ -84,13 +86,19 @@ public class FindService {
                 .orderBy(review.createdAt.asc())
                 .fetch();
 
-        List<ReviewDTO> returnList = new ArrayList<>();
+        List<FindReviewDTO> returnList = new ArrayList<>();
 
         for (ReviewEntity reviewEntity : result) {
 
+            FindReviewDTO findReviewDTO = new FindReviewDTO();
+
             ReviewDTO dto = ReviewDTO.toReviewDTO(reviewEntity);
 
-            returnList.add(dto);
+            findReviewDTO.setReviewDTO(dto);
+
+            findReviewDTO.setUserId(UserDTO.ToUserDTO(reviewEntity.getUser()).getId());
+
+            returnList.add(findReviewDTO);
         }
 
         return returnList;

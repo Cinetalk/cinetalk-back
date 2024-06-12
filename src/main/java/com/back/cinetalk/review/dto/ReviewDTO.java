@@ -1,14 +1,12 @@
 package com.back.cinetalk.review.dto;
 
 import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.user.dto.UserDTO;
 import com.back.cinetalk.user.entity.UserEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewDTO {
@@ -17,7 +15,9 @@ public class ReviewDTO {
 
     private Long movieId;
 
-    private UserEntity user;
+    private String movienm;
+
+    private UserDTO user;
 
     private Double star;
 
@@ -31,11 +31,10 @@ public class ReviewDTO {
         return ReviewDTO.builder()
                 .id(reviewEntity.getId())
                 .movieId(reviewEntity.getMovieId())
-                .user(reviewEntity.getUser())
+                .movienm(reviewEntity.getMovienm())
                 .star(reviewEntity.getStar())
                 .content(reviewEntity.getContent())
                 .spoiler(reviewEntity.isSpoiler())
-                .parentReview(reviewEntity.getParentReview())
                 .build();
     }
 }

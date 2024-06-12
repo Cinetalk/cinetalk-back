@@ -1,6 +1,5 @@
 package com.back.cinetalk.movie.service;
 
-import com.back.cinetalk.movie.dto.MentionKeywordDTO;
 import com.back.cinetalk.movie.dto.MovieDTO;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
@@ -11,7 +10,9 @@ import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
+import com.back.cinetalk.user.dto.UserDTO;
 import com.back.cinetalk.user.entity.QUserEntity;
+import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.querydsl.core.QueryFactory;
 import com.querydsl.core.Tuple;
@@ -26,6 +27,7 @@ import kr.co.shineware.nlp.komoran.core.Komoran;
 import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -264,7 +266,7 @@ public class MovieMainService {
                 .select(review.content)
                 .from(review)
                 // review.createdAt의 날짜 부분만 비교하기 위해 LocalDate로 변환 후 비교
-                .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX)))
+                .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX)).and(review.parentReview.isNull()))
                 .fetch();
 
         if(reviewList.isEmpty()){
@@ -307,36 +309,27 @@ public class MovieMainService {
 
             String keyword = entry.getKey();
 
-            // 리뷰 검색 - 쿼리 최적화
-            List<MentionKeywordDTO> reviewTuples = queryFactory
-                    .select(Projections.constructor(MentionKeywordDTO.class,review.as("reviewinfo"), user.nickname))
-                    .from(review)
-                    .leftJoin(user).on(review.user.eq(user))
-                    .where(review.content.like("%" + keyword + "%"))
-                    .orderBy(review.createdAt.asc())
-                    .limit(10)
-                    .fetch();
+            List<ReviewEntity> list = reviewRepository.findTop10ByContentContainingAndParentReviewIsNullOrderByCreatedAtAsc(keyword);
 
+            List<Map<String,Object>> result = new ArrayList<>();
 
-            /*
-            List<Map<String, Object>> reviewListMap = new ArrayList<>();
+            for (ReviewEntity entity:list){
 
-            for (Tuple tuple : reviewTuples) {
-                Map<String, Object> reviewMap = new HashMap<>();
+                Map<String,Object> map = new HashMap<>();
 
-                ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(tuple.get(review)));
+                ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(entity);
+                map.put("review",reviewDTO);
 
-                String nickname = tuple.get(1, String.class);
+                String nickname = UserDTO.ToUserDTO(entity.getUser()).getNickname();
+                map.put("nickname",nickname);
 
-                reviewMap.put("review", reviewDTO);
-                reviewMap.put("nickname", nickname);
-                reviewListMap.add(reviewMap);
+                result.add(map);
             }
-            */
 
             Map<String, Object> resultMap = new HashMap<>();
+
             resultMap.put("keyword", keyword);
-            resultMap.put("reviewList", reviewTuples);
+            resultMap.put("reviewList", result);
             resultList.add(resultMap);
         }
 
