@@ -1,9 +1,7 @@
 package com.back.cinetalk.review.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
-import com.back.cinetalk.rereview.entity.ReReviewEntity;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
-import com.back.cinetalk.review_genre.ReviewGenreEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,11 +38,12 @@ public class ReviewEntity extends BaseEntity {
 
     private boolean spoiler;
 
-    @OneToMany(mappedBy = "review")
-    private List<ReReviewEntity> reReviewEntityList = new ArrayList<ReReviewEntity>();
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private ReviewEntity parentReview; //부모 리뷰
 
-    @OneToMany(mappedBy = "review")
-    private List<ReviewGenreEntity> reviewGenreEntityList = new ArrayList<ReviewGenreEntity>();
+    @OneToMany(mappedBy = "parentReview", orphanRemoval = true)
+    private List<ReviewEntity> childrenComment = new ArrayList<ReviewEntity>(); //자식 댓글들(리뷰에 대한 댓글)
 
     public void update(ReviewRequestDTO reviewRequestDTO) {
         this.star = reviewRequestDTO.getStar();

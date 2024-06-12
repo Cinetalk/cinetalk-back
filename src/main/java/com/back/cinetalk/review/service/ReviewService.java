@@ -44,6 +44,7 @@ public class ReviewService {
                 .star(reviewRequestDTO.getStar())
                 .content(reviewRequestDTO.getContent())
                 .spoiler(reviewRequestDTO.isSpoiler())
+                .parentReview(null)
                 .build();
 
         return reviewRepository.save(review);

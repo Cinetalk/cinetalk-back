@@ -4,7 +4,6 @@ import com.back.cinetalk.movie.dto.MovieDTO;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.rate.entity.QRateEntity;
-import com.back.cinetalk.rereview.entity.QReReviewEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import com.back.cinetalk.review.dto.ReviewResponseDTO;
