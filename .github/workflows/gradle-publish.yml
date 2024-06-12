@@ -54,7 +54,7 @@ jobs:
           key: ${{ secrets.AWS_PEM_KEY }}
           port: 22
           script: |
-            docker login -u kallis0926 -p alemal@!34
+            docker login -u kallis0926 -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull kallis0926/cinetalk-back-app:0.1
             cd cinetalk-back-cicd
-            docker-compose up -d
+            docker-compose -f docker-compose.yml up -d
