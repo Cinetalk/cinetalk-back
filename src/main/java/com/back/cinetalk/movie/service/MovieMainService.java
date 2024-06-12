@@ -8,6 +8,7 @@ import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
+import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
@@ -52,7 +53,6 @@ public class MovieMainService {
 
     QReviewEntity review = QReviewEntity.reviewEntity;
     QUserEntity user = QUserEntity.userEntity;
-    QReReviewEntity reReview = QReReviewEntity.reReviewEntity;
     QRateEntity rate = QRateEntity.rateEntity;
 
     public List<Map<String, Object>> nowPlayingList() throws IOException {
@@ -140,14 +140,19 @@ public class MovieMainService {
 
         String email = jwtUtil.getEmail(accessToken);
 
+        NumberTemplate<Long> RereviewCountSubquery = Expressions.numberTemplate(Long.class,
+                "(select count(*) from ReviewEntity where parentReview.id = {0})", review.id);
+
+
         List<Tuple> result = queryFactory
                 .select(review,
-                        JPAExpressions.select(reReview.count()).from(reReview).where(reReview.review.eq(review)),
+                        //JPAExpressions.select(review.count()).from(review).where(review.id.eq(review.parentReview.id)),
+                        RereviewCountSubquery.as("RereivewCount"),
                         JPAExpressions.select(rate.count()).from(rate).where(rate.reviewId.eq(review.id))
                 )
                 .from(review)
                 .leftJoin(user).on(review.user.eq(user))
-                .where(user.email.eq(email))
+                .where(user.email.eq(email).and(review.parentReview.id.isNull()))
                 .orderBy(review.createdAt.asc())
                 .fetch();
 
@@ -158,20 +163,21 @@ public class MovieMainService {
             Map<String, Object> resultMap = new HashMap<>();
 
             ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(tuple.get(review)));
+
             Long reReviewCount = tuple.get(1, Long.class);
             Long rateCount = tuple.get(2, Long.class);
+
             Map<String, Object> oneByID = getOneByID(reviewDTO.getMovieId());
             String poster = (String) oneByID.get("poster_path");
 
             resultMap.put("review_id", reviewDTO.getId());
             resultMap.put("movie_id", reviewDTO.getMovieId());
-            resultMap.put("user_id", reviewDTO.getUserId());
+            resultMap.put("user_id", reviewDTO.getUser().getId());
             resultMap.put("star", reviewDTO.getStar());
             resultMap.put("content", reviewDTO.getContent());
             resultMap.put("reReviewCount", reReviewCount);
             resultMap.put("likeCount", rateCount);
             resultMap.put("poster", poster);
-
             resultlist.add(resultMap);
         }
 
@@ -199,10 +205,10 @@ public class MovieMainService {
                     "(select count(*) from RateEntity where rate = 1 and reviewId = {0})", review.id);
 
             NumberTemplate<Long> reReviewCountSubquery = Expressions.numberTemplate(Long.class,
-                    "(select count(*) from ReReviewEntity where reviewId = {0})", review.id);
+                    "(select count(*) from ReviewEntity where parentReview.id = {0})", review.id);
 
             NumberTemplate<Double> avgStarSubquery = Expressions.numberTemplate(Double.class,
-                    "(select ROUND(avg(star), 1) from ReviewEntity where movieId = {0})", movieid);
+                    "(select ROUND(avg(star), 1) from ReviewEntity where movieId = {0} and parentReview.id is null)", movieid);
 
             Tuple result = queryFactory
                     .select(review,
@@ -210,12 +216,15 @@ public class MovieMainService {
                             reReviewCountSubquery.as("reReviewCount"),
                             avgStarSubquery.as("avgStar"))
                     .from(review)
-                    .where(review.movieId.eq(movieid))
+                    .where(review.movieId.eq(movieid).and(review.parentReview.isNull()))
                     .orderBy(rateCountSubquery.desc())
                     .limit(1)
                     .fetchFirst();
 
-            ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(result.get(review)));
+            //ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull));
+
+            result.get(review)
+
             Map<String, Object> oneByID = getOneByID(movieid);
 
             Map<String, Object> map = new HashMap<>();

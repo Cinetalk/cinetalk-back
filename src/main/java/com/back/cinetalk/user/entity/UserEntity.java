@@ -1,7 +1,6 @@
 package com.back.cinetalk.user.entity;
 
 import com.back.cinetalk.keyword.entity.KeywordEntity;
-import com.back.cinetalk.rereview.entity.ReReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.UserDTO;
 import jakarta.persistence.*;
@@ -36,9 +35,6 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user")
     private List<ReviewEntity> reviewEntityList = new ArrayList<ReviewEntity>();
-
-    @OneToMany(mappedBy = "user")
-    private List<ReReviewEntity> reReviewEntityList = new ArrayList<ReReviewEntity>();
 
     @OneToMany(mappedBy = "user")
     private List<KeywordEntity> keywordEntityList = new ArrayList<KeywordEntity>();
