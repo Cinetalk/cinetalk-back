@@ -1,6 +1,7 @@
 package com.back.cinetalk.keyword.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
+import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,9 @@ public class KeywordEntity extends BaseEntity {
 
     private Long movieId;
 
-//    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     private String keyword;
 
