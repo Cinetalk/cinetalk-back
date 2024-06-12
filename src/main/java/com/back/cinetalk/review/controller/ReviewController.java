@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +24,9 @@ public class ReviewController {
 
     @PostMapping("/{movieId}/save")
     @Operation(summary = "리뷰 등록 API", description = "리뷰를 등록하는 프로세스")
-    @ApiResponse(responseCode = "200", description = "등록완료",
-            content = @Content(schema = @Schema(implementation = ReviewRequestDTO.class)))
-    public ReviewResponseDTO saveReview(HttpServletRequest request, @PathVariable Long movieId, @RequestBody ReviewRequestDTO reviewRequestDTO) {
+    public ReviewResponseDTO saveReview(HttpServletRequest request,
+                                        @PathVariable Long movieId,
+                                        @RequestBody @Valid ReviewRequestDTO reviewRequestDTO) {
 
         ReviewEntity reviewEntity = reviewService.saveReview(request, movieId, reviewRequestDTO);
         return ReviewResponseDTO.toReviewResponseDTO(reviewEntity);
@@ -40,10 +41,11 @@ public class ReviewController {
         return ReviewPreViewListDTO.toReviewPreViewListDTO(reviewList);
     }
 
-
     @PatchMapping("/{reviewId}")
     @Operation(summary = "리뷰 수정 API", description = "리뷰를 수정하는 API 입니다.")
-    public ReviewResponseDTO updateReview(HttpServletRequest request, @PathVariable Long reviewId, @RequestBody ReviewRequestDTO reviewRequestDTO) {
+    public ReviewResponseDTO updateReview(HttpServletRequest request,
+                                          @PathVariable Long reviewId,
+                                          @Valid @RequestBody ReviewRequestDTO reviewRequestDTO) {
 
         ReviewEntity reviewEntity = reviewService.updateReview(request, reviewId, reviewRequestDTO);
         return ReviewResponseDTO.toReviewResponseDTO(reviewEntity);
@@ -51,7 +53,9 @@ public class ReviewController {
 
     @DeleteMapping("/{reviewId}")
     @Operation(summary = "리뷰 삭제 API", description = "리뷰를 삭제하는 API 입니다.")
-    public StateRes deleteReview(HttpServletRequest request, @PathVariable Long reviewId) {
+    public StateRes deleteReview(HttpServletRequest request,
+                                 @PathVariable Long reviewId) {
+
         return reviewService.deleteReview(request, reviewId);
     }
 
