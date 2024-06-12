@@ -221,9 +221,7 @@ public class MovieMainService {
                     .limit(1)
                     .fetchFirst();
 
-            //ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull));
-
-            result.get(review)
+            ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(result.get(review)));
 
             Map<String, Object> oneByID = getOneByID(movieid);
 
