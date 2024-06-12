@@ -199,9 +199,13 @@ public class MovieMainService {
 
         List<Map<String, Object>> resultlist = new ArrayList<>();
 
+
+
         for (Tuple tuple : movielist) {
 
             Long movieid = tuple.get(1, Long.class);
+
+
 
             NumberTemplate<Long> rateCountSubquery = Expressions.numberTemplate(Long.class,
                     "(select count(*) from RateEntity where rate = 1 and reviewId = {0})", review.id);
@@ -223,17 +227,19 @@ public class MovieMainService {
                     .limit(1)
                     .fetchFirst();
 
-            ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(result.get(review)));
-
             Map<String, Object> oneByID = getOneByID(movieid);
 
-            Map<String, Object> map = new HashMap<>();
+            ReviewEntity reviewEntity = result.get(review);
 
             LocalDateTime createdAt = result.get(review).getCreatedAt();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
             String formattedDate = createdAt.format(formatter);
 
-            map.put("reviewData", reviewDTO);
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("movieid",movieid);
+            map.put("star",reviewEntity.getStar());
+            map.put("content",reviewEntity.getContent());
             map.put("regDate", formattedDate);
             map.put("likeCount", result.get(1, Long.class));
             map.put("rereviewCount", result.get(2, Long.class));

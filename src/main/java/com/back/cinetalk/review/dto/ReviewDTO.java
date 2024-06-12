@@ -25,6 +25,8 @@ public class ReviewDTO {
 
     private boolean spoiler;
 
+    private ReviewEntity parentReview;
+
     public static ReviewDTO toReviewDTO(ReviewEntity reviewEntity){
         return ReviewDTO.builder()
                 .id(reviewEntity.getId())
@@ -33,6 +35,7 @@ public class ReviewDTO {
                 .star(reviewEntity.getStar())
                 .content(reviewEntity.getContent())
                 .spoiler(reviewEntity.isSpoiler())
+                .parentReview(reviewEntity.getParentReview())
                 .build();
     }
 }
