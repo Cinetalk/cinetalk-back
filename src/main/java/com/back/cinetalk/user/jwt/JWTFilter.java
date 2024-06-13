@@ -49,11 +49,6 @@ public class JWTFilter extends OncePerRequestFilter {
         if (accessToken == null) {
 
             log.info("토큰 존재하지 않음");
-            /*
-            if(!requestUri.matches("^\\/logout$") || !requestUri.matches("^\\/login$") || !requestUri.matches("^\\/signup$")){
-
-            }
-             */
 
             //다음 요청으로 넘기는 구문
             filterChain.doFilter(request, response);

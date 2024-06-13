@@ -68,8 +68,9 @@ public class SecurityConfig {
 
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:63342"));
+                        //configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));  // <--cors 건드려줄 부분
                         configuration.setAllowedMethods(Collections.singletonList("*"));
+                        configuration.addAllowedOriginPattern("*"); // cors 지정시 삭제해야할 부분
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
                         configuration.setMaxAge(3600L);
@@ -110,9 +111,10 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/join","/reissue","/movie/**","/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/user").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/user","/movie/ReviewByUser").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/login", "/join","/reissue","/movie/**","/find/**", "keywords/**","/reviews/**").permitAll()
                         .anyRequest().authenticated());
 
 

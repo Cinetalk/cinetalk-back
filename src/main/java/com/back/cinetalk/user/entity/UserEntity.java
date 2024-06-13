@@ -1,8 +1,13 @@
 package com.back.cinetalk.user.entity;
 
+import com.back.cinetalk.keyword.entity.KeywordEntity;
+import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -11,7 +16,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +32,12 @@ public class UserEntity {
     private String provider;
 
     private String role;
+
+    @OneToMany(mappedBy = "user")
+    private List<ReviewEntity> reviewEntityList = new ArrayList<ReviewEntity>();
+
+    @OneToMany(mappedBy = "user")
+    private List<KeywordEntity> keywordEntityList = new ArrayList<KeywordEntity>();
 
     public static UserEntity ToUserEntity(UserDTO userDTO){
         return UserEntity.builder()

@@ -1,5 +1,6 @@
 package com.back.cinetalk.movie.entity;
 
+import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.movie.dto.MovieDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,29 +16,24 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieEntity {
+public class MovieEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String movie_id;
+    private Long movieId;
 
     private String movienm;
 
-    private LocalDate regdate;
-
-    @PrePersist
-    public void prePersist() {
-        this.regdate = LocalDate.now(); // 현재 날짜를 설정
-    }
+    private int audiAcc;
 
     public static MovieEntity ToMovieEntity(MovieDTO movieDTO){
         return MovieEntity.builder()
                 .id(movieDTO.getId())
-                .movie_id(movieDTO.getMovie_id())
+                .movieId(movieDTO.getMovieId())
                 .movienm(movieDTO.getMovienm())
-                .regdate(movieDTO.getRegdate())
+                .audiAcc(movieDTO.getAudiAcc())
                 .build();
     }
 }
