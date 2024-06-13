@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/reviews")
@@ -33,28 +35,37 @@ public class ReviewController {
         return ReviewResponseDTO.toReviewResponseDTO(reviewEntity);
     }
 
-    @PostMapping("/{parentId}/reReview")
+    @PostMapping("/{parentReviewId}/reReview")
     public ReReviewResponseDTO saveReReview(HttpServletRequest request,
-                                                   @PathVariable Long parentId,
+                                                   @PathVariable(name = "parentReviewId") Long parentReviewId,
                                                    @RequestBody @Valid ReReviewRequestDTO reReviewRequestDTO) {
 
-        ReviewEntity reReviewEntity = reviewService.saveReReview(request, parentId, reReviewRequestDTO);
+        ReviewEntity reReviewEntity = reviewService.saveReReview(request, parentReviewId, reReviewRequestDTO);
         return ReReviewResponseDTO.toReReviewResponseDTO(reReviewEntity);
     }
 
     @GetMapping("/{movieId}")
     @Operation(summary = "특정 영화의 리뷰 목록 조회 API", description = "특정 영화 리뷰들의 목록을 조회하는 API 이며, 페이징을 포함합니다.")
-    public ReviewPreViewListDTO getReviewListByStore(@PathVariable(name = "movieId") Long movieId,
+    public ReviewPreViewListDTO getReviewListByMovie(@PathVariable(name = "movieId") Long movieId,
                                                      @RequestParam(name = "page") Integer page) {
 
         Page<ReviewPreViewDTO> reviewList = reviewService.getReviewList(movieId, page);
         return ReviewPreViewListDTO.toReviewPreViewListDTO(reviewList);
     }
 
+    @GetMapping("/{parentReviewId}/reReview")
+    @Operation(summary = "리뷰의 댓글 목록 조회 API", description = "특정 리뷰의 댓글 목록을 조회하는 API 이며, 페이징을 포함합니다.")
+    public ReReviewPreViewListDTO getReviewListByParentReview(@PathVariable(name = "parentReviewId") Long parentReviewId,
+                                                              @RequestParam(name = "page") Integer page) {
+
+        Page<ReReviewPreViewDTO> reReviewList = reviewService.getReReviewList(parentReviewId, page);
+        return ReReviewPreViewListDTO.toReReviewPreViewListDTO(reReviewList);
+    }
+
     @PatchMapping("/{reviewId}")
     @Operation(summary = "리뷰 수정 API", description = "리뷰를 수정하는 API 입니다.")
     public ReviewResponseDTO updateReview(HttpServletRequest request,
-                                          @PathVariable Long reviewId,
+                                          @PathVariable(name = "reviewId") Long reviewId,
                                           @Valid @RequestBody ReviewRequestDTO reviewRequestDTO) {
 
         ReviewEntity reviewEntity = reviewService.updateReview(request, reviewId, reviewRequestDTO);
@@ -64,7 +75,7 @@ public class ReviewController {
     @DeleteMapping("/{reviewId}")
     @Operation(summary = "리뷰 삭제 API", description = "리뷰를 삭제하는 API 입니다.")
     public StateRes deleteReview(HttpServletRequest request,
-                                 @PathVariable Long reviewId) {
+                                 @PathVariable(name = "reviewId") Long reviewId) {
 
         return reviewService.deleteReview(request, reviewId);
     }

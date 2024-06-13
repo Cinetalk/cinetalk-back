@@ -1,9 +1,6 @@
 package com.back.cinetalk.review.service;
 
-import com.back.cinetalk.review.dto.ReReviewRequestDTO;
-import com.back.cinetalk.review.dto.ReviewPreViewDTO;
-import com.back.cinetalk.review.dto.ReviewRequestDTO;
-import com.back.cinetalk.review.dto.StateRes;
+import com.back.cinetalk.review.dto.*;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.review.repository.ReviewRepositoryCustom;
@@ -11,6 +8,7 @@ import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,8 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,11 +50,11 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public ReviewEntity saveReReview(HttpServletRequest request, Long parentId, ReReviewRequestDTO reReviewRequestDTO) {
+    public ReviewEntity saveReReview(HttpServletRequest request, Long parentReviewId, ReReviewRequestDTO reReviewRequestDTO) {
         String email = jwtUtil.getEmail(request.getHeader("access"));
         UserEntity user = userRepository.findByEmail(email);
 
-        ReviewEntity parentReview = reviewRepository.findById(parentId)
+        ReviewEntity parentReview = reviewRepository.findById(parentReviewId)
                 .orElseThrow(EntityNotFoundException::new);
 
         ReviewEntity comment = ReviewEntity.builder()
@@ -72,7 +69,12 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public Page<ReviewPreViewDTO> getReviewList(Long movieId, Integer page) {
-        return reviewRepository.findAllByMovieIdWithUser(movieId, PageRequest.of(page, 10));
+        return reviewRepository.findAllByMovieId(movieId, PageRequest.of(page, 10));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReReviewPreViewDTO> getReReviewList(Long parentReviewId, Integer page) {
+        return reviewRepository.findAllByParentReviewId(parentReviewId, PageRequest.of(page, 10));
     }
 
     @Transactional
@@ -106,5 +108,4 @@ public class ReviewService {
         reviewRepository.delete(reviewEntity);
         return new StateRes(true);
     }
-
 }
