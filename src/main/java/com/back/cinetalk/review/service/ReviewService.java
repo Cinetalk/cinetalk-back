@@ -83,10 +83,10 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("해당 리뷰를 찾을 수 없습니다."));
 
         if (!user.equals(reviewEntity.getUser())) {
-            throw new SecurityException("리뷰를 수정할 권한이 없습니다.");
+            throw new RuntimeException("리뷰를 수정할 권한이 없습니다.");
         }
 
         reviewEntity.update(reviewRequestDTO);
@@ -99,10 +99,10 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("해당 리뷰를 찾을 수 없습니다."));
 
         if (!user.equals(reviewEntity.getUser())) {
-            throw new SecurityException("리뷰를 수정할 권한이 없습니다.");
+            throw new RuntimeException("리뷰를 수정할 권한이 없습니다.");
         }
 
         reviewRepository.delete(reviewEntity);

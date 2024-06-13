@@ -1,6 +1,8 @@
 package com.back.cinetalk.keyword.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
+import com.back.cinetalk.keyword.dto.KeywordRequestDTO;
+import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +12,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "Keyword")
 @Builder
 @NoArgsConstructor
@@ -30,4 +31,8 @@ public class KeywordEntity extends BaseEntity {
     private String keyword;
 
     private int count;
+
+    public void update(KeywordRequestDTO keywordRequestDTO) {
+        this.keyword = keywordRequestDTO.getKeyword();
+    }
 }
