@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ec2-user
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -55,6 +55,6 @@ jobs:
           key: ${{ secrets.AWS_PEM_KEY }}
 
           script: |
-            docker-compose -f docker-compose.yml down --rmi all
+#            docker-compose -f docker-compose.yml down --rmi all
             docker pull kallis0926/cinetalk-back
             docker-compose -f docker-compose.yml up -d

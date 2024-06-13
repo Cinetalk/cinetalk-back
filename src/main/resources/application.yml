@@ -87,8 +87,6 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://cinetalk-back-database:3306/cinetalk-back-database
 
-
-    ;
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
 
