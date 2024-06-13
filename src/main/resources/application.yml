@@ -34,7 +34,7 @@ spring:
             client-secret: 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
             redirect-uri: http://localhost:8089/login/oauth2/code/google
             authorization-grant-type: authorization_code
-            scope: profile,email
+            scope: profile,email,https://www.googleapis.com/auth/user.birthday.read,https://www.googleapis.com/auth/user.gender.read
           kakao:
             client-name: kakao
             client-id: 800cc786d3549b13be4c7ecc5c5c0ee2

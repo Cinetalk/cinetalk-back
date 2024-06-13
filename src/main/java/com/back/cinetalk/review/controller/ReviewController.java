@@ -26,7 +26,7 @@ public class ReviewController {
     @PostMapping("/{movieId}/save")
     @Operation(summary = "리뷰 등록 API", description = "리뷰를 등록하는 프로세스")
     public ReviewResponseDTO saveReview(HttpServletRequest request,
-                                        @PathVariable Long movieId,
+                                        @PathVariable(name = "movieId") Long movieId,
                                         @RequestBody @Valid ReviewRequestDTO reviewRequestDTO) {
 
         ReviewEntity reviewEntity = reviewService.saveReview(request, movieId, reviewRequestDTO);
