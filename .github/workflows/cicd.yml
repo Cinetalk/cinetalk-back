@@ -45,11 +45,13 @@ jobs:
         run: |
           docker build -t kallis0926/cinetalk-back -f ./Dockerfile . # 여기서 DockerFile 로 썼다가 에러남..
           docker push kallis0926/cinetalk-back
+
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
         env:
           APP: "cinetalk-back"
           COMPOSE: "/root/docker-compose.yml"
+
         with:
           username: self-hosted
           host: 3.37.21.244
