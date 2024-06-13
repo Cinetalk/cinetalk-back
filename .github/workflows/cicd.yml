@@ -48,17 +48,13 @@ jobs:
 
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
-        env:
-          APP: "cinetalk-back"
-          COMPOSE: "/root/docker-compose.yml"
 
         with:
-          username: self-hosted
+          username: ec2-user
           host: 3.37.21.244
           key: ${{ secrets.AWS_PEM_KEY }}
-          envs: APP, COMPOSE
-          script_stop: true
-          script: |
-            sudo docker-compose -f docker-compose.yml down --rmi all
-            sudo docker pull kallis0926/cinetalk-back
-            sudo docker-compose -f docker-compose.yml up -d
+#          script_stop: true
+#          script: |
+#            sudo docker-compose -f docker-compose.yml down --rmi all
+#            sudo docker pull kallis0926/cinetalk-back
+#            sudo docker-compose -f docker-compose.yml up -d
