@@ -8,6 +8,8 @@ public class KakaoResponse implements OAuth2Response{
 
     public KakaoResponse(Map<String, Object> attribute) {
         this.attribute = (Map<String, Object>) attribute.get("kakao_account");
+
+        System.out.println(attribute);
     }
 
     @Override
