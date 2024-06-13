@@ -1,5 +1,6 @@
 package com.back.cinetalk.review.service;
 
+import com.back.cinetalk.review.dto.ReReviewRequestDTO;
 import com.back.cinetalk.review.dto.ReviewPreViewDTO;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import com.back.cinetalk.review.dto.StateRes;
@@ -9,6 +10,7 @@ import com.back.cinetalk.review.repository.ReviewRepositoryCustom;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +51,23 @@ public class ReviewService {
                 .build();
 
         return reviewRepository.save(review);
+    }
+
+    public ReviewEntity saveReReview(HttpServletRequest request, Long parentId, ReReviewRequestDTO reReviewRequestDTO) {
+        String email = jwtUtil.getEmail(request.getHeader("access"));
+        UserEntity user = userRepository.findByEmail(email);
+
+        ReviewEntity parentReview = reviewRepository.findById(parentId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        ReviewEntity comment = ReviewEntity.builder()
+                .user(user)
+                .movieId(parentReview.getMovieId())
+                .content(reReviewRequestDTO.getContent())
+                .parentReview(parentReview)
+                .build();
+
+        return reviewRepository.save(comment);
     }
 
     @Transactional(readOnly = true)

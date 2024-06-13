@@ -2,7 +2,6 @@ package com.back.cinetalk.review.dto;
 
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.UserDTO;
-import com.back.cinetalk.user.entity.UserEntity;
 import lombok.*;
 
 @Builder
