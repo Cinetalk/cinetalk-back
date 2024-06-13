@@ -49,9 +49,7 @@ jobs:
           docker push kallis0926/cinetalk-back
 
       - name: Execute run.sh script
-        run: |
-          chmod +x ./actions-runner/run.sh
-          ./actions-runner/run.sh
+        run: ./actions-runner/run.sh
 
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
