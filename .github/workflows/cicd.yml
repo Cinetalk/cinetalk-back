@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ec2-user
+    runs-on: self-host
     steps:
       - name: Checkout
         uses: actions/checkout@v3
