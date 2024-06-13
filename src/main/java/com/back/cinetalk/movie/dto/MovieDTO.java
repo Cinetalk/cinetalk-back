@@ -18,18 +18,18 @@ public class MovieDTO {
 
     private Long id;
 
-    private String movie_id;
+    private Long movieId;
 
     private String movienm;
 
-    private LocalDate regdate;
+    private int audiAcc;
 
     public static MovieDTO ToMovieDTO(MovieEntity movieEntity){
         return MovieDTO.builder()
                 .id(movieEntity.getId())
-                .movie_id(movieEntity.getMovie_id())
+                .movieId(movieEntity.getMovieId())
                 .movienm(movieEntity.getMovienm())
-                .regdate(movieEntity.getRegdate())
+                .audiAcc(movieEntity.getAudiAcc())
                 .build();
     }
 }
