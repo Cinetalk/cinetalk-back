@@ -9,11 +9,11 @@ services:
     ports:
       - "6379:6379"
   cinetalk-back-database:
-    container_name: cinetalk-back-database
+    container_name: cinetalk-back-database-local
     build:
       dockerfile: Dockerfile
       context: ./database
-    image: kallis0926/cinetalk-back-database
+    image: kallis0926/cinetalk-back-database-local
     environment:
       - MARIADB_DATABASE=cinetalk-back-database-local
       - MARIADB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
