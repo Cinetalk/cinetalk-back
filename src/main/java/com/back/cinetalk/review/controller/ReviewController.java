@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -30,6 +31,15 @@ public class ReviewController {
 
         ReviewEntity reviewEntity = reviewService.saveReview(request, movieId, reviewRequestDTO);
         return ReviewResponseDTO.toReviewResponseDTO(reviewEntity);
+    }
+
+    @PostMapping("/{parentId}/reReview")
+    public ReReviewResponseDTO saveReReview(HttpServletRequest request,
+                                                   @PathVariable Long parentId,
+                                                   @RequestBody @Valid ReReviewRequestDTO reReviewRequestDTO) {
+
+        ReviewEntity reReviewEntity = reviewService.saveReReview(request, parentId, reReviewRequestDTO);
+        return ReReviewResponseDTO.toReReviewResponseDTO(reReviewEntity);
     }
 
     @GetMapping("/{movieId}")
