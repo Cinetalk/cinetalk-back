@@ -56,6 +56,6 @@ jobs:
           script_stop: true
           script: |
             cd cinetalk-back
-            sudo docker-compose -f docker-compose down
+            sudo docker-compose -f docker-compose.yml down
             sudo docker pull kallis0926/cinetalk-back
-            sudo docker-compose -f docker-compose up -d
+            sudo docker-compose -f docker-compose.yml up -d
