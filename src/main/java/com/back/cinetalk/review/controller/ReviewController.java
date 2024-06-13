@@ -26,7 +26,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/{movieId}/save")
-    @Operation(summary = "리뷰 등록 API", description = "리뷰를 등록하는 프로세스")
+    @Operation(summary = "리뷰 등록 API", description = "리뷰를 등록하는 API 입니다.")
     public ReviewResponseDTO saveReview(HttpServletRequest request,
                                         @PathVariable(name = "movieId") Long movieId,
                                         @RequestBody @Valid ReviewRequestDTO reviewRequestDTO) {
@@ -36,6 +36,7 @@ public class ReviewController {
     }
 
     @PostMapping("/{parentReviewId}/reReview")
+    @Operation(summary = "리뷰의 댓글 등록 API", description = "리뷰의 댓글을 등록하는 API 입니다.")
     public ReReviewResponseDTO saveReReview(HttpServletRequest request,
                                                    @PathVariable(name = "parentReviewId") Long parentReviewId,
                                                    @RequestBody @Valid ReReviewRequestDTO reReviewRequestDTO) {
@@ -66,7 +67,7 @@ public class ReviewController {
     @Operation(summary = "리뷰 수정 API", description = "리뷰를 수정하는 API 입니다.")
     public ReviewResponseDTO updateReview(HttpServletRequest request,
                                           @PathVariable(name = "reviewId") Long reviewId,
-                                          @Valid @RequestBody ReviewRequestDTO reviewRequestDTO) {
+                                          @RequestBody @Valid ReviewRequestDTO reviewRequestDTO) {
 
         ReviewEntity reviewEntity = reviewService.updateReview(request, reviewId, reviewRequestDTO);
         return ReviewResponseDTO.toReviewResponseDTO(reviewEntity);

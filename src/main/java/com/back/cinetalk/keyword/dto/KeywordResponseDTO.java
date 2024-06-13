@@ -23,5 +23,4 @@ public class KeywordResponseDTO {
                 .count(keywordEntity.getCount())
                 .build();
     }
-
 }

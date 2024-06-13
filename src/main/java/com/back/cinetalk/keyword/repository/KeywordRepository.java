@@ -15,8 +15,10 @@ public interface KeywordRepository extends JpaRepository<KeywordEntity, Long>, K
     @Query("SELECT DISTINCT k.keyword FROM KeywordEntity k " +
             "WHERE k.movieId = :movieId " +
             "GROUP BY k.keyword " +
-            "ORDER BY MAX(k.createdAt) DESC " +
+            "ORDER BY MAX(k.updatedAt) DESC " +
             "LIMIT 4")
     List<String> findDistinctKeywordsByMovieIdOrderByCreatedAtDesc(@Param("movieId") Long movieId);
+
+    boolean existsByUserIdAndMovieId(Long userId, Long movieId);
 }
 
