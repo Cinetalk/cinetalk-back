@@ -53,7 +53,7 @@ jobs:
           username: ec2-user
           host: 3.37.21.244
           key: ${{ secrets.AWS_PEM_KEY }}
-          script_stop: true
+
           script: |
             cd cinetalk-back
             sudo docker-compose -f docker-compose.yml down
