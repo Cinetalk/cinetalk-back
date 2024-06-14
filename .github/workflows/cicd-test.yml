@@ -56,6 +56,9 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: develop
 
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.7
