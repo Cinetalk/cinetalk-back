@@ -12,7 +12,7 @@ jobs:
   run-java-gradle:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up JDK21
         uses: actions/setup-java@v3
@@ -50,37 +50,18 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: build and release to DockerHub
-        env:
-          NAME: kallis0926
-          APP: cinetalk-back
-        run: |
-          docker build -t kallis0926/cinetalk-back -f ./Dockerfile .
-          docker push kallis0926/cinetalk-back
-
-#      - name: Image digest
-#        run: echo ${{ steps.docker_build.outputs.digest }}
-
   cd-pipeline:
     needs: build-image
-    name: continuos deploy
+    name: continuous deploy
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
-      - name: copy file via ssh password
-        uses: appleboy/scp-action@v2
-        with:
-          host: ${{ secrets.EC2_IP }}
-          username: ec2-user
-          key: ${{ secrets.AWS_PEM_KEY }}
-          port: 22
-          source: "docker-compose.yml"
-          target: "/home/ec2-user/cinetalk-back"
+      - uses: actions/checkout@v3
+
       - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@v2
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_IP }}
           username: ec2-user
           key: ${{ secrets.AWS_PEM_KEY }}
           port: 22
-          script: "docker-compose -f docker-compose up -d"
+          script: cd /home/ec2-user/cinetalk-back && docker-compose -f docker-compose.yml up -d --build

@@ -5,7 +5,6 @@ import com.back.cinetalk.keyword.dto.KeywordResponseDTO;
 import com.back.cinetalk.keyword.dto.LatestKeywordResponseDTO;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.keyword.service.KeywordService;
-import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController

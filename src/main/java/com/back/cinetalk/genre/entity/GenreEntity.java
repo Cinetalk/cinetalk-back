@@ -1,7 +1,5 @@
 package com.back.cinetalk.genre;
 
-import com.back.cinetalk.badge.entity.BadgeEntity;
-import com.back.cinetalk.bookmark.entity.BookmarkEntity;
 import com.back.cinetalk.review_genre.ReviewGenreEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
