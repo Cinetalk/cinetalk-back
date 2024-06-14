@@ -44,7 +44,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         //구글 로그인일때
         else if(registrationId.equals("google")){
 
-            oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
+            String accessToken = userRequest.getAccessToken().getTokenValue();
+
+            oAuth2Response = new GoogleResponse(oAuth2User.getAttributes(),accessToken);
 
             log.info(String.valueOf("oAuth2Response : "+oAuth2Response));
         }
@@ -68,6 +70,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         //oauth 디폴트 password 생성
         userDTO.setPassword("oauthdefalt");
         userDTO.setName(oAuth2Response.getName());
+        userDTO.setGender(oAuth2Response.getGender());
+        userDTO.setBirthday(oAuth2Response.getBirthday());
+        userDTO.setProfile(oAuth2Response.getProfile());
         userDTO.setProvider(oAuth2Response.getProvider());
 
         //DB에 존재하지 않을 경우 : 회원가입
@@ -84,23 +89,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
         //DB에 존재할 경우 : 로그인  --- ※다른 소셜에 이미 있는 이메일일 경우 처리 필요
         else{
+
+            userDTO.setRole(existData.getRole());
             
-            /*
             //같은 소셜 로그인일 경우
             if(oAuth2Response.getProvider().equals(existData.getProvider())){
-                userDTO.setRole(existData.getRole());
+
 
                 return new CustomOAuth2User(userDTO);
             }
             //다른 소셜 로그인일 경우
             else {
-                
-            }
-            */
-             
-            userDTO.setRole(existData.getRole());
 
-            return new CustomOAuth2User(userDTO);
+                userRepository.updateProviderByEmail(oAuth2Response.getProvider(),oAuth2Response.getEmail());
+
+                return new CustomOAuth2User(userDTO);
+            }
         }
     }
 }

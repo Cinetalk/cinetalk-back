@@ -1,11 +1,14 @@
 package com.back.cinetalk.user.entity;
 
+import com.back.cinetalk.bookmark.entity.BookmarkEntity;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
+import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,14 @@ public class UserEntity {
 
     private String nickname;
 
+    private String gender;
+
+    private LocalDate birthday;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] profile;
+
     private String provider;
 
     private String role;
@@ -39,6 +50,12 @@ public class UserEntity {
     @OneToMany(mappedBy = "user")
     private List<KeywordEntity> keywordEntityList = new ArrayList<KeywordEntity>();
 
+    @OneToMany(mappedBy = "user")
+    private List<RateEntity> rateEntityList = new ArrayList<RateEntity>();
+
+    @OneToMany(mappedBy = "user")
+    private List<BookmarkEntity> bookmarkEntityList = new ArrayList<BookmarkEntity>();
+
     public static UserEntity ToUserEntity(UserDTO userDTO){
         return UserEntity.builder()
                 .id(userDTO.getId())
@@ -46,6 +63,9 @@ public class UserEntity {
                 .password(userDTO.getPassword())
                 .name(userDTO.getName())
                 .nickname(userDTO.getNickname())
+                .gender(userDTO.getGender())
+                .birthday(userDTO.getBirthday())
+                .profile(userDTO.getProfile())
                 .provider(userDTO.getProvider())
                 .role(userDTO.getRole())
                 .build();

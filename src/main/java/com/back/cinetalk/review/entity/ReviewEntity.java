@@ -1,6 +1,7 @@
 package com.back.cinetalk.review.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
+import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -45,10 +46,12 @@ public class ReviewEntity extends BaseEntity {
     @OneToMany(mappedBy = "parentReview", orphanRemoval = true)
     private List<ReviewEntity> childrenComment = new ArrayList<ReviewEntity>(); //자식 댓글들(리뷰에 대한 댓글)
 
+    @OneToMany(mappedBy = "review")
+    private List<RateEntity> rateEntityList = new ArrayList<RateEntity>();
+
     public void update(ReviewRequestDTO reviewRequestDTO) {
         this.star = reviewRequestDTO.getStar();
         this.content = reviewRequestDTO.getContent();
         this.spoiler = reviewRequestDTO.isSpoiler();
     }
-
 }

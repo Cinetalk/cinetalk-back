@@ -61,7 +61,6 @@ public class MovieMainService {
 
     public List<Map<String, Object>> nowPlayingList() throws IOException {
 
-
         MovieEntity time = movieRepository.findFirstByOrderByCreatedAtAsc();
 
         LocalDate createdAt = time.getCreatedAt().toLocalDate();
@@ -152,7 +151,7 @@ public class MovieMainService {
                 .select(review,
                         //JPAExpressions.select(review.count()).from(review).where(review.id.eq(review.parentReview.id)),
                         RereviewCountSubquery.as("RereivewCount"),
-                        JPAExpressions.select(rate.count()).from(rate).where(rate.reviewId.eq(review.id))
+                        JPAExpressions.select(rate.count()).from(rate).where(rate.review.id.eq(review.id))
                 )
                 .from(review)
                 .leftJoin(user).on(review.user.eq(user))
@@ -210,7 +209,7 @@ public class MovieMainService {
 
 
             NumberTemplate<Long> rateCountSubquery = Expressions.numberTemplate(Long.class,
-                    "(select count(*) from RateEntity where rate = 1 and reviewId = {0})", review.id);
+                    "(select count(*) from RateEntity where rate = 1 and review.id = {0})", review.id);
 
             NumberTemplate<Long> reReviewCountSubquery = Expressions.numberTemplate(Long.class,
                     "(select count(*) from ReviewEntity where parentReview.id = {0})", review.id);

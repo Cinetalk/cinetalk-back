@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Builder
 @Getter
 @NoArgsConstructor
@@ -18,5 +21,11 @@ public class LatestKeywordResponseDTO {
         return LatestKeywordResponseDTO.builder()
                 .keyword(keyword)
                 .build();
+    }
+
+    public static List<LatestKeywordResponseDTO> fromEntityList(List<String> keywordList) {
+        return keywordList.stream()
+                .map(LatestKeywordResponseDTO::toLatestKeywordResponseDTO)
+                .collect(Collectors.toList());
     }
 }

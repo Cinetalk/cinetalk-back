@@ -9,16 +9,11 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewPreViewDTO {
+public class ReReviewPreViewDTO {
 
     String nickName;
-
-    Double star;
 
     String content;
 
     LocalDateTime createdAt;
-
-    boolean spoiler;
-
 }
