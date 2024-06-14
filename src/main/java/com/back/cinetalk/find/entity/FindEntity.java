@@ -22,14 +22,12 @@ public class FindEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String keword;
-
-    private LocalDate regdate;
+    private String findword;
 
     public static FindEntity ToFindEntity(FindDTO findDTO){
         return FindEntity.builder()
                 .id(findDTO.getId())
-                .keword(findDTO.getKeword())
+                .findword(findDTO.getFindword())
                 .build();
     }
 }

@@ -1,12 +1,15 @@
 package com.back.cinetalk.find.service;
 
 import com.back.cinetalk.find.dto.FindDTO;
+import com.back.cinetalk.find.dto.FindReviewDTO;
 import com.back.cinetalk.find.entity.FindEntity;
+import com.back.cinetalk.find.entity.QFindEntity;
 import com.back.cinetalk.find.repository.FindRepository;
 import com.back.cinetalk.movie.service.CallAPI;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.user.dto.UserDTO;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +33,11 @@ public class FindService {
     private final JPAQueryFactory queryFactory;
 
 
-    public ResponseEntity<?> WordSave(String keword){
+    public ResponseEntity<?> WordSave(String findword){
 
         FindDTO findDTO = new FindDTO();
 
-        findDTO.setKeword(keword);
+        findDTO.setFindword(findword);
 
         FindEntity findEntity = FindEntity.ToFindEntity(findDTO);
 
@@ -70,7 +75,7 @@ public class FindService {
         return resultlist;
     }
 
-    public List<ReviewDTO> ReviewResult(String query) {
+    public List<FindReviewDTO> ReviewResult(String query) {
 
         QReviewEntity review = QReviewEntity.reviewEntity;
 
@@ -81,15 +86,37 @@ public class FindService {
                 .orderBy(review.createdAt.asc())
                 .fetch();
 
-        List<ReviewDTO> returnList = new ArrayList<>();
+        List<FindReviewDTO> returnList = new ArrayList<>();
 
         for (ReviewEntity reviewEntity : result) {
 
+            FindReviewDTO findReviewDTO = new FindReviewDTO();
+
             ReviewDTO dto = ReviewDTO.toReviewDTO(reviewEntity);
 
-            returnList.add(dto);
+            findReviewDTO.setReviewDTO(dto);
+
+            findReviewDTO.setUserId(UserDTO.ToUserDTO(reviewEntity.getUser()).getId());
+
+            returnList.add(findReviewDTO);
         }
 
         return returnList;
+    }
+
+    public ResponseEntity<?> PopularFind(){
+
+        QFindEntity find = QFindEntity.findEntity;
+
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7).with(LocalTime.MIDNIGHT);
+
+        List<String> list = queryFactory.select(find.findword).from(find)
+                .where(find.createdAt.gt(sevenDaysAgo))
+                .groupBy(find.findword)
+                .orderBy(find.count().desc(), find.createdAt.asc(), find.findword.asc())
+                .limit(10)
+                .fetch();
+
+        return new ResponseEntity<>(list,HttpStatus.OK);
     }
 }

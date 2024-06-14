@@ -32,13 +32,13 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         List<ReviewPreViewDTO> results = queryFactory
                 .select(Projections.constructor(
                         ReviewPreViewDTO.class,
-                        userEntity.nickname,
+                        reviewEntity.user.nickname,
                         reviewEntity.star,
                         reviewEntity.content,
                         reviewEntity.createdAt,
                         reviewEntity.spoiler))
                 .from(reviewEntity)
-                .leftJoin(userEntity).on(reviewEntity.userId.eq(userEntity.id))
+                .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
                 .where(reviewEntity.movieId.eq(movieId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

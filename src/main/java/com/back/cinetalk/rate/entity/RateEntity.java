@@ -24,21 +24,21 @@ public class RateEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int review_id;
+    private Long reviewId;
 
     @ColumnDefault("0")
-    private int rereview_id;
+    private Long rereviewId;
 
-    private int user_id;
+    private Long userId;
 
     private int rate;
 
     public static RateEntity ToRateEntity(RateDTO rateDTO){
         return RateEntity.builder()
                 .id(rateDTO.getId())
-                .review_id(rateDTO.getReview_id())
-                .rereview_id(rateDTO.getRereview_id())
-                .user_id(rateDTO.getUser_id())
+                .reviewId(rateDTO.getReviewId())
+                .rereviewId(rateDTO.getRereviewId())
+                .userId(rateDTO.getUserId())
                 .rate(rateDTO.getRate())
                 .build();
     }

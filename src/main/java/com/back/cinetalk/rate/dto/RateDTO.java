@@ -19,20 +19,20 @@ public class RateDTO {
 
     private Long id;
 
-    private int review_id;
+    private Long reviewId;
 
-    private int rereview_id;
+    private Long rereviewId;
 
-    private int user_id;
+    private Long userId;
 
     private int rate;
 
     public static RateDTO ToRateDTO(RateEntity rateEntity){
         return RateDTO.builder()
                 .id(rateEntity.getId())
-                .review_id(rateEntity.getReview_id())
-                .rereview_id(rateEntity.getRereview_id())
-                .user_id(rateEntity.getUser_id())
+                .reviewId(rateEntity.getReviewId())
+                .rereviewId(rateEntity.getRereviewId())
+                .userId(rateEntity.getUserId())
                 .rate(rateEntity.getRate())
                 .build();
     }

@@ -4,16 +4,19 @@ import com.back.cinetalk.movie.dto.MovieDTO;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.rate.entity.QRateEntity;
-import com.back.cinetalk.rereview.entity.QReReviewEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
+import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
+import com.back.cinetalk.user.dto.UserDTO;
 import com.back.cinetalk.user.entity.QUserEntity;
+import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.querydsl.core.QueryFactory;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.JPAExpressions;
@@ -24,6 +27,7 @@ import kr.co.shineware.nlp.komoran.core.Komoran;
 import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -53,7 +57,6 @@ public class MovieMainService {
 
     QReviewEntity review = QReviewEntity.reviewEntity;
     QUserEntity user = QUserEntity.userEntity;
-    QReReviewEntity reReview = QReReviewEntity.reReviewEntity;
     QRateEntity rate = QRateEntity.rateEntity;
 
     public List<Map<String, Object>> nowPlayingList() throws IOException {
@@ -85,7 +88,7 @@ public class MovieMainService {
 
                     MovieDTO movieDTO = new MovieDTO();
 
-                    movieDTO.setMovieId((Integer) map.get("id"));
+                    movieDTO.setMovieId((Long) map.get("id"));
                     movieDTO.setMovienm((String) map.get("title"));
                     movieDTO.setAudiAcc(Integer.parseInt((String) info.get("audiAcc")));
 
@@ -101,9 +104,9 @@ public class MovieMainService {
             List<MovieEntity> list = movieRepository.findAll();
 
             for (MovieEntity movieEntity : list) {
-                int movieId = movieEntity.getMovieId();
+                Long movieId = movieEntity.getMovieId();
 
-                result.add(getOneByID((long) movieId));
+                result.add(getOneByID(movieId));
             }
         }
         return result;
@@ -141,14 +144,19 @@ public class MovieMainService {
 
         String email = jwtUtil.getEmail(accessToken);
 
+        NumberTemplate<Long> RereviewCountSubquery = Expressions.numberTemplate(Long.class,
+                "(select count(*) from ReviewEntity where parentReview.id = {0})", review.id);
+
+
         List<Tuple> result = queryFactory
                 .select(review,
-                        JPAExpressions.select(reReview.count()).from(reReview).where(reReview.review_id.eq(review.id.intValue())),
-                        JPAExpressions.select(rate.count()).from(rate).where(rate.review_id.eq(review.id.intValue()))
+                        //JPAExpressions.select(review.count()).from(review).where(review.id.eq(review.parentReview.id)),
+                        RereviewCountSubquery.as("RereivewCount"),
+                        JPAExpressions.select(rate.count()).from(rate).where(rate.reviewId.eq(review.id))
                 )
                 .from(review)
-                .leftJoin(user).on(review.userId.eq(user.id))
-                .where(user.email.eq(email))
+                .leftJoin(user).on(review.user.eq(user))
+                .where(user.email.eq(email).and(review.parentReview.id.isNull()))
                 .orderBy(review.createdAt.asc())
                 .fetch();
 
@@ -159,20 +167,21 @@ public class MovieMainService {
             Map<String, Object> resultMap = new HashMap<>();
 
             ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(tuple.get(review)));
+
             Long reReviewCount = tuple.get(1, Long.class);
             Long rateCount = tuple.get(2, Long.class);
+
             Map<String, Object> oneByID = getOneByID(reviewDTO.getMovieId());
             String poster = (String) oneByID.get("poster_path");
 
             resultMap.put("review_id", reviewDTO.getId());
             resultMap.put("movie_id", reviewDTO.getMovieId());
-            resultMap.put("user_id", reviewDTO.getUserId());
+            resultMap.put("user_id", reviewDTO.getUser().getId());
             resultMap.put("star", reviewDTO.getStar());
             resultMap.put("content", reviewDTO.getContent());
             resultMap.put("reReviewCount", reReviewCount);
             resultMap.put("likeCount", rateCount);
             resultMap.put("poster", poster);
-
             resultlist.add(resultMap);
         }
 
@@ -192,18 +201,22 @@ public class MovieMainService {
 
         List<Map<String, Object>> resultlist = new ArrayList<>();
 
+
+
         for (Tuple tuple : movielist) {
 
             Long movieid = tuple.get(1, Long.class);
 
+
+
             NumberTemplate<Long> rateCountSubquery = Expressions.numberTemplate(Long.class,
-                    "(select count(*) from RateEntity where rate = 1 and review_id = {0})", review.id);
+                    "(select count(*) from RateEntity where rate = 1 and reviewId = {0})", review.id);
 
             NumberTemplate<Long> reReviewCountSubquery = Expressions.numberTemplate(Long.class,
-                    "(select count(*) from ReReviewEntity where review_id = {0})", review.id);
+                    "(select count(*) from ReviewEntity where parentReview.id = {0})", review.id);
 
             NumberTemplate<Double> avgStarSubquery = Expressions.numberTemplate(Double.class,
-                    "(select ROUND(avg(star), 1) from ReviewEntity where movieId = {0})", movieid);
+                    "(select ROUND(avg(star), 1) from ReviewEntity where movieId = {0} and parentReview.id is null)", movieid);
 
             Tuple result = queryFactory
                     .select(review,
@@ -211,21 +224,24 @@ public class MovieMainService {
                             reReviewCountSubquery.as("reReviewCount"),
                             avgStarSubquery.as("avgStar"))
                     .from(review)
-                    .where(review.movieId.eq(movieid))
+                    .where(review.movieId.eq(movieid).and(review.parentReview.isNull()))
                     .orderBy(rateCountSubquery.desc())
                     .limit(1)
                     .fetchFirst();
 
-            ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(result.get(review)));
             Map<String, Object> oneByID = getOneByID(movieid);
 
-            Map<String, Object> map = new HashMap<>();
+            ReviewEntity reviewEntity = result.get(review);
 
             LocalDateTime createdAt = result.get(review).getCreatedAt();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
             String formattedDate = createdAt.format(formatter);
 
-            map.put("reviewData", reviewDTO);
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("movieid",movieid);
+            map.put("star",reviewEntity.getStar());
+            map.put("content",reviewEntity.getContent());
             map.put("regDate", formattedDate);
             map.put("likeCount", result.get(1, Long.class));
             map.put("rereviewCount", result.get(2, Long.class));
@@ -250,7 +266,7 @@ public class MovieMainService {
                 .select(review.content)
                 .from(review)
                 // review.createdAt의 날짜 부분만 비교하기 위해 LocalDate로 변환 후 비교
-                .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX)))
+                .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX)).and(review.parentReview.isNull()))
                 .fetch();
 
         if(reviewList.isEmpty()){
@@ -264,69 +280,56 @@ public class MovieMainService {
             Review.append(content);
         }
 
-        Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
+        Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
 
         // 형태소 분석 및 단어 추출 - 알고리즘 최적화
-        List<String> morphList = new ArrayList<>();
-        for (String reviewContent : reviewList) {
-            List<Token> tokenList = komoran.analyze(reviewContent).getTokenList();
-            for (Token token : tokenList) {
-                String pos = token.getPos();
-                String morph = token.getMorph();
-                if (pos.contains("NN") && morph.length() > 1) {
-                    morphList.add(morph);
-                }
+        Map<String, Integer> wordFrequency = new HashMap<>();
+
+        List<Token> tokenList = komoran.analyze(String.valueOf(Review)).getTokenList();
+
+        for (Token token : tokenList) {
+            String pos = token.getPos();
+            String morph = token.getMorph();
+            if (pos.contains("NN") && morph.length() > 1) {
+                // 단어가 이미 존재하면 빈도수를 증가시키고, 없으면 새로운 키로 추가
+                wordFrequency.put(morph, wordFrequency.getOrDefault(morph, 0) + 1);
             }
         }
 
-        // 단어 빈도수 계산
-        Map<String, Integer> morphCountMap = new HashMap<>();
-        for (String morph : morphList) {
-            morphCountMap.put(morph, morphCountMap.getOrDefault(morph, 0) + 1);
-        }
+        // 빈도순으로 정렬
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
+        sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
-        // 단어 빈도수를 기준으로 내림차순 정렬
-        List<Map.Entry<String, Integer>> sortedEntries = morphCountMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toList());
-
-        //키워드 5개만 추리기
-        if (sortedEntries.size() > 5) {
-            sortedEntries = sortedEntries.subList(0, 5);
-        }
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
-        for (Map.Entry<String, Integer> entry : sortedEntries) {
+        for (int i = 0; i<5; i++) {
+
+            Map.Entry<String, Integer> entry = sortedList.get(i);
+
             String keyword = entry.getKey();
 
-            // 리뷰 검색 - 쿼리 최적화
-            List<Tuple> reviewTuples = queryFactory
-                    .select(review, user.nickname)
-                    .from(review)
-                    .leftJoin(user).on(review.userId.eq(user.id.longValue()))
-                    .where(review.content.like("%" + keyword + "%"))
-                    .orderBy(review.createdAt.asc())
-                    .limit(10)
-                    .fetch();
+            List<ReviewEntity> list = reviewRepository.findTop10ByContentContainingAndParentReviewIsNullOrderByCreatedAtAsc(keyword);
 
-            List<Map<String, Object>> reviewListMap = new ArrayList<>();
+            List<Map<String,Object>> result = new ArrayList<>();
 
-            for (Tuple tuple : reviewTuples) {
-                Map<String, Object> reviewMap = new HashMap<>();
+            for (ReviewEntity entity:list){
 
-                ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(tuple.get(review)));
+                Map<String,Object> map = new HashMap<>();
 
-                String nickname = tuple.get(1, String.class);
+                ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(entity);
+                map.put("review",reviewDTO);
 
-                reviewMap.put("review", reviewDTO);
-                reviewMap.put("nickname", nickname);
-                reviewListMap.add(reviewMap);
+                String nickname = UserDTO.ToUserDTO(entity.getUser()).getNickname();
+                map.put("nickname",nickname);
+
+                result.add(map);
             }
 
             Map<String, Object> resultMap = new HashMap<>();
+
             resultMap.put("keyword", keyword);
-            resultMap.put("reviewList", reviewListMap);
+            resultMap.put("reviewList", result);
             resultList.add(resultMap);
         }
 

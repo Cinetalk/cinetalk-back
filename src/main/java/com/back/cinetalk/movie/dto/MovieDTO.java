@@ -18,7 +18,7 @@ public class MovieDTO {
 
     private Long id;
 
-    private int movieId;
+    private Long movieId;
 
     private String movienm;
 

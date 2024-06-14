@@ -1,5 +1,6 @@
 package com.back.cinetalk.find.controller;
 
+import com.back.cinetalk.find.dto.FindReviewDTO;
 import com.back.cinetalk.find.service.FindService;
 import com.back.cinetalk.movie.service.MovieDetailService;
 import com.back.cinetalk.review.dto.ReviewDTO;
@@ -24,14 +25,13 @@ import java.util.Map;
 public class FindController {
 
     private final FindService findService;
-    private final MovieDetailService movieDetailService;
 
     @PostMapping("/findSave")
     @Operation(summary = "검색어 저장",description = "인기 검색어 순위를 위한 검색어 저장 프로세스")
     @ApiResponse(responseCode = "200",description = "저장완료",content = @Content(schema = @Schema(implementation = HttpResponse.class)))
-    public ResponseEntity<?> WordSave(@RequestParam(value = "keword") String keword){
+    public ResponseEntity<?> WordSave(@RequestParam(value = "findword") String findword){
 
-        return findService.WordSave(keword);
+        return findService.WordSave(findword);
     }
 
     @GetMapping("/findText")
@@ -61,7 +61,7 @@ public class FindController {
 
 
         //리뷰 결과 정렬
-        List<ReviewDTO> reviewlist = findService.ReviewResult(query);
+        List<FindReviewDTO> reviewlist = findService.ReviewResult(query);
         if (reviewlist.size() > 16) {
             reviewlist = reviewlist.subList(0, 16);
         }
@@ -84,8 +84,15 @@ public class FindController {
     @Operation(summary = "(검색)리뷰 조회",description = "검색어에 따른 모든 리뷰 조회 프로세스")
     public ResponseEntity<?> findReview(@RequestParam(value = "query")String query){
 
-        List<ReviewDTO> reviewlist = findService.ReviewResult(query);
+        List<FindReviewDTO> reviewlist = findService.ReviewResult(query);
 
         return new ResponseEntity<>(reviewlist,HttpStatus.OK);
+    }
+
+    @GetMapping("/PopularFind")
+    @Operation(summary = "인기 검색어",description = "오늘을 포함한 7일 동안의 인기검색어 리스트")
+    public ResponseEntity<?> PopularFind(){
+
+        return findService.PopularFind();
     }
 }
