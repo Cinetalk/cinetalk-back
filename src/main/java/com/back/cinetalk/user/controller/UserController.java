@@ -55,6 +55,6 @@ public class UserController {
             return new ResponseEntity<>("닉네임이 옳바르지 않습니다.", HttpStatus.BAD_REQUEST);
         }
 
-        return userService.nickNameMerge(request,response,nickname);
+        return userService.nickNameMerge(request,nickname);
     }
 }

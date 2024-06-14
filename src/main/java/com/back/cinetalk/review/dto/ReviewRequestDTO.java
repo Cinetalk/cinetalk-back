@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 public class ReviewRequestDTO {
 
@@ -15,4 +17,6 @@ public class ReviewRequestDTO {
 
     @NotNull
     private boolean spoiler;
+
+    private List<Long> genreList;
 }

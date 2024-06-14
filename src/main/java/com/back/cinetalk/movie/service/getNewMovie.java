@@ -52,8 +52,6 @@ public class getNewMovie {
             resultmap.put("movieNm",map.get("movieNm"));
             resultmap.put("audiAcc",map.get("audiAcc"));
 
-            //System.out.println(map.get("audiAcc"));
-
             resultlist.add(resultmap);
         }
 
