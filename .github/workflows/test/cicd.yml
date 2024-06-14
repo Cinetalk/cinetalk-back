@@ -13,7 +13,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@main
         with:
           submodules: true
       - name: Validate Gradle Wrapper
@@ -76,9 +76,19 @@ jobs:
           host: ${{ secrets.EC2_IP }}
           key: ${{ secrets.AWS_PEM_KEY }}
           port: 22
+          source: docker-compose.yml
+          target: /home/ec2-user/
 
-          script: |
-            cd cinetalk-back
-            docker-compose -f docker-compose.yml down --rmi all
-            docker pull kallis0926/cinetalk-back
-            docker-compose -f docker-compose.yml up -d --build
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+            host: ${{ secrets.EC2_IP }}
+            username: ec2-user
+            key: ${{ secrets.AWS_PEM_KEY }}
+            port: 22
+            script: docker-compose pull && docker-compose up -d
+
+#          script: |
+#            docker-compose -f docker-compose.yml down --rmi all
+#            docker pull kallis0926/cinetalk-back
+#            docker-compose -f docker-compose.yml up -d --build
