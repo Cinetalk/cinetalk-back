@@ -1,9 +1,8 @@
 package com.back.cinetalk.review.repository;
 
-import com.back.cinetalk.review.dto.ReReviewPreViewDTO;
+import com.back.cinetalk.review.dto.CommentPreViewDTO;
 import com.back.cinetalk.review.dto.ReviewPreViewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
-import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -62,15 +61,15 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     }
 
     @Override
-    public Page<ReReviewPreViewDTO> findAllByParentReviewId(Long parentReviewId, Pageable pageable) {
+    public Page<CommentPreViewDTO> findAllByParentReviewId(Long parentReviewId, Pageable pageable) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
         QReviewEntity reviewEntity = QReviewEntity.reviewEntity;
         QUserEntity userEntity = QUserEntity.userEntity;
 
-        List<ReReviewPreViewDTO> results = queryFactory
+        List<CommentPreViewDTO> results = queryFactory
                 .select(Projections.constructor(
-                        ReReviewPreViewDTO.class,
+                        CommentPreViewDTO.class,
                         reviewEntity.user.nickname,
                         reviewEntity.content,
                         reviewEntity.createdAt))
