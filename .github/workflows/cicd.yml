@@ -78,7 +78,6 @@ jobs:
           port: 22
 
           script: |
-            cd cinetalk-back
-            docker-compose -f docker-compose.yml down --rmi all
+            ./cinetalk-back/docker-compose -f docker-compose.yml down --rmi all
             docker pull kallis0926/cinetalk-back
-            docker-compose -f docker-compose.yml up -d --build
+            ./cinetalk-back/docker-compose -f docker-compose.yml up -d --build
