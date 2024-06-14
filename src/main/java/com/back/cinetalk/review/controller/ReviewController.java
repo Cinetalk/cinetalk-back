@@ -68,7 +68,7 @@ public class ReviewController {
     }
 
     @PatchMapping("/comments/{commentId}")
-    @Operation(summary = "리뷰 수정 API", description = "리뷰를 수정하는 API 입니다.")
+    @Operation(summary = "댓글 수정 API", description = "댓글을 수정하는 API 입니다.")
     public CommentResponseDTO updateComment(HttpServletRequest request,
                                           @PathVariable(name = "commentId") Long commentId,
                                           @RequestBody @Valid CommentRequestDTO commentRequestDTO) {
@@ -78,7 +78,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
-    @Operation(summary = "리뷰 삭제 API", description = "리뷰를 삭제하는 API 입니다.")
+    @Operation(summary = "리뷰 or 댓글 삭제 API", description = "리뷰 혹은 댓글을 삭제하는 API 입니다.")
     public StateRes deleteReview(HttpServletRequest request,
                                  @PathVariable(name = "reviewId") Long reviewId) {
 
