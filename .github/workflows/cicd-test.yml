@@ -50,15 +50,18 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push
-        id: docker_build
+      - name: build and release to DockerHub
         uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/app:latest
+        env:
+          NAME: kallis0926
+          APP: cinetalk-back
+        run: |
+          docker build -t kallis0926/cinetalk-back -f ./Dockerfile .
+          docker push kallis0926/cinetalk-back
 
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+#      - name: Image digest
+#        run: echo ${{ steps.docker_build.outputs.digest }}
+
   cd-pipeline:
     needs: build-image
     name: continuos deploy
