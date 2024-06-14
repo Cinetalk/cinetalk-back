@@ -67,15 +67,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      - name: copy file via ssh password
-        uses: appleboy/scp-action@v2
-        with:
-          host: ${{ secrets.EC2_IP }}
-          username: ec2-user
-          key: ${{ secrets.AWS_PEM_KEY }}
-          port: 22
-          source: "docker-compose.yml"
-          target: "/home/ec2-user/cinetalk-back"
+
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v2
         with:
@@ -83,4 +75,6 @@ jobs:
           username: ec2-user
           key: ${{ secrets.AWS_PEM_KEY }}
           port: 22
-          script: "docker-compose -f docker-compose up -d"
+          script: |
+           docker pull kallis0926/cinetalk-back
+           docker-compose -f docker-compose up -d
