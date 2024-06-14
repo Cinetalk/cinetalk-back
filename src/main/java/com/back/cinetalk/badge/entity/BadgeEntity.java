@@ -1,7 +1,7 @@
 package com.back.cinetalk.badge.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
-import com.back.cinetalk.genre.GenreEntity;
+import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,6 @@
 package com.back.cinetalk.bookmark.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
-import com.back.cinetalk.genre.GenreEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
