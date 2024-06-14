@@ -53,10 +53,10 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.AWS_PEM_KEY }}
 
-      - name: deploy
-        run: |
-          chmod +x ./deploy.sh
-          ./deploy.sh
+#      - name: deploy
+#        run: |
+#          chmod +x ./deploy.sh
+#          ./deploy.sh
 
 #
 #      - name: Connect to EC2
