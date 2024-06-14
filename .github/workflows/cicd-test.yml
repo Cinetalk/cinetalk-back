@@ -77,4 +77,4 @@ jobs:
           port: 22
           script: |
            docker pull kallis0926/cinetalk-back
-           ~/cinetalk-back/docker-compose -f docker-compose.yml up -d
+           ~/ec2-user/cinetalk-back docker-compose -f docker-compose.yml up -d
