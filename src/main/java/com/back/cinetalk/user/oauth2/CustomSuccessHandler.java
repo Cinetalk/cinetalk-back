@@ -65,7 +65,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addCookie(createCookie("refresh",refresh));
         response.setStatus(HttpStatus.OK.value());
 
-        //닉네임이 존재할 경우
+        //닉네임이 존재하지 않을 경우
         if(nickname == null){
 
             String Newnickname = nicknameGenerator.getNickname();
@@ -74,20 +74,21 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             response.sendRedirect("http://localhost:63342/front/nickName.html");
         }
-        //닉네임이 존재하지 않을 경우
+        //닉네임이 존재할 경우
         else{
-            response.sendRedirect("http://localhost:63342/front/index.html");
+            response.sendRedirect("https://cinetalk-front-dev.vercel.app/");
         }
     }
 
     private Cookie createCookie(String key, String value){
 
         Cookie cookie = new Cookie(key,value);
-        cookie.setMaxAge(24*60*60);
-        //cookie.setSecure(true);
+        cookie.setMaxAge(24*60*60); //1일
+        //https 만 쿠키전송
+        //cookie.setSecure(false);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
         cookie.setHttpOnly(true);
-
+        cookie.setAttribute("SameSite","None");
         return cookie;
     }
 

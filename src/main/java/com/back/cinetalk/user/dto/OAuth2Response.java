@@ -1,5 +1,7 @@
 package com.back.cinetalk.user.dto;
 
+import java.time.LocalDate;
+
 public interface OAuth2Response {
 
     //제공자 (Ex. naver, google, ...)
@@ -10,4 +12,13 @@ public interface OAuth2Response {
     String getEmail();
     //사용자 실명 (설정한 이름)
     String getName();
+
+    //사용자 성별
+    String getGender();
+
+    //사용자 생년월일
+    LocalDate getBirthday();
+
+    //사용자 프로필사진
+    byte[] getProfile();
 }

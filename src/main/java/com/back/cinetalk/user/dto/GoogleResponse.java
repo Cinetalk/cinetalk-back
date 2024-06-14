@@ -1,5 +1,6 @@
 package com.back.cinetalk.user.dto;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 public class GoogleResponse implements OAuth2Response{
@@ -33,5 +34,20 @@ public class GoogleResponse implements OAuth2Response{
     public String getName() {
 
         return attribute.get("name").toString();
+    }
+
+    @Override
+    public String getGender() {
+        return null;
+    }
+
+    @Override
+    public LocalDate getBirthday() {
+        return null;
+    }
+
+    @Override
+    public byte[] getProfile() {
+        return new byte[0];
     }
 }

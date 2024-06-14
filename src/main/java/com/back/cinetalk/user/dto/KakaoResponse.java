@@ -1,5 +1,6 @@
 package com.back.cinetalk.user.dto;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 public class KakaoResponse implements OAuth2Response{
@@ -36,5 +37,20 @@ public class KakaoResponse implements OAuth2Response{
         Map<String,Object> profile = (Map<String, Object>) attribute.get("profile");
 
         return profile.get("nickname").toString();
+    }
+
+    @Override
+    public String getGender() {
+        return null;
+    }
+
+    @Override
+    public LocalDate getBirthday() {
+        return null;
+    }
+
+    @Override
+    public byte[] getProfile() {
+        return new byte[0];
     }
 }
