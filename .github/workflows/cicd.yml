@@ -79,6 +79,7 @@ jobs:
           username: ec2-user
           host: ${{ secrets.EC2_IP }}
           key: ${{ secrets.AWS_PEM_KEY }}
+          port: 22
 
           script: |
             cd cinetalk-back
