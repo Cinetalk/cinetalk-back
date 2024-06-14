@@ -58,12 +58,9 @@ jobs:
           docker build -t kallis0926/cinetalk-back -f ./Dockerfile .
           docker push kallis0926/cinetalk-back
 
-#      - name: Image digest
-#        run: echo ${{ steps.docker_build.outputs.digest }}
-
   cd-pipeline:
     needs: build-image
-    name: continuos deploy
+    name: continuous deploy
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
@@ -75,6 +72,4 @@ jobs:
           username: ec2-user
           key: ${{ secrets.AWS_PEM_KEY }}
           port: 22
-          script: |
-           docker pull kallis0926/cinetalk-back
-           cd /home/ec2-user/cinetalk-back && docker-compose -f docker-compose.yml up -d
+          script: cd /home/ec2-user/cinetalk-back && docker-compose -f docker-compose.yml up -d --build
