@@ -92,7 +92,7 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public Page<CommentPreViewDTO> getReReviewList(Long parentReviewId, Integer page) {
+    public Page<CommentPreViewDTO> getCommentList(Long parentReviewId, Integer page) {
         return reviewRepository.findAllByParentReviewId(parentReviewId, PageRequest.of(page, 10));
     }
 

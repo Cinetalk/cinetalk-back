@@ -31,9 +31,9 @@ public class ReviewController {
 
     @PostMapping("/{parentReviewId}/comments")
     @Operation(summary = "리뷰의 댓글 등록 API", description = "리뷰의 댓글을 등록하는 API 입니다.")
-    public CommentResponseDTO saveReReview(HttpServletRequest request,
-                                            @PathVariable(name = "parentReviewId") Long parentReviewId,
-                                            @RequestBody @Valid CommentRequestDTO commentRequestDTO) {
+    public CommentResponseDTO saveComment(HttpServletRequest request,
+                                          @PathVariable(name = "parentReviewId") Long parentReviewId,
+                                          @RequestBody @Valid CommentRequestDTO commentRequestDTO) {
 
         ReviewEntity reReviewEntity = reviewService.saveComment(request, parentReviewId, commentRequestDTO);
         return CommentResponseDTO.toCommentResponseDTO(reReviewEntity);
@@ -50,10 +50,10 @@ public class ReviewController {
 
     @GetMapping("/{parentReviewId}/comments")
     @Operation(summary = "리뷰의 댓글 목록 조회 API", description = "특정 리뷰의 댓글 목록을 조회하는 API 이며, 페이징을 포함합니다.")
-    public CommentPreViewListDTO getReviewListByParentReview(@PathVariable(name = "parentReviewId") Long parentReviewId,
-                                                             @RequestParam(name = "page") Integer page) {
+    public CommentPreViewListDTO getCommentListByParentReview(@PathVariable(name = "parentReviewId") Long parentReviewId,
+                                                              @RequestParam(name = "page") Integer page) {
 
-        Page<CommentPreViewDTO> reReviewList = reviewService.getReReviewList(parentReviewId, page);
+        Page<CommentPreViewDTO> reReviewList = reviewService.getCommentList(parentReviewId, page);
         return CommentPreViewListDTO.toReReviewPreViewListDTO(reReviewList);
     }
 
