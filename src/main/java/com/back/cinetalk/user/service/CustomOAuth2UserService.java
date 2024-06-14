@@ -44,7 +44,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         //구글 로그인일때
         else if(registrationId.equals("google")){
 
-            oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
+            String accessToken = userRequest.getAccessToken().getTokenValue();
+
+            oAuth2Response = new GoogleResponse(oAuth2User.getAttributes(),accessToken);
 
             log.info(String.valueOf("oAuth2Response : "+oAuth2Response));
         }
@@ -89,7 +91,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         else{
 
             userDTO.setRole(existData.getRole());
-
+            
             //같은 소셜 로그인일 경우
             if(oAuth2Response.getProvider().equals(existData.getProvider())){
 
