@@ -38,8 +38,8 @@ public class ReviewController {
     @PostMapping("/{parentReviewId}/reReview")
     @Operation(summary = "리뷰의 댓글 등록 API", description = "리뷰의 댓글을 등록하는 API 입니다.")
     public ReReviewResponseDTO saveReReview(HttpServletRequest request,
-                                                   @PathVariable(name = "parentReviewId") Long parentReviewId,
-                                                   @RequestBody @Valid ReReviewRequestDTO reReviewRequestDTO) {
+                                            @PathVariable(name = "parentReviewId") Long parentReviewId,
+                                            @RequestBody @Valid ReReviewRequestDTO reReviewRequestDTO) {
 
         ReviewEntity reReviewEntity = reviewService.saveReReview(request, parentReviewId, reReviewRequestDTO);
         return ReReviewResponseDTO.toReReviewResponseDTO(reReviewEntity);
