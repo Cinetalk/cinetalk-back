@@ -77,4 +77,4 @@ jobs:
           port: 22
           script: |
            docker pull kallis0926/cinetalk-back
-           docker-compose -f docker-compose up -d
+           ~/cinetalk/docker-compose -f docker-compose up -d
