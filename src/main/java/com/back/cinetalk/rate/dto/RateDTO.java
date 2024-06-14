@@ -2,6 +2,7 @@ package com.back.cinetalk.rate.dto;
 
 import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.user.entity.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,20 +20,17 @@ public class RateDTO {
 
     private Long id;
 
-    private Long reviewId;
+    private ReviewEntity review;
 
-    private Long rereviewId;
-
-    private Long userId;
+    private UserEntity user;
 
     private int rate;
 
     public static RateDTO ToRateDTO(RateEntity rateEntity){
         return RateDTO.builder()
                 .id(rateEntity.getId())
-                .reviewId(rateEntity.getReviewId())
-                .rereviewId(rateEntity.getRereviewId())
-                .userId(rateEntity.getUserId())
+                .review(rateEntity.getReview())
+                .user(rateEntity.getUser())
                 .rate(rateEntity.getRate())
                 .build();
     }
