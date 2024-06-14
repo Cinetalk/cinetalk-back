@@ -1,4 +1,3 @@
-
 package com.back.cinetalk.review_genre.repository;
 
 import com.back.cinetalk.review_genre.entity.ReviewGenreEntity;
