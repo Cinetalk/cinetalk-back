@@ -2,10 +2,12 @@ name: ci-cd-pipeline
 on:
   push:
     branches:
-      - [main, develop]
+      - main
+      - develop
   pull_request:
     branches:
-      - [main, develop]
+      - main
+      - develop
 jobs:
   run-test-code:
     runs-on: self-hosted
