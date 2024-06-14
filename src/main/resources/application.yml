@@ -25,9 +25,9 @@ spring:
             client-name: naver
             client-id: ZlS_SJtn3r3v8GzuvoEN
             client-secret: 5Na6cINIVr
-            redirect-uri: http://localhost:8089/login/oauth2/code/naver
+            redirect-uri: http://cinetalk.kro.kr/login/oauth2/code/naver
             authorization-grant-type: authorization_code
-            scope: name,email,profile_image,mobile
+            scope: name,email,profile_image,gender,birthday,birthyear
           google:
             client-name: google
             client-id: 990375759582-uauvot1i5dcq368ir6018c23c2mlf47s.apps.googleusercontent.com

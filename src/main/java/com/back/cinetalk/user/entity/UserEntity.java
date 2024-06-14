@@ -6,6 +6,7 @@ import com.back.cinetalk.user.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,14 @@ public class UserEntity {
 
     private String nickname;
 
+    private String gender;
+
+    private LocalDate birthday;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] profile;
+
     private String provider;
 
     private String role;
@@ -46,6 +55,9 @@ public class UserEntity {
                 .password(userDTO.getPassword())
                 .name(userDTO.getName())
                 .nickname(userDTO.getNickname())
+                .gender(userDTO.getGender())
+                .birthday(userDTO.getBirthday())
+                .profile(userDTO.getProfile())
                 .provider(userDTO.getProvider())
                 .role(userDTO.getRole())
                 .build();

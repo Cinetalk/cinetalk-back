@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Schema(description = "User 데이터 담기는 DTO")
 @Data
 @Builder
@@ -23,6 +25,12 @@ public class UserDTO {
 
     private String nickname;
 
+    private String gender;
+
+    private LocalDate birthday;
+
+    private byte[] profile;
+
     private String provider;
 
     private String role;
@@ -35,6 +43,9 @@ public class UserDTO {
                 .password(userEntity.getPassword())
                 .name(userEntity.getName())
                 .nickname(userEntity.getNickname())
+                .gender(userEntity.getGender())
+                .birthday(userEntity.getBirthday())
+                .profile(userEntity.getProfile())
                 .provider(userEntity.getProvider())
                 .role(userEntity.getRole())
                 .build();
