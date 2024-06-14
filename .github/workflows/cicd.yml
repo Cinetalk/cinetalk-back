@@ -76,8 +76,8 @@ jobs:
           host: ${{ secrets.EC2_IP }}
           key: ${{ secrets.AWS_PEM_KEY }}
           port: 22
-          source: "docker-compose.yml"
-          target: "/home/ec2-user/"
+          source: docker-compose.yml
+          target: /home/ec2-user/
 
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
@@ -86,7 +86,7 @@ jobs:
             username: ec2-user
             key: ${{ secrets.AWS_PEM_KEY }}
             port: 22
-            script: "docker-compose pull && docker-compose up -d"
+            script: docker-compose pull && docker-compose up -d
 
 #          script: |
 #            docker-compose -f docker-compose.yml down --rmi all
