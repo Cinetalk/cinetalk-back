@@ -61,7 +61,6 @@ public class MovieMainService {
 
     public List<Map<String, Object>> nowPlayingList() throws IOException {
 
-
         MovieEntity time = movieRepository.findFirstByOrderByCreatedAtAsc();
 
         LocalDate createdAt = time.getCreatedAt().toLocalDate();

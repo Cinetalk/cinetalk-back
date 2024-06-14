@@ -1,3 +1,6 @@
+server:
+  port: 8089
+
 spring:
   profiles:
     active: local
@@ -15,7 +18,7 @@ spring:
 
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/cinetalk-back-database
+    url: ${SPRING_DATASOURCE_URI}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
 
@@ -27,10 +30,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-      show-sql: true
     properties:
       hibernate:
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #이거 안해주니깐 미친놈이 Find 테이블을 find 로 바꿔버림
         dialect: org.hibernate.dialect.MariaDBDialect
+        show-sql: true
+        format_sql: true
   jwt:
     secret: ${JWT_SECRET}
 
@@ -42,7 +48,7 @@ spring:
             client-name: naver
             client-id: ${NAVER_CLIENT_ID}
             client-secret: ${NAVER_CLIENT_SECRET}
-            redirect-uri: ${NAVER_CLIENT_REDIRECT_URI}
+            redirect-uri: ${NAVER_REDIRECT_URI}
             authorization-grant-type: ${NAVER_CLIENT_AUTHORIZATION_GRANT_TYPE}
             scope: ${NAVER_SCOPE}
           google:
@@ -87,8 +93,7 @@ spring:
       on-profile: prod
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://cinetalk-back-database:3306/cinetalk-back-database
-
+    url: ${SPRING_DATASOURCE_URI}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
 
@@ -99,7 +104,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      show-sql: true
+      format_sql: true
 
   jwt:
     secret: ${JWT_SECRET}
@@ -112,7 +121,7 @@ spring:
             client-name: naver
             client-id: ${NAVER_CLIENT_ID}
             client-secret: ${NAVER_CLIENT_SECRET}
-            redirect-uri: ${NAVER_CLIENT_REDIRECT_URI}
+            redirect-uri: ${NAVER_REDIRECT_URI}
             authorization-grant-type: ${NAVER_CLIENT_AUTHORIZATION_GRANT_TYPE}
             scope: ${NAVER_SCOPE}
           google:
