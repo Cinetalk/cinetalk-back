@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+@Repository // JpaRepository를 상속 받으면 이 어노테이션을 지원함.
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , QuerydslPredicateExecutor<ReviewEntity>, ReviewRepositoryCustom {
 
    boolean existsByUserIdAndMovieId(Long userId, Long movieId);
