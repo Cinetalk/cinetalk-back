@@ -68,10 +68,6 @@ jobs:
 #          chmod +x ./deploy.sh
 #          ./deploy.sh
 
-#
-#      - name: Connect to EC2
-#        run: ssh -o StrictHostKeyChecking=no -i "/path/to/your/cinetalk-back-windows-key.pem" ec2-user@ec2-3-37-21-244.ap-northeast-2.compute.amazonaws.com "~/deploy.sh"
-
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
 
