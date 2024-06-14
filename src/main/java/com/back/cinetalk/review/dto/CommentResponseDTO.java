@@ -12,15 +12,15 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReReviewResponseDTO {
+public class CommentResponseDTO {
 
-    Long reReviewId;
+    Long reviewId;
 
     LocalDateTime createdAt;
 
-    public static ReReviewResponseDTO toReReviewResponseDTO(ReviewEntity reviewEntity) {
-        return ReReviewResponseDTO.builder()
-                .reReviewId(reviewEntity.getId())
+    public static CommentResponseDTO toCommentResponseDTO(ReviewEntity reviewEntity) {
+        return CommentResponseDTO.builder()
+                .reviewId(reviewEntity.getId())
                 .createdAt(LocalDateTime.now())
                 .build();
     }
