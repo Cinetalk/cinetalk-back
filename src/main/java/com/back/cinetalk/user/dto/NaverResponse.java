@@ -1,5 +1,10 @@
 package com.back.cinetalk.user.dto;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.Map;
 
 public class NaverResponse implements OAuth2Response{
@@ -32,5 +37,38 @@ public class NaverResponse implements OAuth2Response{
     @Override
     public String getName() {
         return attribute.get("name").toString();
+    }
+
+    @Override
+    public String getGender() {
+        return attribute.get("gender").toString();
+    }
+
+    @Override
+    public LocalDate getBirthday() {
+
+        String birthString = attribute.get("birthyear").toString() + "-" + attribute.get("birthday").toString();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return LocalDate.parse(birthString, formatter);
+    }
+
+    @Override
+    public byte[] getProfile() {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        String url = attribute.get("profile_image").toString();
+
+        ResponseEntity<byte[]> response = restTemplate.getForEntity(url, byte[].class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+
+            return response.getBody();
+        } else {
+
+            return null;
+        }
     }
 }
