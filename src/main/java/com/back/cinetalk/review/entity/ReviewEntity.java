@@ -50,5 +50,4 @@ public class ReviewEntity extends BaseEntity {
         this.content = reviewRequestDTO.getContent();
         this.spoiler = reviewRequestDTO.isSpoiler();
     }
-
 }

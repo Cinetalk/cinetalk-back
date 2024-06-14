@@ -7,6 +7,7 @@ import com.back.cinetalk.keyword.repository.KeywordRepository;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,15 +25,19 @@ public class KeywordService {
     private final JWTUtil jwtUtil;
 
     @Transactional
-    public KeywordEntity create(HttpServletRequest request, Long movieId, KeywordRequestDTO keywordRequestDTO) {
+    public KeywordEntity createKeyword(HttpServletRequest request, Long movieId, KeywordRequestDTO keywordRequestDTO) {
         // 로그인 검사 로직
-//        String email = jwtUtil.getEmail(request.getHeader("access"));
-//        UserEntity user = userRepository.findByEmail(email);
+        String email = jwtUtil.getEmail(request.getHeader("access"));
+        UserEntity user = userRepository.findByEmail(email);
+
+        if (keywordRepository.existsByUserIdAndMovieId(user.getId(), movieId)) {
+            throw new RuntimeException("이미 작성한 키워드입니다.");
+        }
 
         return keywordRepository.save(KeywordEntity.builder()
                 .movieId(movieId)
                 .keyword(keywordRequestDTO.getKeyword())
-//                .user(user)
+                .user(user)
                 .count(1)
                 .build());
     }
@@ -45,5 +50,21 @@ public class KeywordService {
     @Transactional(readOnly = true)
     public List<String> getLatestMentionedKeywordListByMovie(Long movieId) {
         return keywordRepository.findDistinctKeywordsByMovieIdOrderByCreatedAtDesc(movieId);
+    }
+
+    @Transactional
+    public KeywordEntity updateKeyword(HttpServletRequest request, Long keywordId, KeywordRequestDTO keywordRequestDTO) {
+        String email = jwtUtil.getEmail(request.getHeader("access"));
+        UserEntity user = userRepository.findByEmail(email);
+
+        KeywordEntity keywordEntity = keywordRepository.findById(keywordId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        if (!user.equals(keywordEntity.getUser())) {
+            throw new RuntimeException("키워드를 수정할 권한이 없습니다.");
+        }
+
+        keywordEntity.update(keywordRequestDTO);
+        return keywordEntity;
     }
 }

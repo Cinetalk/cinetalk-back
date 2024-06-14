@@ -4,13 +4,13 @@ name: CI/CD
 # event trigger
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -24,6 +24,16 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
+
+      - name: Gradle Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -45,16 +55,31 @@ jobs:
           NAME: kallis0926
           APP: cinetalk-back
         run: |
-          docker build -t kallis0926/cinetalk-back -f ./Dockerfile . # 여기서 DockerFile 로 썼다가 에러남..
+          docker build -t kallis0926/cinetalk-back -f ./Dockerfile .
           docker push kallis0926/cinetalk-back
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.AWS_PEM_KEY }}
+
+#      - name: deploy
+#        run: |
+#          chmod +x ./deploy.sh
+#          ./deploy.sh
+
+#
+#      - name: Connect to EC2
+#        run: ssh -o StrictHostKeyChecking=no -i "/path/to/your/cinetalk-back-windows-key.pem" ec2-user@ec2-3-37-21-244.ap-northeast-2.compute.amazonaws.com "~/deploy.sh"
 
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
 
         with:
           username: ec2-user
-          host: 3.37.21.244
+          host: ${{ secrets.EC2_IP }}
           key: ${{ secrets.AWS_PEM_KEY }}
+          port: 22
 
           script: |
             cd cinetalk-back
