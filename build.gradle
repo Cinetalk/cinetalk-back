@@ -6,8 +6,8 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.1'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.springframework.boot' version '3.2.6'
+    id 'io.spring.dependency-management' version '1.1.5'
 }
 
 group = 'com.example'
@@ -17,7 +17,19 @@ java {
     sourceCompatibility = '21'
 }
 
-apply plugin: 'war'
+bootJar {
+    archiveFileName = 'app.jar'
+}
+
+jar {
+    enabled = false
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 
 repositories {
     mavenCentral()
@@ -30,6 +42,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.0.5'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
     compileOnly 'org.projectlombok:lombok'
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.1.2'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
@@ -48,11 +64,12 @@ dependencies {
     //형태소 분석 API
     implementation 'com.github.shin285:KOMORAN:3.3.9'
 
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
-    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    // providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 }
 
 
