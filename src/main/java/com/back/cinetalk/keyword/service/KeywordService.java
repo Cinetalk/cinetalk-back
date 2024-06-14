@@ -26,13 +26,13 @@ public class KeywordService {
     @Transactional
     public KeywordEntity create(HttpServletRequest request, Long movieId, KeywordRequestDTO keywordRequestDTO) {
         // 로그인 검사 로직
-//        String email = jwtUtil.getEmail(request.getHeader("access"));
-//        UserEntity user = userRepository.findByEmail(email);
+        String email = jwtUtil.getEmail(request.getHeader("access"));
+        UserEntity user = userRepository.findByEmail(email);
 
         return keywordRepository.save(KeywordEntity.builder()
                 .movieId(movieId)
                 .keyword(keywordRequestDTO.getKeyword())
-//                .user(user)
+                .user(user)
                 .count(1)
                 .build());
     }

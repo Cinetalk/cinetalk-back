@@ -1,6 +1,6 @@
-package com.back.cinetalk.genre;
+package com.back.cinetalk.genre.entity;
 
-import com.back.cinetalk.review_genre.ReviewGenreEntity;
+import com.back.cinetalk.review_genre.entity.ReviewGenreEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
