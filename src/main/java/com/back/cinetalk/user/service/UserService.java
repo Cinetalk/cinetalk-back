@@ -3,7 +3,6 @@ package com.back.cinetalk.user.service;
 import com.back.cinetalk.user.dto.UserDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
-import com.back.cinetalk.user.repository.RefreshRepository;
 import com.back.cinetalk.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +19,6 @@ public class UserService {
 
     public final JWTUtil jwtUtil;
 
-    private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
 
     public ResponseEntity<?> UserInfo(HttpServletRequest request, HttpServletResponse response){
@@ -40,7 +38,7 @@ public class UserService {
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> nickNameMerge(HttpServletRequest request,HttpServletResponse response,String nickname){
+    public ResponseEntity<?> nickNameMerge(HttpServletRequest request,String nickname){
 
         log.info("닉네임 재설정 로직");
 

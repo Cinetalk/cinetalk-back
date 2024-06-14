@@ -1,6 +1,10 @@
 package com.back.cinetalk.user.dto;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class KakaoResponse implements OAuth2Response{
@@ -34,23 +38,52 @@ public class KakaoResponse implements OAuth2Response{
     @Override
     public String getName() {
 
-        Map<String,Object> profile = (Map<String, Object>) attribute.get("profile");
-
-        return profile.get("nickname").toString();
+        return attribute.get("name").toString();
     }
 
     @Override
     public String getGender() {
-        return null;
+
+        String gender = attribute.get("gender").toString();
+
+        if(gender.equals("male")){
+            return "M";
+        }else{
+            return "F";
+        }
     }
 
     @Override
     public LocalDate getBirthday() {
-        return null;
+
+        String birthyear = attribute.get("birthyear").toString();
+
+        String birthday = attribute.get("birthday").toString();
+
+        String birth = birthyear+"-"+birthday.substring(0,2)+"-"+birthday.substring(2);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return LocalDate.parse(birth, formatter);
     }
 
     @Override
     public byte[] getProfile() {
-        return new byte[0];
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        Map<String,Object> profile = (Map<String, Object>) attribute.get("profile");
+
+        String url = profile.get("profile_image_url").toString();
+
+        ResponseEntity<byte[]> response = restTemplate.getForEntity(url, byte[].class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+
+            return response.getBody();
+        } else {
+
+            return null;
+        }
     }
 }
