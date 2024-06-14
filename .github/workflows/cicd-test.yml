@@ -14,7 +14,7 @@ jobs:
 
   build-image:
     needs: run-test-code
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
 
       - name: Set up JDK21
