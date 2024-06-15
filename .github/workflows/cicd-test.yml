@@ -10,7 +10,7 @@ on:
       - develop
 jobs:
   run-java-gradle:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -39,7 +39,7 @@ jobs:
 
   build-image:
     needs: run-java-gradle
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -53,7 +53,7 @@ jobs:
   cd-pipeline:
     needs: build-image
     name: continuous deploy
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
