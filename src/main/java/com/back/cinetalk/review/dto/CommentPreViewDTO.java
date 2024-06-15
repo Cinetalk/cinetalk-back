@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReReviewPreViewDTO {
+public class CommentPreViewDTO {
 
     String nickName;
 

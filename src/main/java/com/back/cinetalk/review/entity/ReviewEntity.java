@@ -2,6 +2,7 @@ package com.back.cinetalk.review.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.rate.entity.RateEntity;
+import com.back.cinetalk.review.dto.CommentRequestDTO;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -49,9 +50,15 @@ public class ReviewEntity extends BaseEntity {
     @OneToMany(mappedBy = "review")
     private List<RateEntity> rateEntityList = new ArrayList<RateEntity>();
 
-    public void update(ReviewRequestDTO reviewRequestDTO) {
+    public void updateReview(ReviewRequestDTO reviewRequestDTO) {
         this.star = reviewRequestDTO.getStar();
         this.content = reviewRequestDTO.getContent();
         this.spoiler = reviewRequestDTO.isSpoiler();
     }
+
+    public void updateComment(CommentRequestDTO commentRequestDTO) {
+        this.content = commentRequestDTO.getContent();
+    }
+
+
 }
