@@ -27,9 +27,10 @@ public class UserController {
     @GetMapping("/user")
     public String UserP(){
 
+
+
         return "user인증됨";
     }
-
 
     @Operation(summary = "User정보 발급",description = "토큰과 같이 요청시 유저 정보 반환")
     @ApiResponse(responseCode = "200",description = "정보 발급 성공")
@@ -56,5 +57,13 @@ public class UserController {
         }
 
         return userService.nickNameMerge(request,nickname);
+    }
+
+    @GetMapping("/AuthBy")
+    public ResponseEntity<?> AuthBy(@RequestParam(name = "authToken")String authToken){
+
+
+
+        return null;
     }
 }
