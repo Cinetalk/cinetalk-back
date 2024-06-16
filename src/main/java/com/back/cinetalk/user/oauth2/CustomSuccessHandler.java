@@ -76,7 +76,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
         //닉네임이 존재할 경우
         else{
-            response.sendRedirect("https://cinetalk-front-dev.vercel.app/");
+            response.sendRedirect("https://httpbin.org/legacy");
         }
     }
 
@@ -85,7 +85,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Cookie cookie = new Cookie(key,value);
         cookie.setMaxAge(24*60*60); //1일
         //https 만 쿠키전송
-        //cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
         cookie.setHttpOnly(true);
         cookie.setAttribute("SameSite","None");
