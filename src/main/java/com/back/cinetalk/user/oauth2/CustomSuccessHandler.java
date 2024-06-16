@@ -76,7 +76,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
         //닉네임이 존재할 경우
         else{
-            response.sendRedirect("https://httpbin.org/legacy");
+            response.sendRedirect("https://cinetalk-front-dev.vercel.app?ddd=dfdfdfd");
         }
     }
 
@@ -87,7 +87,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         //https 만 쿠키전송
         cookie.setSecure(true);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setAttribute("SameSite","None");
         return cookie;
     }
