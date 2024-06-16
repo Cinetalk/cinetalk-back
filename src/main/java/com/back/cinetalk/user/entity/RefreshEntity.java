@@ -21,6 +21,7 @@ public class RefreshEntity {
     public String email;
     public String refresh;
     public String expiration;
+    public String auth;
 
     public static RefreshEntity ToRefreshEntity(RefreshDTO refreshDTO){
         return RefreshEntity.builder()
@@ -28,6 +29,7 @@ public class RefreshEntity {
                 .email(refreshDTO.getEmail())
                 .refresh(refreshDTO.getRefresh())
                 .expiration(refreshDTO.getExpiration())
+                .auth(refreshDTO.getAuth())
                 .build();
     }
 }
