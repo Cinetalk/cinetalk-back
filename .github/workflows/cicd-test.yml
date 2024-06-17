@@ -58,7 +58,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/your-image-name:latest .
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/cinetalk-back-app
 
   cd-pipeline:
     needs: build-image
