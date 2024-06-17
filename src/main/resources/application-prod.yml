@@ -19,7 +19,7 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       show-sql: true
-      # format_sql: true
+      format_sql: true
 
   jwt:
     secret: ${JWT_SECRET}
