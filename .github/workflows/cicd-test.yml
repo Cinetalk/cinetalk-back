@@ -3,11 +3,12 @@ on:
   push:
     branches:
       - main
-      - develop
+
   pull_request:
     branches:
       - main
-      - develop
+
+
 jobs:
   run-java-gradle:
     runs-on: ubuntu-latest
@@ -63,8 +64,8 @@ jobs:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_IP }}
           username: ec2-user
+          host: ${{ secrets.EC2_IP }}
           key: ${{ secrets.AWS_PEM_KEY }}
           port: 22
           script: cd /home/ec2-user/cinetalk-back && docker-compose -f docker-compose.yml up -d --build
