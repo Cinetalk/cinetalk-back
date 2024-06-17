@@ -26,8 +26,8 @@ spring:
 
   cinetalk:
     back:
-        base:
-        url: http://localhost:8080/dir/
+      base:
+      url: http://localhost:8080/dir/
 
   jpa:
     hibernate:
@@ -37,9 +37,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MariaDBDialect
-#        naming:
-#          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #이거 안해주니깐 미친놈이 Find 테이블을 find 로 바꿔버림
-#        dialect: org.hibernate.dialect.MariaDBDialect
+        #        naming:
+        #          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #이거 안해주니깐 미친놈이 Find 테이블을 find 로 바꿔버림
+        #        dialect: org.hibernate.dialect.MariaDBDialect
         format_sql: true
         use_sql_comments: true
 

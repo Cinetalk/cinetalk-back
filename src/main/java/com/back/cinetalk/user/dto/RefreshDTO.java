@@ -17,6 +17,7 @@ public class RefreshDTO {
     public String email;
     public String refresh;
     public String expiration;
+    private String auth;
 
     public static RefreshDTO ToRefreshDTO(RefreshEntity refreshEntity){
         return RefreshDTO.builder()
@@ -24,6 +25,7 @@ public class RefreshDTO {
                 .email(refreshEntity.getEmail())
                 .refresh(refreshEntity.getRefresh())
                 .expiration(refreshEntity.getExpiration())
+                .auth(refreshEntity.getAuth())
                 .build();
     }
 }
