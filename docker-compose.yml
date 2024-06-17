@@ -1,11 +1,11 @@
 version: "3.8"                                # 파일 규격 버전
-services:                                     # 이 항목 밑에 실행하려는 컨테이너들을 정의
-  cinetalk-back-redis:                        # 서비스명
+services: # 이 항목 밑에 실행하려는 컨테이너들을 정의
+  cinetalk-back-redis: # 서비스명
     container_name: cinetalk-back-redis       # 컨테이너 명
     build:
       dockerfile: Dockerfile
       context: ./redis
-    image: ${DOCKER_USERNAME}/cinetalk-back-redis
+    image: ${DOCKER_USERNAME}/cinetalk-back-app
     ports:
       - "6379:6379"
   cinetalk-back-database:
@@ -13,7 +13,7 @@ services:                                     # 이 항목 밑에 실행하려�
     build:
       dockerfile: Dockerfile
       context: ./database
-    image: ${DOCKER_USERNAME}/cinetalk-back-database
+    image: ${DOCKER_USERNAME}/cinetalk-back-app
     environment:
       - MARIADB_DATABASE=cinetalk-back-database
       - MARIADB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
@@ -25,7 +25,7 @@ services:                                     # 이 항목 밑에 실행하려�
   cinetalk-back-app:
     container_name: cinetalk-back-app
     build: .
-    depends_on:          # DB, REDIS 컨테이너가 실행된 다음 WEB을 실행시킨다.
+    depends_on: # DB, REDIS 컨테이너가 실행된 다음 WEB을 실행시킨다.
       - cinetalk-back-database
       - cinetalk-back-redis
     image: ${DOCKER_USERNAME}/cinetalk-back-app
