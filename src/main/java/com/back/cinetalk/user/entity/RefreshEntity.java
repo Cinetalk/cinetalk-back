@@ -1,5 +1,6 @@
 package com.back.cinetalk.user.entity;
 
+import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.user.dto.RefreshDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshEntity {
+public class RefreshEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

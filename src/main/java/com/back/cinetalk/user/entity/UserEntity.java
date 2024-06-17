@@ -1,6 +1,7 @@
 package com.back.cinetalk.user.entity;
 
 import com.back.cinetalk.bookmark.entity.BookmarkEntity;
+import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
@@ -18,7 +19,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity {
+public class UserEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
