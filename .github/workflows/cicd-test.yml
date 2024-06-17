@@ -8,7 +8,6 @@ on:
     branches:
       - main
 
-
 jobs:
   run-java-gradle:
     runs-on: ubuntu-latest
@@ -42,6 +41,8 @@ jobs:
     needs: run-java-gradle
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -51,15 +52,17 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Build and Push Docker Image
+        run: |
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/your-image-name:latest .
+
   cd-pipeline:
     needs: build-image
-    name: continuous deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: develop
 
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.7
@@ -68,4 +71,6 @@ jobs:
           host: ${{ secrets.EC2_IP }}
           key: ${{ secrets.AWS_PEM_KEY }}
           port: 22
-          script: cd /home/ec2-user/cinetalk-back && docker-compose -f docker-compose.yml up -d --build
+          script: |
+            cd /home/ec2-user/cinetalk-back
+            docker-compose -f docker-compose.yml up -d --build
