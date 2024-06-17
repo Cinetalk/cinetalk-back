@@ -8,6 +8,8 @@ services: # 이 항목 밑에 실행하려는 컨테이너들을 정의
     image: ${DOCKER_USERNAME}/cinetalk-back-app
     ports:
       - "6379:6379"
+
+
   cinetalk-back-database:
     container_name: cinetalk-back-database
     build:
@@ -22,6 +24,9 @@ services: # 이 항목 밑에 실행하려는 컨테이너들을 정의
       - ./database/init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"      # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
+
+
+
   cinetalk-back-app:
     container_name: cinetalk-back-app
     build: .
