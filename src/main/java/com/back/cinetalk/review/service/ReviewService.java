@@ -69,17 +69,17 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewEntity saveReReview(HttpServletRequest request, Long parentId, ReReviewRequestDTO reReviewRequestDTO) {
+    public ReviewEntity saveComment(HttpServletRequest request, Long parentReviewId, CommentRequestDTO commentRequestDTO) {
         String email = jwtUtil.getEmail(request.getHeader("access"));
         UserEntity user = userRepository.findByEmail(email);
 
-        ReviewEntity parentReview = reviewRepository.findById(parentId)
+        ReviewEntity parentReview = reviewRepository.findById(parentReviewId)
                 .orElseThrow(EntityNotFoundException::new);
 
         ReviewEntity comment = ReviewEntity.builder()
                 .user(user)
                 .movieId(parentReview.getMovieId())
-                .content(reReviewRequestDTO.getContent())
+                .content(commentRequestDTO.getContent())
                 .parentReview(parentReview)
                 .build();
 
@@ -92,7 +92,7 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReReviewPreViewDTO> getReReviewList(Long parentReviewId, Integer page) {
+    public Page<CommentPreViewDTO> getCommentList(Long parentReviewId, Integer page) {
         return reviewRepository.findAllByParentReviewId(parentReviewId, PageRequest.of(page, 10));
     }
 
@@ -106,7 +106,21 @@ public class ReviewService {
 
         verifyUserAuthorization(user, reviewEntity);
 
-        reviewEntity.update(reviewRequestDTO);
+        reviewEntity.updateReview(reviewRequestDTO);
+        return reviewEntity;
+    }
+
+    @Transactional
+    public ReviewEntity updateComment(HttpServletRequest request, Long reviewId, CommentRequestDTO commentRequestDTO) {
+        String email = jwtUtil.getEmail(request.getHeader("access"));
+        UserEntity user = userRepository.findByEmail(email);
+
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
+
+        verifyUserAuthorization(user, reviewEntity);
+
+        reviewEntity.updateComment(commentRequestDTO);
         return reviewEntity;
     }
 

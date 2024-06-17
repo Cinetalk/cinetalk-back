@@ -50,4 +50,9 @@ public class UserService {
 
         return new ResponseEntity<>("success",HttpStatus.OK);
     }
+
+    public ResponseEntity<?> AuthBy(){
+
+        return null;
+    }
 }

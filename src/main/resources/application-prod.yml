@@ -1,45 +1,25 @@
-server:
-  port: 8089
-
-spring:
-  profiles:
-    active: local
-    group:
-      local:
-        - common
-      prod:
-        - common
-
----
 spring:
   config:
     activate:
-      on-profile: local
-
+      on-profile: prod
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://sideproject.cgxivbds0jyg.ap-northeast-2.rds.amazonaws.com:3306/innodb
-    username: admin
-    password: qwer1234
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   data:
     redis:
-      host: localhost
+      host: cinetalk-back-redis
       port: 6379
-
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
-
+      # naming:
+      #   physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MariaDBDialect
-        #        naming:
-        #          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #이거 안해주니깐 미친놈이 Find 테이블을 find 로 바꿔버림
-        #        dialect: org.hibernate.dialect.MariaDBDialect
-        format_sql: true
-        use_sql_comments: true
+      show-sql: true
+      # format_sql: true
 
   jwt:
     secret: ${JWT_SECRET}
@@ -83,8 +63,7 @@ spring:
             user-info-uri: ${PROVIDER_KAKAO_USER_INFO_URI}
             user-name-attribute: ${PROVIDER_KAKAO_USER_NAME_ATTRIBUTE}
 
----
-spring:
-  config:
-    activate:
-      on-profile: common
+cinetalk:
+  back:
+    base:
+      url: http://3.37.21.244/dir/

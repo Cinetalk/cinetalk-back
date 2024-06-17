@@ -3,14 +3,15 @@ on:
   push:
     branches:
       - main
-      - develop
+
   pull_request:
     branches:
       - main
-      - develop
+
+
 jobs:
   run-java-gradle:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -39,7 +40,7 @@ jobs:
 
   build-image:
     needs: run-java-gradle
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -53,7 +54,7 @@ jobs:
   cd-pipeline:
     needs: build-image
     name: continuous deploy
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -63,8 +64,8 @@ jobs:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_IP }}
           username: ec2-user
+          host: ${{ secrets.EC2_IP }}
           key: ${{ secrets.AWS_PEM_KEY }}
           port: 22
           script: cd /home/ec2-user/cinetalk-back && docker-compose -f docker-compose.yml up -d --build

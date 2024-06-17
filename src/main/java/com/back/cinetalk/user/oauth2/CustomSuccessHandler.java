@@ -6,6 +6,7 @@ import com.back.cinetalk.user.dto.RefreshDTO;
 import com.back.cinetalk.user.entity.RefreshEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
+import com.back.cinetalk.user.service.AuthTokenCreate;
 import com.back.cinetalk.user.service.NicknameGenerator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -21,7 +22,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Random;
 
 @Component
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -31,11 +31,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final UserRepository userRepository;
     private final NicknameGenerator nicknameGenerator;
 
-    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository, NicknameGenerator nicknameGenerator) {
+    private final AuthTokenCreate authTokenCreate;
+
+    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository, NicknameGenerator nicknameGenerator, AuthTokenCreate authTokenCreate) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
         this.userRepository = userRepository;
         this.nicknameGenerator = nicknameGenerator;
+        this.authTokenCreate = authTokenCreate;
     }
 
     @Override
@@ -53,10 +56,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         //refresh 토큰생성 --리다이렉트 되면서 어처피 header 는 못받음
         //String access = jwtUtil.createJwt("access",email, role, 600000L);
+
+        // 신규추가 240616 cross domain 을 위한 임시 토큰 생성
+        String authToken = authTokenCreate.TokenCreate();
+
         String refresh = jwtUtil.createJwt("refresh",email, role, 86400000L);
 
         //토큰 DB에 저장
-        addRefreshEntity(email,refresh,86400000L);
+        addRefreshEntity(email,refresh,86400000L,authToken);
 
         String nickname = userRepository.findNicknameByEmail(email);
 
@@ -72,11 +79,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             userRepository.updateNicknameByEmail(email,Newnickname);
 
-            response.sendRedirect("http://localhost:63342/front/nickName.html");
+            response.sendRedirect("http://localhost:63342/front/nickName.html?");
         }
         //닉네임이 존재할 경우
         else{
-            response.sendRedirect("https://cinetalk-front-dev.vercel.app/");
+            response.sendRedirect("https://cinetalk-front-dev.vercel.app?authToken="+authToken);
         }
     }
 
@@ -85,14 +92,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Cookie cookie = new Cookie(key,value);
         cookie.setMaxAge(24*60*60); //1일
         //https 만 쿠키전송
-        //cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setAttribute("SameSite","None");
         return cookie;
     }
 
-    private void addRefreshEntity(String email,String refresh,Long expiredMs){
+    private void addRefreshEntity(String email,String refresh,Long expiredMs,String authToken){
 
         Date date = new Date(System.currentTimeMillis() + expiredMs);
 
@@ -100,6 +107,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         refreshDTO.setEmail(email);
         refreshDTO.setRefresh(refresh);
         refreshDTO.setExpiration(date.toString());
+        refreshDTO.setAuth(authToken);
 
         RefreshEntity refreshEntity = RefreshEntity.ToRefreshEntity(refreshDTO);
 
