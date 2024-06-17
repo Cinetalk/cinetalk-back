@@ -18,7 +18,19 @@ java {
     sourceCompatibility = '21'
 }
 
-apply plugin: 'war'
+bootJar {
+    archiveFileName = 'app.jar'
+}
+
+jar {
+    enabled = false
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 
 repositories {
     mavenCentral()
@@ -58,7 +70,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
-    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    // providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 }
 
 

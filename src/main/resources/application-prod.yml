@@ -4,7 +4,7 @@ spring:
       on-profile: prod
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://cinetalk-back-database:3306/cinetalk-back-database
+    url: jdbc:mariadb://sideproject.cgxivbds0jyg.ap-northeast-2.rds.amazonaws.com:3306/innodb
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
 
@@ -14,7 +14,7 @@ spring:
       port: 6379
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
       # naming:
       #   physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
