@@ -56,9 +56,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker Image
-        run: |
-          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/cinetalk-back-app:latest .
+#      - name: Build and Push Docker Image
+#        run: |
+#          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/cinetalk-back-app:latest .
 
   cd-pipeline:
     needs: build-image
