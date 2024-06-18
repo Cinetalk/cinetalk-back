@@ -11,12 +11,11 @@ services: # 이 항목 밑에 실행하려는 컨테이너들을 정의
 
 
   cinetalk-back-database:
-    image: mysql:latest
     container_name: cinetalk-back-database
-#    build:
-#      dockerfile: Dockerfile
-#      context: ./database
-#    image: ${DOCKER_USERNAME}/cinetalk-back-database
+    build:
+      dockerfile: Dockerfile
+      context: ./database
+    image: ${DOCKER_USERNAME}/cinetalk-back
     environment:
       - MARIADB_DATABASE=cinetalk-back-database
       - MARIADB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
@@ -36,6 +35,7 @@ services: # 이 항목 밑에 실행하려는 컨테이너들을 정의
       - cinetalk-back-redis
     image: ${DOCKER_USERNAME}/cinetalk-back-app
     environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://cinetalk-back-database:3306/cinetalk-back-database?useSSL=false&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
