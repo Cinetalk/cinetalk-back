@@ -87,7 +87,8 @@ public class MovieMainService {
 
                     MovieDTO movieDTO = new MovieDTO();
 
-                    movieDTO.setMovieId((Long) map.get("id"));
+                    int movieid = (int) map.get("id");
+                    movieDTO.setMovieId(Long.valueOf(movieid));
                     movieDTO.setMovienm((String) map.get("title"));
                     movieDTO.setAudiAcc(Integer.parseInt((String) info.get("audiAcc")));
 
