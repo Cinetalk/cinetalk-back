@@ -10,6 +10,7 @@ import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.UserDTO;
+import com.back.cinetalk.user.entity.UserEntity;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +97,7 @@ public class FindService {
 
             findReviewDTO.setReviewDTO(dto);
 
-            findReviewDTO.setUserId(UserDTO.ToUserDTO(reviewEntity.getUser()).getId());
+            findReviewDTO.setUserDTO(UserDTO.ToUserDTO(reviewEntity.getUser()));
 
             returnList.add(findReviewDTO);
         }
