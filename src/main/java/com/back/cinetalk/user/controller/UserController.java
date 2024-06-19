@@ -60,11 +60,4 @@ public class UserController {
         return userService.nickNameMerge(request,nickname);
     }
 
-    @GetMapping("/AuthBy")
-    public ResponseEntity<?> AuthBy(@RequestParam(name = "authToken")String authToken){
-
-
-
-        return null;
-    }
 }

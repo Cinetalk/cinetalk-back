@@ -6,6 +6,7 @@ import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.RefreshRepository;
 import com.back.cinetalk.user.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +23,6 @@ public class UserService {
     public final JWTUtil jwtUtil;
 
     private final UserRepository userRepository;
-
-    private final RefreshRepository refreshRepository;
 
     public ResponseEntity<?> UserInfo(HttpServletRequest request, HttpServletResponse response){
 
@@ -53,12 +52,5 @@ public class UserService {
         userRepository.updateNicknameByEmail(email,nickname);
 
         return new ResponseEntity<>("success",HttpStatus.OK);
-    }
-
-    public ResponseEntity<?> AuthBy(String authToken){
-
-        refreshRepository.findByAuth(authToken);
-
-        return null;
     }
 }

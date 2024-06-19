@@ -11,6 +11,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Entity
@@ -25,6 +26,7 @@ public class UserEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String email;
 
     private String password;
@@ -66,7 +68,7 @@ public class UserEntity extends BaseEntity {
                 .nickname(userDTO.getNickname())
                 .gender(userDTO.getGender())
                 .birthday(userDTO.getBirthday())
-                .profile(userDTO.getProfile())
+                .profile(Base64.getDecoder().decode(userDTO.getProfile()))
                 .provider(userDTO.getProvider())
                 .role(userDTO.getRole())
                 .build();
