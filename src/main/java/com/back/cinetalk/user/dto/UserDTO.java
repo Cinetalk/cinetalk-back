@@ -40,7 +40,6 @@ public class UserDTO {
         return UserDTO.builder()
                 .id(userEntity.getId())
                 .email(userEntity.getEmail())
-                .password(userEntity.getPassword())
                 .name(userEntity.getName())
                 .nickname(userEntity.getNickname())
                 .gender(userEntity.getGender())

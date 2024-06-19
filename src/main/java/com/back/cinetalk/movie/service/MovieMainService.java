@@ -64,6 +64,7 @@ public class MovieMainService {
         MovieEntity time = movieRepository.findFirstByOrderByCreatedAtAsc();
 
         LocalDate createdAt = time.getCreatedAt().toLocalDate();
+
         LocalDate nowDate = LocalDate.now();
 
         Duration duration = Duration.between(createdAt.atStartOfDay(), nowDate.atStartOfDay());
