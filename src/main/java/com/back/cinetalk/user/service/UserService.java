@@ -57,7 +57,7 @@ public class UserService {
 
     public ResponseEntity<?> AuthBy(String authToken){
 
-        RefreshEntity refreshEntity = refreshRepository.findByAuth(authToken);
+        refreshRepository.findByAuth(authToken);
 
         return null;
     }
