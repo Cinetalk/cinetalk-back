@@ -36,14 +36,18 @@ public class UserService {
 
         UserDTO userDTO = UserDTO.ToUserDTO(userEntity);
 
-        userDTO.setPassword("");
-
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
     public ResponseEntity<?> nickNameMerge(HttpServletRequest request,String nickname){
 
         log.info("닉네임 재설정 로직");
+
+        Boolean nickYN = userRepository.existsByNickname(nickname);
+
+        if(nickYN){
+            return new ResponseEntity<>("already nickname",HttpStatus.OK);
+        }
 
         String accessToken= request.getHeader("access");
 

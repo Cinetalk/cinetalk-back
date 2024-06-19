@@ -103,10 +103,12 @@ public class ReIssueService {
         log.info("토큰 재생성 성공");
 
         //응답 바디
-        PrintWriter writer = response.getWriter();
-        writer.print("token reissue");
+        //PrintWriter writer = response.getWriter();
+        //writer.print("token reissue");
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        UserEntity userEntity = userRepository.findByEmail(email);
+
+        return new ResponseEntity<>(UserDTO.ToUserDTO(userEntity),HttpStatus.OK);
     }
 
     private Cookie createCookie(String key,String value){
