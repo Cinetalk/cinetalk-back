@@ -64,6 +64,7 @@ public class MovieMainService {
         MovieEntity time = movieRepository.findFirstByOrderByCreatedAtAsc();
 
         LocalDate createdAt = time.getCreatedAt().toLocalDate();
+
         LocalDate nowDate = LocalDate.now();
 
         Duration duration = Duration.between(createdAt.atStartOfDay(), nowDate.atStartOfDay());
@@ -87,7 +88,8 @@ public class MovieMainService {
 
                     MovieDTO movieDTO = new MovieDTO();
 
-                    movieDTO.setMovieId((Long) map.get("id"));
+                    int movieid = (int) map.get("id");
+                    movieDTO.setMovieId(Long.valueOf(movieid));
                     movieDTO.setMovienm((String) map.get("title"));
                     movieDTO.setAudiAcc(Integer.parseInt((String) info.get("audiAcc")));
 

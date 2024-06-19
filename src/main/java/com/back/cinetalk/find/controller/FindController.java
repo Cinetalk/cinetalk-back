@@ -36,7 +36,7 @@ public class FindController {
 
     @GetMapping("/findText")
     @Operation(summary = "연관 검색어 표출",description = "검색할 때마다 연관 검색어를 불러오는 프로세스")
-    @ApiResponse(responseCode = "200",description = "연관 검색어 출력",content = @Content(schema = @Schema(implementation = HttpResponse.class)))
+    @ApiResponse(responseCode = "200",description = "연관 검색어 출력",content = @Content(schema = @Schema(implementation = String.class)))
     public ResponseEntity<?> findText(@RequestParam(value = "query")String query) throws IOException {
 
         List<String> result = findService.findText(query);
@@ -46,7 +46,7 @@ public class FindController {
 
     @GetMapping("/findResult")
     @Operation(summary = "검색 결과",description = "검색어를 기반으로 영화,리뷰를 불러오는 프로세스")
-    @ApiResponse(responseCode = "200",description = "결과 출력",content = @Content(schema = @Schema(implementation = HttpResponse.class)))
+    @ApiResponse(responseCode = "200",description = "결과 출력",content = @Content(schema = @Schema(implementation = FindReviewDTO.class)))
     public ResponseEntity<?> findResult(@RequestParam(value = "query")String query) throws Exception {
 
         //반환 map 생성
@@ -82,6 +82,7 @@ public class FindController {
 
     @GetMapping("/findReview")
     @Operation(summary = "(검색)리뷰 조회",description = "검색어에 따른 모든 리뷰 조회 프로세스")
+    @ApiResponse(responseCode = "200",description = "결과 출력",content = @Content(schema = @Schema(implementation = FindReviewDTO.class)))
     public ResponseEntity<?> findReview(@RequestParam(value = "query")String query){
 
         List<FindReviewDTO> reviewlist = findService.ReviewResult(query);
@@ -91,6 +92,7 @@ public class FindController {
 
     @GetMapping("/PopularFind")
     @Operation(summary = "인기 검색어",description = "오늘을 포함한 7일 동안의 인기검색어 리스트")
+    @ApiResponse(responseCode = "200",description = "연관 검색어 출력",content = @Content(schema = @Schema(implementation = String.class)))
     public ResponseEntity<?> PopularFind(){
 
         return findService.PopularFind();
