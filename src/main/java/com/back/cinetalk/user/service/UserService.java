@@ -6,6 +6,7 @@ import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.RefreshRepository;
 import com.back.cinetalk.user.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,6 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final RefreshRepository refreshRepository;
-
     public ResponseEntity<?> UserInfo(HttpServletRequest request, HttpServletResponse response){
 
         log.info("User정보 로직");
@@ -37,14 +36,18 @@ public class UserService {
 
         UserDTO userDTO = UserDTO.ToUserDTO(userEntity);
 
-        userDTO.setPassword("");
-
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
     public ResponseEntity<?> nickNameMerge(HttpServletRequest request,String nickname){
 
         log.info("닉네임 재설정 로직");
+
+        Boolean nickYN = userRepository.existsByNickname(nickname);
+
+        if(nickYN){
+            return new ResponseEntity<>("already nickname",HttpStatus.OK);
+        }
 
         String accessToken= request.getHeader("access");
 
@@ -53,12 +56,5 @@ public class UserService {
         userRepository.updateNicknameByEmail(email,nickname);
 
         return new ResponseEntity<>("success",HttpStatus.OK);
-    }
-
-    public ResponseEntity<?> AuthBy(String authToken){
-
-        refreshRepository.findByAuth(authToken);
-
-        return null;
     }
 }

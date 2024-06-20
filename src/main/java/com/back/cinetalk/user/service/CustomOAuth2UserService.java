@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
+
 @Service
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -72,7 +74,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         userDTO.setName(oAuth2Response.getName());
         userDTO.setGender(oAuth2Response.getGender());
         userDTO.setBirthday(oAuth2Response.getBirthday());
-        userDTO.setProfile(oAuth2Response.getProfile());
+        userDTO.setProfile(Base64.getEncoder().encodeToString(oAuth2Response.getProfile()));
         userDTO.setProvider(oAuth2Response.getProvider());
 
         //DB에 존재하지 않을 경우 : 회원가입
