@@ -25,6 +25,8 @@ public class GenreEntity {
 
     private String name;
 
+    private String badgename;
+
     @OneToMany(mappedBy = "genre")
     private List<ReviewGenreEntity> reviewGenreEntityList;
 

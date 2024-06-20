@@ -68,9 +68,17 @@ public class UserEntity extends BaseEntity {
                 .nickname(userDTO.getNickname())
                 .gender(userDTO.getGender())
                 .birthday(userDTO.getBirthday())
-                .profile(Base64.getDecoder().decode(userDTO.getProfile()))
+                .profile(TodecodeProfile(userDTO.getProfile()))
                 .provider(userDTO.getProvider())
                 .role(userDTO.getRole())
                 .build();
+    }
+
+    public static byte[] TodecodeProfile(String profileString){
+        if(profileString != null){
+            return Base64.getDecoder().decode(profileString);
+        }else {
+            return null;
+        }
     }
 }
