@@ -1,7 +1,6 @@
 package com.back.cinetalk.user.controller;
 
-import com.back.cinetalk.badge.dto.BadgeByUserResponseDTO;
-import com.back.cinetalk.user.dto.UserDTO;
+import com.back.cinetalk.user.dto.BadgeByUserResponseDTO;
 import com.back.cinetalk.user.service.MyPageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,4 +1,4 @@
-package com.back.cinetalk.badge.dto;
+package com.back.cinetalk.user.dto;
 
 import com.back.cinetalk.user.entity.UserEntity;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,7 @@
 package com.back.cinetalk.user.service;
 
-import com.back.cinetalk.badge.dto.BadgeByUserResponseDTO;
+import com.back.cinetalk.bookmark.entity.QBookmarkEntity;
+import com.back.cinetalk.user.dto.BadgeByUserResponseDTO;
 import com.back.cinetalk.badge.entity.BadgeEntity;
 import com.back.cinetalk.badge.repository.BadgeRepository;
 import com.back.cinetalk.rate.entity.QRateEntity;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.back.cinetalk.bookmark.entity.QBookmarkEntity.*;
+
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
@@ -31,6 +34,7 @@ public class MyPageService {
     QReviewEntity review = QReviewEntity.reviewEntity;
     QUserEntity user = QUserEntity.userEntity;
     QRateEntity rate = QRateEntity.rateEntity;
+    QBookmarkEntity bookmark = QBookmarkEntity.bookmarkEntity;
 
     public ResponseEntity<?> BadgeByUser(HttpServletRequest request){
 
@@ -66,9 +70,19 @@ public class MyPageService {
 
         UserEntity byEmail = userRepository.findByEmail(email);
 
-        Long count = queryFactory.select(rate.count())
+        Long rateCount = queryFactory.select(rate.count())
                 .from(rate)
                 .where(rate.review.user.id.eq(byEmail.getId()).and(rate.rate.eq(1)))
+                .fetchFirst();
+
+        Long reviewCount = queryFactory.select(review.count())
+                .from(review)
+                .where(review.user.id.eq(byEmail.getId()))
+                .fetchFirst();
+
+        Long bookmarkCount = queryFactory.select(bookmark.count())
+                .from(bookmark)
+                .where(bookmark.user.id.eq(byEmail.getId()))
                 .fetchFirst();
 
 

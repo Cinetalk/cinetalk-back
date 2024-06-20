@@ -79,11 +79,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             userRepository.updateNicknameByEmail(email,Newnickname);
 
-            response.sendRedirect("http://localhost:3030/front/nickName.html?authToken"+authToken);
+            response.sendRedirect("http://localhost:3000/redirect/without-nickName?authToken="+authToken);
         }
         //닉네임이 존재할 경우
         else{
-            response.sendRedirect("https://cinetalk-front-dev.vercel.app?authToken="+authToken);
+            response.sendRedirect("http://localhost:3000/redirect?authToken="+authToken);
         }
     }
 
