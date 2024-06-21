@@ -43,7 +43,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         //oauth 로그인 인지 판단
         String requestUri = request.getRequestURI();
-        log.info("jwtfilter-uri : "+requestUri);
+        log.info("jwtfilter-uri : " + requestUri);
 
         //헤더가 없다면 다음 요청으로 넘김
         if (accessToken == null) {

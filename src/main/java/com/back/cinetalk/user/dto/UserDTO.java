@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Schema(description = "User 데이터 담기는 DTO")
 @Data
@@ -34,6 +35,8 @@ public class UserDTO {
     private String provider;
 
     private String role;
+
+    private List<String> favoriteGenres;
 
 
     public static UserDTO ToUserDTO(UserEntity userEntity){

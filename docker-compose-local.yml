@@ -8,6 +8,8 @@ services:
     image: kallis0926/cinetalk-back-redis
     ports:
       - "6379:6379"
+
+
   cinetalk-back-database:
     container_name: cinetalk-back-database
     build:

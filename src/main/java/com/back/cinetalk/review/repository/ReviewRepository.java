@@ -13,4 +13,6 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , Qu
    boolean existsByUserIdAndMovieId(Long userId, Long movieId);
 
    List<ReviewEntity> findTop10ByContentContainingAndParentReviewIsNullOrderByCreatedAtAsc(String Content);
+
+   List<ReviewEntity> findByUserId(Long userId);
 }

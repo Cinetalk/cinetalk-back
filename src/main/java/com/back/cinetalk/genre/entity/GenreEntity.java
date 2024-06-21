@@ -1,5 +1,6 @@
 package com.back.cinetalk.genre.entity;
 
+import com.back.cinetalk.didnotwhatchmovie.entity.MovieGenreEntity;
 import com.back.cinetalk.badge.entity.BadgeEntity;
 import com.back.cinetalk.review_genre.entity.ReviewGenreEntity;
 import jakarta.persistence.*;
@@ -24,6 +25,10 @@ public class GenreEntity {
     private Long id;
 
     private String name;
+
+    // 이 영화 보셨나요? (MovieGenreEntity로 연결)
+    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MovieGenreEntity> movieGenres = new ArrayList<>();
 
     @OneToMany(mappedBy = "genre")
     private List<ReviewGenreEntity> reviewGenreEntityList;

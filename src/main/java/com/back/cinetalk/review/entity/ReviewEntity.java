@@ -1,24 +1,25 @@
 package com.back.cinetalk.review.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
+import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.dto.CommentRequestDTO;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@Table(name = "Review")
+// 한개의 영화에서는 한개의 리뷰만 작성
+@Table(name = "Review", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "movie_id"})
+})
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class ReviewEntity extends BaseEntity {
 
@@ -39,6 +40,12 @@ public class ReviewEntity extends BaseEntity {
     private String content;
 
     private boolean spoiler;
+
+    // 한개의 영화에는 한개의 리뷰만
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
+    private MovieEntity movie;
+
 
     @ManyToOne
     @JoinColumn(name = "parent_id")

@@ -21,6 +21,7 @@ public class getNewMovie {
         this.webClient = webClientBuilder.baseUrl("http://www.kobis.or.kr/kobisopenapi/webservice")
                 .build();
     }
+    // 이름이랑 누적관객수만 가져옴
     @SuppressWarnings("unchecked")
     public List<Map<String,Object>> MainList() {
 

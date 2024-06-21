@@ -2,11 +2,13 @@ package com.back.cinetalk.user.entity;
 
 import com.back.cinetalk.bookmark.entity.BookmarkEntity;
 import com.back.cinetalk.config.entity.BaseEntity;
+import com.back.cinetalk.didnotwhatchmovie.entity.DidNotWhatchMovieEntity;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.UserDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -15,16 +17,18 @@ import java.util.List;
 
 @Entity
 @Getter
-@Table(name = "User")
+@Table(name = "user")
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class UserEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
+    @NotEmpty
     private String email;
 
     private String password;
@@ -37,6 +41,7 @@ public class UserEntity extends BaseEntity {
 
     private LocalDate birthday;
 
+
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] profile;
@@ -44,6 +49,7 @@ public class UserEntity extends BaseEntity {
     private String provider;
 
     private String role;
+
 
     @OneToMany(mappedBy = "user")
     private List<ReviewEntity> reviewEntityList = new ArrayList<ReviewEntity>();
@@ -71,4 +77,8 @@ public class UserEntity extends BaseEntity {
                 .role(userDTO.getRole())
                 .build();
     }
+
+    // 승일
+    @OneToMany(mappedBy = "user")
+    private List<DidNotWhatchMovieEntity> didNotWhatchMovie = new ArrayList<>();
 }
