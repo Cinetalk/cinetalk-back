@@ -31,7 +31,6 @@ public class DidNotWhatchMovieEntity {
     public DidNotWhatchMovieEntity(UserEntity user, MovieEntity movie, MovieGenreEntity movieGenre) {
         this.user = user;
         this.movie = movie;
-        this.
     }
 
 
