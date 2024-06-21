@@ -139,56 +139,6 @@ public class MovieMainService {
         return callAPI.callAPI(url);
     }
 
-    public List<Map<String, Object>> ReviewByUser(HttpServletRequest request) throws IOException {
-
-        String accessToken = request.getHeader("access");
-
-        String email = jwtUtil.getEmail(accessToken);
-
-        NumberTemplate<Long> RereviewCountSubquery = Expressions.numberTemplate(Long.class,
-                "(select count(*) from ReviewEntity where parentReview.id = {0})", review.id);
-
-
-        List<Tuple> result = queryFactory
-                .select(review,
-                        //JPAExpressions.select(review.count()).from(review).where(review.id.eq(review.parentReview.id)),
-                        RereviewCountSubquery.as("RereivewCount"),
-                        JPAExpressions.select(rate.count()).from(rate).where(rate.review.id.eq(review.id))
-                )
-                .from(review)
-                .leftJoin(user).on(review.user.eq(user))
-                .where(user.email.eq(email).and(review.parentReview.id.isNull()))
-                .orderBy(review.createdAt.asc())
-                .fetch();
-
-        List<Map<String, Object>> resultlist = new ArrayList<>();
-
-        for (Tuple tuple : result) {
-
-            Map<String, Object> resultMap = new HashMap<>();
-
-            ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(Objects.requireNonNull(tuple.get(review)));
-
-            Long reReviewCount = tuple.get(1, Long.class);
-            Long rateCount = tuple.get(2, Long.class);
-
-            Map<String, Object> oneByID = getOneByID(reviewDTO.getMovieId());
-            String poster = (String) oneByID.get("poster_path");
-
-            resultMap.put("review_id", reviewDTO.getId());
-            resultMap.put("movie_id", reviewDTO.getMovieId());
-            resultMap.put("user_id", reviewDTO.getUser().getId());
-            resultMap.put("star", reviewDTO.getStar());
-            resultMap.put("content", reviewDTO.getContent());
-            resultMap.put("reReviewCount", reReviewCount);
-            resultMap.put("likeCount", rateCount);
-            resultMap.put("poster", poster);
-            resultlist.add(resultMap);
-        }
-
-        return resultlist;
-    }
-
     public List<Map<String, Object>> HidingPiece() throws IOException {
 
         List<Tuple> movielist = queryFactory
@@ -321,7 +271,10 @@ public class MovieMainService {
                 ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(entity);
                 map.put("review",reviewDTO);
 
-                String nickname = UserDTO.ToUserDTO(entity.getUser()).getNickname();
+                System.out.println(entity.getId());
+                System.out.println(entity.getUser().getId());
+                String nickname = entity.getUser().getNickname();
+
                 map.put("nickname",nickname);
 
                 result.add(map);

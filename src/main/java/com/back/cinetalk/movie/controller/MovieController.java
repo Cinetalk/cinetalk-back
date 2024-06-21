@@ -45,15 +45,6 @@ public class MovieController {
         return movieMainService.nowPlayingList();
     }
 
-    @GetMapping("/ReviewByUser")
-    @Operation(summary = "user의 최근톡",description = "회원의 리뷰 목록 최신순")
-    public ResponseEntity<?> ReviewByUser(HttpServletRequest request) throws IOException {
-
-        List<Map<String, Object>> maps = movieMainService.ReviewByUser(request);
-
-        return new ResponseEntity<>(maps, HttpStatus.OK);
-    }
-
     @GetMapping("/HidingPiece")
     @Operation(summary = "숨겨진 명작",description = "리뷰가 제일 많이 달린 영화 10개에 대한 정보 출력")
     public ResponseEntity<?> HidingPiece() throws IOException {

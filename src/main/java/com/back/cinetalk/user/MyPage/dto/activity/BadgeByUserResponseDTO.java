@@ -1,4 +1,4 @@
-package com.back.cinetalk.user.dto;
+package com.back.cinetalk.user.MyPage.dto.activity;
 
 import com.back.cinetalk.user.entity.UserEntity;
 import lombok.AllArgsConstructor;
