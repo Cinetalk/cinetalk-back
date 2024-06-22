@@ -1,6 +1,7 @@
 package com.back.cinetalk.userBadge.entity;
 
 import com.back.cinetalk.badge.entity.BadgeEntity;
+import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserBadgeEntity {
+public class UserBadgeEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -10,6 +10,4 @@ import java.util.List;
 
 @Repository
 public interface BadgeRepository extends JpaRepository<BadgeEntity, Long> {
-
-    List<BadgeEntity> findByUser(UserEntity user);
 }

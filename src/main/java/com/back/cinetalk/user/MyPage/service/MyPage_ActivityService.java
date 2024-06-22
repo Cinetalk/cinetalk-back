@@ -61,11 +61,11 @@ public class MyPage_ActivityService {
 
         UserEntity byEmail = userByAccess.getUserEntity(request);
 
-        List<BadgeEntity> byuser = badgeRepository.findByUser(byEmail);
+        //List<BadgeEntity> byuser = badgeRepository.findByUser(byEmail);
 
         List<BadgeByUserResponseDTO> result = new ArrayList<>();
 
-        for (BadgeEntity badgeEntity:byuser) {
+        /*for (BadgeEntity badgeEntity:byuser) {
 
             BadgeByUserResponseDTO badge = BadgeByUserResponseDTO.builder()
                     .badge_name(badgeEntity.getGenre().getBadgename())
@@ -74,7 +74,7 @@ public class MyPage_ActivityService {
                     .build();
 
             result.add(badge);
-        }
+        }*/
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
