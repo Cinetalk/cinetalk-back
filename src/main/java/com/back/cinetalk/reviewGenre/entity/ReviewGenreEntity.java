@@ -1,4 +1,4 @@
-package com.back.cinetalk.review_genre.entity;
+package com.back.cinetalk.reviewGenre.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.genre.entity.GenreEntity;

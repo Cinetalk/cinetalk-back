@@ -10,10 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-// cicd test
 @RestController
 @RequestMapping("/reviews")
-
 @RequiredArgsConstructor
 public class ReviewController {
 

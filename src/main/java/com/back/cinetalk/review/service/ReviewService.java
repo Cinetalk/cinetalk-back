@@ -1,16 +1,18 @@
 package com.back.cinetalk.review.service;
 
+import com.back.cinetalk.exception.errorCode.CommonErrorCode;
+import com.back.cinetalk.exception.exception.RestApiException;
+import com.back.cinetalk.exception.handler.ReviewHandler;
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.genre.repository.GenreRepository;
 import com.back.cinetalk.review.dto.*;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
-import com.back.cinetalk.review_genre.entity.ReviewGenreEntity;
-import com.back.cinetalk.review_genre.repository.ReviewGenreRepository;
+import com.back.cinetalk.reviewGenre.entity.ReviewGenreEntity;
+import com.back.cinetalk.reviewGenre.repository.ReviewGenreRepository;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,14 +38,14 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         if (reviewRepository.existsByUserIdAndMovieId(user.getId(), movieId)) {
-            throw new RuntimeException("이미 작성한 리뷰입니다.");
+            throw new RestApiException(CommonErrorCode.REVIEW_ALREADY_IN_WRITE);
         }
 
         List<Long> genreList = reviewRequestDTO.getGenreList();
         List<GenreEntity> genreEntities = genreRepository.findAllById(genreList);
 
         if (genreEntities.size() != genreList.size()) {
-            throw new RuntimeException("일부 장르가 존재하지 않습니다.");
+            throw new RestApiException(CommonErrorCode.GENRE_NOT_FOUND);
         }
 
         ReviewEntity reviewEntity = ReviewEntity.builder()
@@ -74,7 +76,7 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity parentReview = reviewRepository.findById(parentReviewId)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new ReviewHandler(CommonErrorCode.REVIEW_NOT_FOUND));
 
         ReviewEntity comment = ReviewEntity.builder()
                 .user(user)
@@ -102,7 +104,11 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ReviewHandler(CommonErrorCode.REVIEW_NOT_FOUND));
+
+        if (reviewEntity.getParentReview() != null) {
+            throw new RestApiException(CommonErrorCode.REVIEW_NOT_ALLOWED);
+        }
 
         verifyUserAuthorization(user, reviewEntity);
 
@@ -116,7 +122,11 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ReviewHandler(CommonErrorCode.COMMENT_NOT_FOUND));
+
+        if (reviewEntity.getParentReview() == null) {
+            throw new RestApiException(CommonErrorCode.REVIEW_NOT_ALLOWED);
+        }
 
         verifyUserAuthorization(user, reviewEntity);
 
@@ -130,7 +140,7 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ReviewHandler(CommonErrorCode.REVIEW_NOT_FOUND));
 
         verifyUserAuthorization(user, reviewEntity);
 
@@ -140,7 +150,7 @@ public class ReviewService {
 
     private void verifyUserAuthorization(UserEntity user, ReviewEntity reviewEntity) {
         if (!user.equals(reviewEntity.getUser())) {
-            throw new SecurityException("리뷰를 수정할 권한이 없습니다.");
+            throw new RestApiException(CommonErrorCode.REVIEW_NOT_ALLOWED);
         }
     }
 
