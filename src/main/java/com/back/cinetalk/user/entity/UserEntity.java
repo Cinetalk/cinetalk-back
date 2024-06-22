@@ -6,6 +6,7 @@ import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.UserDTO;
+import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -58,6 +59,9 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<BookmarkEntity> bookmarkEntityList = new ArrayList<BookmarkEntity>();
+
+    @OneToMany(mappedBy = "user")
+    private List<UserBadgeEntity> userBadgeEntityList = new ArrayList<UserBadgeEntity>();
 
     public static UserEntity ToUserEntity(UserDTO userDTO){
         return UserEntity.builder()

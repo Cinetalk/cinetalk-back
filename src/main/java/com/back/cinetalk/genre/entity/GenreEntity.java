@@ -25,10 +25,8 @@ public class GenreEntity {
 
     private String name;
 
-    private String badgename;
-
     @OneToMany(mappedBy = "genre")
-    private List<ReviewGenreEntity> reviewGenreEntityList;
+    private List<ReviewGenreEntity> reviewGenreEntityList = new ArrayList<ReviewGenreEntity>();
 
     @OneToMany(mappedBy = "genre")
     private List<BadgeEntity> badgeEntityList = new ArrayList<BadgeEntity>();
