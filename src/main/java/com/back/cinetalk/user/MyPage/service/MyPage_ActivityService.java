@@ -1,25 +1,28 @@
 package com.back.cinetalk.user.MyPage.service;
 
 import com.back.cinetalk.bookmark.entity.QBookmarkEntity;
+import com.back.cinetalk.genre.entity.QGenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.service.MovieMainService;
 import com.back.cinetalk.rate.repository.RateRepository;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
+import com.back.cinetalk.reviewGenre.entity.QReviewGenreEntity;
+import com.back.cinetalk.reviewGenre.entity.ReviewGenreEntity;
 import com.back.cinetalk.user.MyPage.component.UserByAccess;
-import com.back.cinetalk.user.MyPage.dto.activity.BadgeByUserResponseDTO;
+import com.back.cinetalk.user.MyPage.dto.activity.*;
 import com.back.cinetalk.badge.entity.BadgeEntity;
 import com.back.cinetalk.badge.repository.BadgeRepository;
 import com.back.cinetalk.rate.entity.QRateEntity;
 import com.back.cinetalk.review.entity.QReviewEntity;
-import com.back.cinetalk.user.MyPage.dto.activity.CountSumByUserResponseDTO;
-import com.back.cinetalk.user.MyPage.dto.activity.LogByUserResponseDTO;
-import com.back.cinetalk.user.MyPage.dto.activity.ReviewByUserResponseDTO;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
+import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
+import com.back.cinetalk.userBadge.repository.UserBadgeRepository;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPQLQuery;
@@ -44,7 +47,7 @@ public class MyPage_ActivityService {
 
     private final UserRepository userRepository;
     private final BadgeRepository badgeRepository;
-    private final JWTUtil jwtUtil;
+    private final UserBadgeRepository userBadgeRepository;
     private final JPAQueryFactory queryFactory;
     private final ReviewRepository reviewRepository;
     private final RateRepository rateRepository;
@@ -56,28 +59,46 @@ public class MyPage_ActivityService {
     QRateEntity rate = QRateEntity.rateEntity;
     QBookmarkEntity bookmark = QBookmarkEntity.bookmarkEntity;
     QKeywordEntity keyword = QKeywordEntity.keywordEntity;
+    QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
+    QGenreEntity genre = QGenreEntity.genreEntity;
 
     public ResponseEntity<?> BadgeByUser(HttpServletRequest request){
 
         UserEntity byEmail = userByAccess.getUserEntity(request);
 
-        //List<BadgeEntity> byuser = badgeRepository.findByUser(byEmail);
+        List<UserBadgeEntity> byUser = userBadgeRepository.findByUser(byEmail);
 
         List<BadgeByUserResponseDTO> result = new ArrayList<>();
 
-        /*for (BadgeEntity badgeEntity:byuser) {
+        for (UserBadgeEntity userBadgeEntity: byUser) {
 
             BadgeByUserResponseDTO badge = BadgeByUserResponseDTO.builder()
-                    .badge_name(badgeEntity.getGenre().getBadgename())
-                    .genre_name(badgeEntity.getGenre().getName())
-                    .useyn(badgeEntity.getUseyn())
-                    .build();
+                .genre_id(userBadgeEntity.getBadge().getGenre().getId())
+                .genre_name(userBadgeEntity.getBadge().getGenre().getName())
+                .badge_name(userBadgeEntity.getBadge().getName())
+                .isUse(userBadgeEntity.isUse())
+                .build();
 
             result.add(badge);
-        }*/
+        }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    public ResponseEntity<?> ReviewByGenreFromUser(HttpServletRequest request){
+
+        UserEntity byEmail = userByAccess.getUserEntity(request);
+
+        List<ReviewByGenreFromUserDTO> result = queryFactory
+                .select(Projections.constructor(ReviewByGenreFromUserDTO.class, genre.id, genre.name, reviewGenre.count().coalesce(0L).as("count")))
+                .from(genre)
+                .leftJoin(reviewGenre).on(genre.id.eq(reviewGenre.genre.id).and(reviewGenre.review.user.eq(byEmail)))
+                .groupBy(genre.id)
+                .fetch();
+
+        return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
 
     public ResponseEntity<?> CountSumByUser(HttpServletRequest request){
 

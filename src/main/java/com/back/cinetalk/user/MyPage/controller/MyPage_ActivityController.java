@@ -1,9 +1,6 @@
 package com.back.cinetalk.user.MyPage.controller;
 
-import com.back.cinetalk.user.MyPage.dto.activity.BadgeByUserResponseDTO;
-import com.back.cinetalk.user.MyPage.dto.activity.CountSumByUserResponseDTO;
-import com.back.cinetalk.user.MyPage.dto.activity.LogByUserResponseDTO;
-import com.back.cinetalk.user.MyPage.dto.activity.ReviewByUserResponseDTO;
+import com.back.cinetalk.user.MyPage.dto.activity.*;
 import com.back.cinetalk.user.MyPage.service.MyPage_ActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,6 +30,13 @@ public class MyPage_ActivityController {
     @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
     public ResponseEntity<?> BadgeByUser(HttpServletRequest request){return myPage_activityService.BadgeByUser(request);}
+
+    @GetMapping("/ReviewByGenreFromUser")
+    @Operation(summary = "유저의 장르별 리뷰 갯수",description = "토큰과 같이 요청시 유저가 작성한 리뷰의 갯수를 장르별로 조회")
+    @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = ReviewByGenreFromUserDTO.class)))
+    @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
+    @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
+    public ResponseEntity<?> ReviewByGenreFromUser(HttpServletRequest request){return myPage_activityService.ReviewByGenreFromUser(request);}
 
     @GetMapping("/CountSumByUser")
     @Operation(summary = "유저의 좋아요,댓글,찜 갯수",description = "토큰과 같이 요청시 유저의 좋아요,댓글,찜 갯수 반환")

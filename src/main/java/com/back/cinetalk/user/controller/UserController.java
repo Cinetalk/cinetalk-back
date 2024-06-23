@@ -11,10 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -24,21 +21,16 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "닉네임 설정",description = "회원가입 시 닉네임 설정")
+    @Operation(summary = "닉네임 수정",description = "회원가입 시 닉네임,생년월일,")
     @ApiResponse(responseCode = "200",description = "success")
     @ApiResponse(responseCode = "404",description = "닉네임이 옳바르지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
     @Parameter(name = "nickname",description = "닉네임",required = false)
-    @PostMapping("/nickNameMerge")
+    @PatchMapping("/nickNameMerge")
     public ResponseEntity<?> nickNameMerge(HttpServletRequest request, HttpServletResponse response,
-                                           @RequestParam(name = "nickname",required = false)String nickname){
+                                           UserDTO userDTO){
 
-        if(nickname == null){
-
-            return new ResponseEntity<>("닉네임이 옳바르지 않습니다.", HttpStatus.BAD_REQUEST);
-        }
-
-        return userService.nickNameMerge(request,nickname);
+        return userService.nickNameMerge(request,userDTO);
     }
 
     @Operation(summary = "마이페이지 상단 유저정보",description = "토큰과 같이 요청시 유저 정보 반환")
