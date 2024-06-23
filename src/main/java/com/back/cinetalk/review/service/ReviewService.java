@@ -4,7 +4,6 @@ import com.back.cinetalk.badge.entity.BadgeEntity;
 import com.back.cinetalk.badge.repository.BadgeRepository;
 import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
-import com.back.cinetalk.exception.handler.ErrorHandler;
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.genre.repository.GenreRepository;
 import com.back.cinetalk.review.dto.*;
@@ -88,7 +87,7 @@ public class ReviewService {
         // 리뷰 수가 10개 이상인 경우 뱃지 발급
         if (genreReviewCount >= 10) {
             BadgeEntity badge = badgeRepository.findByGenre(genre)
-                    .orElseThrow(() -> new ErrorHandler(CommonErrorCode.BADGE_NOT_FOUND));
+                    .orElseThrow(() -> new RestApiException(CommonErrorCode.BADGE_NOT_FOUND));
 
             if (badge != null) {
                 // 이미 해당 장르 뱃지를 발급받았는지 확인
@@ -114,7 +113,7 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity parentReview = reviewRepository.findById(parentReviewId)
-                .orElseThrow(() -> new ErrorHandler(CommonErrorCode.REVIEW_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.REVIEW_NOT_FOUND));
 
         ReviewEntity comment = ReviewEntity.builder()
                 .user(user)
@@ -142,7 +141,7 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ErrorHandler(CommonErrorCode.REVIEW_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.REVIEW_NOT_FOUND));
 
         if (reviewEntity.getParentReview() != null) {
             throw new RestApiException(CommonErrorCode.REVIEW_NOT_ALLOWED);
@@ -160,7 +159,7 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ErrorHandler(CommonErrorCode.COMMENT_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.COMMENT_NOT_FOUND));
 
         if (reviewEntity.getParentReview() == null) {
             throw new RestApiException(CommonErrorCode.REVIEW_NOT_ALLOWED);
@@ -178,7 +177,7 @@ public class ReviewService {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ErrorHandler(CommonErrorCode.REVIEW_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.REVIEW_NOT_FOUND));
 
         verifyUserAuthorization(user, reviewEntity);
 
@@ -200,7 +199,7 @@ public class ReviewService {
         // 리뷰 수가 10개 미만인 경우 뱃지 회수
         if (genreReviewCount < 10) {
             BadgeEntity badge = badgeRepository.findByGenre(genre)
-                    .orElseThrow(() -> new ErrorHandler(CommonErrorCode.BADGE_NOT_FOUND));
+                    .orElseThrow(() -> new RestApiException(CommonErrorCode.BADGE_NOT_FOUND));
 
             if (badge != null) {
                 // 해당 장르 뱃지를 발급받았는지 확인
