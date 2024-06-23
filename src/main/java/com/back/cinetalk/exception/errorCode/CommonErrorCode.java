@@ -25,9 +25,10 @@ public enum CommonErrorCode implements ErrorCode {
     // 키워드 관련 에러
     KEYWORD_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 작성한 리뷰입니다."),
     KEYWORD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 리뷰를 찾을 수 없습니다"),
-    KEYWORD_NOT_ALLOWED(HttpStatus.FORBIDDEN, "리뷰를 수정할 권한이 없습니다"),;
+    KEYWORD_NOT_ALLOWED(HttpStatus.FORBIDDEN, "리뷰를 수정할 권한이 없습니다"),
 
-    
+    // 뱃지 관련 에러
+    BADGE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 뱃지를 찾을 수 없습니다"),;
 
 
     private final HttpStatus httpStatus;
