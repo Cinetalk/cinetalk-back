@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BadgeByUserResponseDTO {
 
-    private String badge_name;
+    private Long genre_id;
     private String genre_name;
-    private char useyn;
+    private String badge_name;
+    private boolean isUse;
 }

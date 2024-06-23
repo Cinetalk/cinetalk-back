@@ -39,11 +39,11 @@ public class UserService {
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> nickNameMerge(HttpServletRequest request,String nickname){
+    public ResponseEntity<?> nickNameMerge(HttpServletRequest request,UserDTO userDTO){
 
         log.info("닉네임 재설정 로직");
 
-        Boolean nickYN = userRepository.existsByNickname(nickname);
+        Boolean nickYN = userRepository.existsByNickname(userDTO.getNickname());
 
         if(nickYN){
             return new ResponseEntity<>("already nickname",HttpStatus.OK);
@@ -53,7 +53,7 @@ public class UserService {
 
         String email = jwtUtil.getEmail(accessToken);
 
-        userRepository.updateNicknameByEmail(email,nickname);
+        //userRepository.updateNicknameByEmail(email,nickname);
 
         return new ResponseEntity<>("success",HttpStatus.OK);
     }
