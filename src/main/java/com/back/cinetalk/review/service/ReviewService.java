@@ -41,8 +41,7 @@ public class ReviewService {
     private final JWTUtil jwtUtil;
 
     @Transactional
-    public ReviewEntity saveReview(HttpServletRequest request, Long movieId, ReviewRequestDTO reviewRequestDTO) {
-        String email = jwtUtil.getEmail(request.getHeader("access"));
+    public ReviewEntity saveReview(Long movieId, ReviewRequestDTO reviewRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
 
         if (reviewRepository.existsByUserIdAndMovieId(user.getId(), movieId)) {
@@ -101,15 +100,14 @@ public class ReviewService {
                             .build();
                     userBadgeRepository.save(userBadge);
 
-                    log.info("뱃지가 발급되었습니다!");
+                    log.info(genre.getName() + "장르의 뱃지가 발급되었습니다!");
                 }
             }
         }
     }
 
     @Transactional
-    public ReviewEntity saveComment(HttpServletRequest request, Long parentReviewId, CommentRequestDTO commentRequestDTO) {
-        String email = jwtUtil.getEmail(request.getHeader("access"));
+    public ReviewEntity saveComment(Long parentReviewId, CommentRequestDTO commentRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity parentReview = reviewRepository.findById(parentReviewId)
@@ -136,8 +134,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewEntity updateReview(HttpServletRequest request, Long reviewId, ReviewRequestDTO reviewRequestDTO) {
-        String email = jwtUtil.getEmail(request.getHeader("access"));
+    public ReviewEntity updateReview(Long reviewId, ReviewRequestDTO reviewRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
@@ -154,8 +151,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewEntity updateComment(HttpServletRequest request, Long reviewId, CommentRequestDTO commentRequestDTO) {
-        String email = jwtUtil.getEmail(request.getHeader("access"));
+    public ReviewEntity updateComment(Long reviewId, CommentRequestDTO commentRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
@@ -172,8 +168,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public StateRes deleteReview(HttpServletRequest request, Long reviewId) {
-        String email = jwtUtil.getEmail(request.getHeader("access"));
+    public StateRes deleteReview(Long reviewId, String email) {
         UserEntity user = userRepository.findByEmail(email);
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
@@ -205,6 +200,8 @@ public class ReviewService {
                 // 해당 장르 뱃지를 발급받았는지 확인
                 Optional<UserBadgeEntity> existingBadge = userBadgeRepository.findByUserAndBadge(user, badge);
                 existingBadge.ifPresent(userBadgeRepository::delete);
+
+                log.info(genre.getName() + "장르의 뱃지가 제거되었습니다!");
             }
         }
     }
