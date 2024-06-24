@@ -1,19 +1,20 @@
 package com.back.cinetalk.user.service;
 
+import com.back.cinetalk.exception.errorCode.CommonErrorCode;
+import com.back.cinetalk.exception.exception.RestApiException;
+import com.back.cinetalk.user.MyPage.component.UserByAccess;
+import com.back.cinetalk.user.dto.NickNameMergeDTO;
 import com.back.cinetalk.user.dto.UserDTO;
-import com.back.cinetalk.user.entity.RefreshEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
-import com.back.cinetalk.user.repository.RefreshRepository;
 import com.back.cinetalk.user.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -24,7 +25,10 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public ResponseEntity<?> UserInfo(HttpServletRequest request, HttpServletResponse response){
+    private final UserByAccess userByAccess;
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<?> UserInfo(HttpServletRequest request){
 
         log.info("User정보 로직");
 
@@ -39,21 +43,20 @@ public class UserService {
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> nickNameMerge(HttpServletRequest request,UserDTO userDTO){
+    @Transactional
+    public ResponseEntity<?> nickNameMerge(HttpServletRequest request, NickNameMergeDTO dto){
 
         log.info("닉네임 재설정 로직");
 
-        Boolean nickYN = userRepository.existsByNickname(userDTO.getNickname());
+        UserEntity userEntity = userByAccess.getUserEntity(request);
+
+        Boolean nickYN = userRepository.existsByNickname(dto.getNickname());
 
         if(nickYN){
-            return new ResponseEntity<>("already nickname",HttpStatus.OK);
+            throw new RestApiException(CommonErrorCode.NICKNAME_ALREADY_EXIST);
         }
 
-        String accessToken= request.getHeader("access");
-
-        String email = jwtUtil.getEmail(accessToken);
-
-        //userRepository.updateNicknameByEmail(email,nickname);
+        userEntity.update(dto);
 
         return new ResponseEntity<>("success",HttpStatus.OK);
     }

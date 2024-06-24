@@ -19,6 +19,7 @@ import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
+import com.back.cinetalk.userBadge.entity.QUserBadgeEntity;
 import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import com.back.cinetalk.userBadge.repository.UserBadgeRepository;
 import com.querydsl.core.Tuple;
@@ -33,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -61,7 +63,9 @@ public class MyPage_ActivityService {
     QKeywordEntity keyword = QKeywordEntity.keywordEntity;
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
     QGenreEntity genre = QGenreEntity.genreEntity;
+    QUserBadgeEntity userBadge = QUserBadgeEntity.userBadgeEntity;
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> BadgeByUser(HttpServletRequest request){
 
         UserEntity byEmail = userByAccess.getUserEntity(request);
@@ -85,6 +89,7 @@ public class MyPage_ActivityService {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> ReviewByGenreFromUser(HttpServletRequest request){
 
         UserEntity byEmail = userByAccess.getUserEntity(request);
@@ -99,7 +104,17 @@ public class MyPage_ActivityService {
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    @Transactional
+    public ResponseEntity<?> BadgeUseUpdate(HttpServletRequest request,List<Long> BadgeList){
 
+        UserEntity byEmail = userByAccess.getUserEntity(request);
+
+
+        return new ResponseEntity<>("",HttpStatus.OK);
+    }
+
+
+    @Transactional(readOnly = true)
     public ResponseEntity<?> CountSumByUser(HttpServletRequest request){
 
         UserEntity byEmail = userByAccess.getUserEntity(request);
@@ -128,6 +143,7 @@ public class MyPage_ActivityService {
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> ReviewByUser(String sort,HttpServletRequest request) throws IOException {
 
         UserEntity user = userByAccess.getUserEntity(request);
@@ -174,6 +190,7 @@ public class MyPage_ActivityService {
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> LogByUser(String sort,HttpServletRequest request) throws IOException {
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
