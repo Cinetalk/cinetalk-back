@@ -2,7 +2,6 @@ package com.back.cinetalk.keyword.service;
 
 import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
-import com.back.cinetalk.exception.handler.ErrorHandler;
 import com.back.cinetalk.keyword.dto.KeywordRequestDTO;
 import com.back.cinetalk.keyword.dto.KeywordResponseDTO;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
@@ -60,7 +59,7 @@ public class KeywordService {
         UserEntity user = userRepository.findByEmail(email);
 
         KeywordEntity keywordEntity = keywordRepository.findById(keywordId)
-                .orElseThrow(() -> new ErrorHandler(CommonErrorCode.KEYWORD_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.KEYWORD_NOT_FOUND));
 
         if (!user.equals(keywordEntity.getUser())) {
             throw new RestApiException(CommonErrorCode.KEYWORD_NOT_ALLOWED);
