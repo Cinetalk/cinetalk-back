@@ -109,8 +109,16 @@ public class MyPage_ActivityService {
 
         UserEntity byEmail = userByAccess.getUserEntity(request);
 
+        queryFactory.update(userBadge).set(userBadge.isUse,false)
+                .where(userBadge.user.eq(byEmail))
+                .execute();
 
-        return new ResponseEntity<>("",HttpStatus.OK);
+        queryFactory.update(userBadge).set(userBadge.isUse,true)
+                .where(userBadge.user.eq(byEmail)
+                        .and(userBadge.badge.genre.id.in(BadgeList)))
+                .execute();
+
+        return new ResponseEntity<>("success",HttpStatus.OK);
     }
 
 

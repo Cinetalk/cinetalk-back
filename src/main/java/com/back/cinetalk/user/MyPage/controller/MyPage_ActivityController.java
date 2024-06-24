@@ -10,12 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/my")
@@ -37,6 +35,13 @@ public class MyPage_ActivityController {
     @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
     public ResponseEntity<?> ReviewByGenreFromUser(HttpServletRequest request){return myPage_activityService.ReviewByGenreFromUser(request);}
+
+    @PatchMapping("/BadgeUseUpdate")
+    @Operation(summary = "유저 뱃지 수정 처리",description = "토큰과 같이 요청시 유저가 사용할 뱃지를 처리하는 로직")
+    @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = ReviewByGenreFromUserDTO.class)))
+    @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
+    @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
+    public ResponseEntity<?> BadgeUseUpdate(@RequestParam(name = "BadgeList") List<Long> BadgeList, HttpServletRequest request){return myPage_activityService.BadgeUseUpdate(request,BadgeList);}
 
     @GetMapping("/CountSumByUser")
     @Operation(summary = "유저의 좋아요,댓글,찜 갯수",description = "토큰과 같이 요청시 유저의 좋아요,댓글,찜 갯수 반환")
