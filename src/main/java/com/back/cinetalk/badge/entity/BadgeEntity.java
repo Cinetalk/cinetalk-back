@@ -2,12 +2,17 @@ package com.back.cinetalk.badge.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.genre.entity.GenreEntity;
+import com.back.cinetalk.reviewGenre.entity.ReviewGenreEntity;
 import com.back.cinetalk.user.entity.UserEntity;
+import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -15,17 +20,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BadgeEntity extends BaseEntity {
-    // cicd test/////
+public class BadgeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "genre_id")
     private GenreEntity genre;
+
+    @OneToMany(mappedBy = "badge")
+    private List<UserBadgeEntity> userBadgeEntityList;
 }

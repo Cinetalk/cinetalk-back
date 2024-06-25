@@ -1,7 +1,7 @@
 package com.back.cinetalk.genre.entity;
 
 import com.back.cinetalk.badge.entity.BadgeEntity;
-import com.back.cinetalk.review_genre.entity.ReviewGenreEntity;
+import com.back.cinetalk.reviewGenre.entity.ReviewGenreEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +26,7 @@ public class GenreEntity {
     private String name;
 
     @OneToMany(mappedBy = "genre")
-    private List<ReviewGenreEntity> reviewGenreEntityList;
+    private List<ReviewGenreEntity> reviewGenreEntityList = new ArrayList<ReviewGenreEntity>();
 
     @OneToMany(mappedBy = "genre")
     private List<BadgeEntity> badgeEntityList = new ArrayList<BadgeEntity>();

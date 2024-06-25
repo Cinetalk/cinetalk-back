@@ -1,8 +1,8 @@
-package com.back.cinetalk.review_genre.entity;
+package com.back.cinetalk.userBadge.entity;
 
+import com.back.cinetalk.badge.entity.BadgeEntity;
 import com.back.cinetalk.config.entity.BaseEntity;
-import com.back.cinetalk.genre.entity.GenreEntity;
-import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,21 +11,23 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "Review_Genre")
+@Table(name = "User_Badge")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewGenreEntity extends BaseEntity {
+public class UserBadgeEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
-    private ReviewEntity review;
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "genre_id")
-    private GenreEntity genre;
+    @JoinColumn(name = "badge_id")
+    private BadgeEntity badge;
+
+    private boolean isUse;
 }

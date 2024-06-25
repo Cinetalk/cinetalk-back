@@ -1,5 +1,7 @@
 package com.back.cinetalk.keyword.service;
 
+import com.back.cinetalk.exception.errorCode.CommonErrorCode;
+import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.keyword.dto.KeywordRequestDTO;
 import com.back.cinetalk.keyword.dto.KeywordResponseDTO;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
@@ -7,8 +9,6 @@ import com.back.cinetalk.keyword.repository.KeywordRepository;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,13 +25,11 @@ public class KeywordService {
     private final JWTUtil jwtUtil;
 
     @Transactional
-    public KeywordEntity createKeyword(HttpServletRequest request, Long movieId, KeywordRequestDTO keywordRequestDTO) {
-        // 로그인 검사 로직
-        String email = jwtUtil.getEmail(request.getHeader("access"));
+    public KeywordEntity createKeyword(Long movieId, KeywordRequestDTO keywordRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
 
         if (keywordRepository.existsByUserIdAndMovieId(user.getId(), movieId)) {
-            throw new RuntimeException("이미 작성한 키워드입니다.");
+            throw new RestApiException(CommonErrorCode.KEYWORD_ALREADY_IN_WRITE);
         }
 
         return keywordRepository.save(KeywordEntity.builder()
@@ -53,15 +51,14 @@ public class KeywordService {
     }
 
     @Transactional
-    public KeywordEntity updateKeyword(HttpServletRequest request, Long keywordId, KeywordRequestDTO keywordRequestDTO) {
-        String email = jwtUtil.getEmail(request.getHeader("access"));
+    public KeywordEntity updateKeyword(Long keywordId, KeywordRequestDTO keywordRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
 
         KeywordEntity keywordEntity = keywordRepository.findById(keywordId)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.KEYWORD_NOT_FOUND));
 
         if (!user.equals(keywordEntity.getUser())) {
-            throw new RuntimeException("키워드를 수정할 권한이 없습니다.");
+            throw new RestApiException(CommonErrorCode.KEYWORD_NOT_ALLOWED);
         }
 
         keywordEntity.update(keywordRequestDTO);
