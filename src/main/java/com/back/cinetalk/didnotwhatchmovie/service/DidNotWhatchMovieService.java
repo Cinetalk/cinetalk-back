@@ -1,5 +1,6 @@
 package com.back.cinetalk.didnotwhatchmovie.service;
 
+import com.back.cinetalk.didnotwhatchmovie.dto.DidNotWhatchMovieDTO;
 import com.back.cinetalk.didnotwhatchmovie.entity.DidNotWhatchMovieEntity;
 import com.back.cinetalk.didnotwhatchmovie.entity.MovieGenreEntity;
 import com.back.cinetalk.didnotwhatchmovie.repository.DidNotWhatchMovieRepository;
@@ -24,12 +25,15 @@ public class DidNotWhatchMovieService {
     private final DidNotWhatchMovieRepository repository;
     private final MovieRepository movieRepository;
 
-
-    public DidNotWhatchMovieEntity saveReview(DidNotWhatchMovieEntity entity) {
-        Optional<DidNotWhatchMovieEntity> existingReview = repository.findByUserIdAndMovieId(entity.getUser().getId(), entity.getMovie().getId());
+    public DidNotWhatchMovieEntity saveReview(DidNotWhatchMovieDTO dto) {
+        Optional<DidNotWhatchMovieEntity> existingReview = repository.findByUserIdAndMovieId(dto.getUser().getId(), dto.getMovie().getId());
         if (existingReview.isPresent()) {
             throw new IllegalStateException("User has already reviewed this movie.");
         }
+        DidNotWhatchMovieEntity entity = DidNotWhatchMovieEntity.builder()
+                .user(dto.getUser())
+                .movie(dto.getMovie())
+                .build();
         return repository.save(entity);
     }
 

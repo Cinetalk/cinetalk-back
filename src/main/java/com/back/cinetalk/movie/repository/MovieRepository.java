@@ -15,7 +15,10 @@ public interface MovieRepository extends JpaRepository<MovieEntity, Long> {
 
     MovieEntity findFirstByOrderByCreatedAtAsc();
 
-    @Query("SELECT m FROM MovieEntity m JOIN m.genres g WHERE g.genre.id IN :genreIds")
-    List<MovieEntity> findByGenreIds(List<Long> genreIds);
+    List<MovieEntity> findByGenreIds(List<Long> popularGenreIds);
+
+
+//    @Query("SELECT m FROM MovieEntity m JOIN m.genres g WHERE g.genre.id IN :genreIds")
+//    List<MovieEntity> findByGenreIds(List<Long> genreIds);
 
 }

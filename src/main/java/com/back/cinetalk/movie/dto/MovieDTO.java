@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Schema(description = "영화 데이터 담기는 DTO")
 @Data
 @Builder

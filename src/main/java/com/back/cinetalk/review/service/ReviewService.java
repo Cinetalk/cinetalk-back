@@ -2,6 +2,7 @@ package com.back.cinetalk.review.service;
 
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.genre.repository.GenreRepository;
+import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.review.dto.*;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
@@ -29,6 +30,7 @@ public class ReviewService {
     private final GenreRepository genreRepository;
     private final ReviewGenreRepository reviewGenreRepository;
     private final JWTUtil jwtUtil;
+    private final MovieRepository movieRepository;
 
     @Transactional
     public ReviewEntity saveReview(HttpServletRequest request, Long movieId, ReviewRequestDTO reviewRequestDTO) {

@@ -41,11 +41,6 @@ public class ReviewEntity extends BaseEntity {
 
     private boolean spoiler;
 
-    // 한개의 영화에는 한개의 리뷰만
-    @ManyToOne
-    @JoinColumn(name = "movie_id")
-    private MovieEntity movie;
-
 
     @ManyToOne
     @JoinColumn(name = "parent_id")

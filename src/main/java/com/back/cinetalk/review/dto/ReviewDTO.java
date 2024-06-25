@@ -29,7 +29,7 @@ public class ReviewDTO {
     public static ReviewDTO toReviewDTO(ReviewEntity reviewEntity){
         return ReviewDTO.builder()
                 .id(reviewEntity.getId())
-                .movieId(reviewEntity.getMovieId())
+                .movieId(reviewEntity.getMovieID())
                 .movienm(reviewEntity.getMovienm())
                 .star(reviewEntity.getStar())
                 .content(reviewEntity.getContent())

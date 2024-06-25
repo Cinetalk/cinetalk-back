@@ -6,8 +6,10 @@ buildscript {
 
 plugins {
     id 'java'
+    id 'idea'
     id 'org.springframework.boot' version '3.2.6'
     id 'io.spring.dependency-management' version '1.1.5'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 
@@ -57,8 +59,12 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
     // [2] QueryDSL 라이브러리
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+//    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+//    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+//    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+//    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
@@ -87,7 +93,9 @@ def generated = 'src/main/generated'
 
 // [4] querydsl QClass 파일 생성 위치를 지정
 tasks.withType(JavaCompile) {
-    options.getGeneratedSourceOutputDirectory().set(file(generated))
+//    options.getGeneratedSourceOutputDirectory().set(file(generated))
+    options.annotationProcessorPath = configurations.annotationProcessor
+    options.generatedSourceOutputDirectory = file(generated)
 }
 
 // [5] java source set 에 querydsl QClass 위치 추가

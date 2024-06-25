@@ -1,5 +1,6 @@
 package com.back.cinetalk.didnotwhatchmovie.controller;
 
+import com.back.cinetalk.didnotwhatchmovie.dto.MovieRecommendationDTO;
 import com.back.cinetalk.didnotwhatchmovie.entity.DidNotWhatchMovieEntity;
 import com.back.cinetalk.didnotwhatchmovie.service.DidNotWhatchMovieService;
 import com.back.cinetalk.movie.entity.MovieEntity;
@@ -25,6 +26,8 @@ public class DidNotWhatchMovieController {
 
     @GetMapping("/recommend/{userId}")
     public List<MovieEntity> recommendMovies(@PathVariable Long userId) {
-        return service.recommendMoviesByGenres(userId);
+        List<MovieEntity> recommendedMovies = service.recommendMoviesByGenres(userId);
+
+        return null;
     }
 }

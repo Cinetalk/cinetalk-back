@@ -23,6 +23,8 @@ public class MovieEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+//    @OneToMany
+//    private List<ReviewEntity> reviewEntity = new ArrayList<>();
     private Long movieId;
 
     private String movienm;
