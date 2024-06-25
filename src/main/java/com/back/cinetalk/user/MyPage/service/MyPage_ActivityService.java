@@ -57,7 +57,6 @@ public class MyPage_ActivityService {
     private final UserByAccess userByAccess;
 
     QReviewEntity review = QReviewEntity.reviewEntity;
-    QUserEntity user = QUserEntity.userEntity;
     QRateEntity rate = QRateEntity.rateEntity;
     QBookmarkEntity bookmark = QBookmarkEntity.bookmarkEntity;
     QKeywordEntity keyword = QKeywordEntity.keywordEntity;
@@ -109,8 +108,16 @@ public class MyPage_ActivityService {
 
         UserEntity byEmail = userByAccess.getUserEntity(request);
 
+        queryFactory.update(userBadge).set(userBadge.isUse,false)
+                .where(userBadge.user.eq(byEmail))
+                .execute();
 
-        return new ResponseEntity<>("",HttpStatus.OK);
+        queryFactory.update(userBadge).set(userBadge.isUse,true)
+                .where(userBadge.user.eq(byEmail)
+                        .and(userBadge.badge.genre.id.in(BadgeList)))
+                .execute();
+
+        return new ResponseEntity<>("success",HttpStatus.OK);
     }
 
 

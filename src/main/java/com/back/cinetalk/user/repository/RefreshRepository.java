@@ -20,6 +20,8 @@ public interface RefreshRepository extends JpaRepository<RefreshEntity, Long> {
 
     RefreshEntity findByAuth(String auth);
 
+    void deleteByEmail(String email);
+
     @Modifying
     @Transactional
     @Query("UPDATE RefreshEntity e SET e.auth = NULL WHERE e.auth = :auth")

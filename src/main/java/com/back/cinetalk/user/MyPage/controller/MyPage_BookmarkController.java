@@ -11,11 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/my")
@@ -30,5 +29,13 @@ public class MyPage_BookmarkController {
     @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
     public ResponseEntity<?> BookmarkByUser(HttpServletRequest request) throws IOException {return myPageBookmarkService.BookmarkByUser(request);}
+
+    @DeleteMapping("/BookmarkDelete")
+    @Operation(summary = "찜 목록 삭제",description = "토큰과 같이 요청시 유저가 선택한 찜목록 삭제")
+    @ApiResponse(responseCode = "200",description = "삭제 완료",content = @Content(schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
+    @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
+    public ResponseEntity<?> BookmarkDelete(@RequestParam(name = "BookmarkList") List<Long> BookmarkList, HttpServletRequest request){return myPageBookmarkService.BookmarkDelete(request, BookmarkList);}
+
 
 }

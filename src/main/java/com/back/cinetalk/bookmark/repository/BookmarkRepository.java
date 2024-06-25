@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> {
-    List<BookmarkEntity> findByUserOrderByCreatedAt(UserEntity user);
+    List<BookmarkEntity> findByUserOrderByCreatedAtDesc(UserEntity user);
 }
