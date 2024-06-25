@@ -87,9 +87,13 @@ public class UserEntity extends BaseEntity {
         }
     }
 
-    public void update(NickNameMergeDTO dto){
+    public void Update(NickNameMergeDTO dto){
         this.nickname = dto.getNickname();
         this.gender = dto.getGender();
         this.birthday = dto.getBirthday();
+    }
+
+    public void UpdateProfile(byte[] profile){
+        this.profile = profile;
     }
 }

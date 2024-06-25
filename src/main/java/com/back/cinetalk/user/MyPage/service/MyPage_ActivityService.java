@@ -57,7 +57,6 @@ public class MyPage_ActivityService {
     private final UserByAccess userByAccess;
 
     QReviewEntity review = QReviewEntity.reviewEntity;
-    QUserEntity user = QUserEntity.userEntity;
     QRateEntity rate = QRateEntity.rateEntity;
     QBookmarkEntity bookmark = QBookmarkEntity.bookmarkEntity;
     QKeywordEntity keyword = QKeywordEntity.keywordEntity;
