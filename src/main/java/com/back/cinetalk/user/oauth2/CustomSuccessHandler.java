@@ -79,7 +79,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             userRepository.updateNicknameByEmail(email,Newnickname);
 
-            response.sendRedirect("http://localhost:3000/redirect/without-nickName?authToken="+authToken);
+            response.sendRedirect("http://localhost:3000/redirect/without-nickname?authToken="+authToken);
         }
         //닉네임이 존재할 경우
         else{
