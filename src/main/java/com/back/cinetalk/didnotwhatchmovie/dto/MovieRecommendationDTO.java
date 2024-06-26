@@ -1,21 +1,15 @@
 package com.back.cinetalk.didnotwhatchmovie.dto;
 
-import com.back.cinetalk.movie.entity.MovieEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
-import java.util.List;
-
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
+@Schema(description = "추천 영화 데이터 담기는 DTO")
 public class MovieRecommendationDTO {
 
-    private Long userId;
 
-    private List<MovieEntity> recommendedMovies;
 
 }
