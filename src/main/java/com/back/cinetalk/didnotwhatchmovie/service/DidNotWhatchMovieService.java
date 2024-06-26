@@ -1,61 +1,72 @@
 package com.back.cinetalk.didnotwhatchmovie.service;
 
-import com.back.cinetalk.didnotwhatchmovie.dto.DidNotWhatchMovieDTO;
-import com.back.cinetalk.didnotwhatchmovie.entity.DidNotWhatchMovieEntity;
-import com.back.cinetalk.didnotwhatchmovie.entity.MovieGenreEntity;
-import com.back.cinetalk.didnotwhatchmovie.repository.DidNotWhatchMovieRepository;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
-import com.back.cinetalk.movie.service.CallAPI;
+import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.review.repository.ReviewRepository;
+import com.back.cinetalk.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-@Service
+
 @Slf4j
+@Service
 @RequiredArgsConstructor
-public class DidNotWhatchMovieService {
+public class DidNotWatchMovieService {
 
-    @Value("${tmdb.rest.api.key}")
-    private String tmdbrestapikey;
-    private final DidNotWhatchMovieRepository repository;
-    private final MovieRepository movieRepository;
+    private UserRepository userRepository;
+    private ReviewRepository reviewRepository;
+    private MovieRepository movieRepository;
 
-    public DidNotWhatchMovieEntity saveReview(DidNotWhatchMovieDTO dto) {
-        Optional<DidNotWhatchMovieEntity> existingReview = repository.findByUserIdAndMovieId(dto.getUser().getId(), dto.getMovie().getId());
-        if (existingReview.isPresent()) {
-            throw new IllegalStateException("User has already reviewed this movie.");
+    public List<MovieEntity> getRecommendMovieList(String email) {
+        List<ReviewEntity> reviewEntiy = reviewRepository.findByUser_Email(email);
+        List<String> genreList = new ArrayList<>();
+        List<Long> reveiwedMovieIds = new ArrayList<>();
+        for(ReviewEntity review: reviewEntiy) {
+            Long movieId = review.getMovieId();
+            MovieEntity movieEntity = movieRepository.findByMovieId(movieId);
+            genreList.add(movieEntity.getGenre());
+            reveiwedMovieIds.add(movieId);
         }
-        DidNotWhatchMovieEntity entity = DidNotWhatchMovieEntity.builder()
-                .user(dto.getUser())
-                .movie(dto.getMovie())
-                .build();
-        return repository.save(entity);
+        String mostFrequentGenre = findMostFrequent(genreList);
+        List<MovieEntity> movieEntities = movieRepository.findByGenre(mostFrequentGenre);
+        List<MovieEntity> filteredMovies = filterMovies(movieEntities, reveiwedMovieIds);
+        return filteredMovies;
     }
 
-    public List<MovieEntity> recommendMoviesByGenres(Long userId) {
-        List<DidNotWhatchMovieEntity> userReviews = repository.findByUserId(userId);
-        Map<Long, Long> genreCount = new HashMap<>();
+    public static List<MovieEntity> filterMovies(List<MovieEntity> movieList, List<Long> excludeMovieIds) {
+        return movieList.stream()
+                .filter(movie -> !excludeMovieIds.contains(movie.getMovieId()))
+                .collect(Collectors.toList());
+    }
 
-        for (DidNotWhatchMovieEntity review : userReviews) {
-            for (MovieGenreEntity movieGenre : review.getMovie().getGenres()) {
-                genreCount.merge(movieGenre.getGenre().getId(), 1L, Long::sum);
+    public static String findMostFrequent(List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+
+        Map<String, Integer> frequencyMap = new HashMap<>();
+        for (String item : list) {
+            frequencyMap.put(item, frequencyMap.getOrDefault(item, 0) + 1);
+        }
+
+        String mostFrequent = null;
+        int maxCount = -1;
+        for (Map.Entry<String, Integer> entry : frequencyMap.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                mostFrequent = entry.getKey();
+                maxCount = entry.getValue();
             }
         }
 
-        List<Long> popularGenreIds = genreCount.entrySet().stream()
-                .filter(entry -> entry.getValue() >= 2)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-
-        if (popularGenreIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return movieRepository.findByGenreIds(popularGenreIds);
+        return mostFrequent;
     }
+
 }
