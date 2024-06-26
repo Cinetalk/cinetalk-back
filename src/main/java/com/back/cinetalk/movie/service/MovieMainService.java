@@ -228,7 +228,7 @@ public class MovieMainService {
         StringBuilder Review = new StringBuilder();
         //리뷰 직렬화
         for (String content : reviewList) {
-            Review.append(content);
+            Review.append(content+".");
         }
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
@@ -238,9 +238,11 @@ public class MovieMainService {
 
         List<Token> tokenList = komoran.analyze(String.valueOf(Review)).getTokenList();
 
+
         for (Token token : tokenList) {
             String pos = token.getPos();
             String morph = token.getMorph();
+
             if (pos.contains("NN") && morph.length() > 1) {
                 // 단어가 이미 존재하면 빈도수를 증가시키고, 없으면 새로운 키로 추가
                 wordFrequency.put(morph, wordFrequency.getOrDefault(morph, 0) + 1);
@@ -251,6 +253,8 @@ public class MovieMainService {
         List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
+
+        System.out.println(sortedList.size());
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 
