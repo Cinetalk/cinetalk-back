@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -26,4 +27,5 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , Qu
    long countByUserAndGenre(@Param("user") UserEntity user, @Param("genre") GenreEntity genre);
 
    List<ReviewEntity> findByUser_Email(String email);
+
 }

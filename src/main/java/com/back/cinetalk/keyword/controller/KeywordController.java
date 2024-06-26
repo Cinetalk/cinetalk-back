@@ -5,6 +5,7 @@ import com.back.cinetalk.keyword.dto.KeywordResponseDTO;
 import com.back.cinetalk.keyword.dto.LatestKeywordResponseDTO;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.keyword.service.KeywordService;
+import com.back.cinetalk.user.jwt.JwtValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -23,11 +24,11 @@ public class KeywordController {
 
     @PostMapping("/{movieId}/save")
     @Operation(summary = "특정 영화의 키워드 등록 API", description = "특정 영화의 키워드를 등록하는 API 입니다.")
-    public KeywordResponseDTO createKeyword(HttpServletRequest request,
-                                            @PathVariable(name = "movieId") Long movieId,
-                                            @RequestBody @Valid KeywordRequestDTO keywordRequestDTO) {
+    public KeywordResponseDTO createKeyword(@PathVariable(name = "movieId") Long movieId,
+                                            @RequestBody @Valid KeywordRequestDTO keywordRequestDTO,
+                                            @JwtValidation String email) {
 
-        KeywordEntity keywordEntity = keywordService.createKeyword(request, movieId, keywordRequestDTO);
+        KeywordEntity keywordEntity = keywordService.createKeyword(movieId, keywordRequestDTO, email);
         return KeywordResponseDTO.toKeywordResponseDTO(keywordEntity);
     }
 
@@ -48,11 +49,11 @@ public class KeywordController {
 
     @PatchMapping("/{keywordId}")
     @Operation(summary = "특정 영화의 키워드 수정 API", description = "특정 영화의 키워드를 수정하는 API 입니다.")
-    public KeywordResponseDTO updateKeyword(HttpServletRequest request,
-                                            @PathVariable(name = "keywordId") Long keywordId,
-                                            @RequestBody @Valid KeywordRequestDTO keywordRequestDTO) {
+    public KeywordResponseDTO updateKeyword(@PathVariable(name = "keywordId") Long keywordId,
+                                            @RequestBody @Valid KeywordRequestDTO keywordRequestDTO,
+                                            @JwtValidation String emai) {
 
-        KeywordEntity keywordEntity = keywordService.updateKeyword(request, keywordId, keywordRequestDTO);
+        KeywordEntity keywordEntity = keywordService.updateKeyword(keywordId, keywordRequestDTO, emai);
         return KeywordResponseDTO.toKeywordResponseDTO(keywordEntity);
     }
 }

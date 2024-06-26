@@ -1,9 +1,12 @@
 package com.back.cinetalk.user.service;
 
+import com.back.cinetalk.user.dto.UserDTO;
+import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.repository.RefreshRepository;
 import com.back.cinetalk.user.dto.RefreshDTO;
 import com.back.cinetalk.user.entity.RefreshEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
+import com.back.cinetalk.user.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,12 +26,13 @@ import java.util.Date;
 public class ReIssueService {
 
     private final JWTUtil jwtUtil;
-
     private final RefreshRepository refreshRepository;
+    private final UserRepository userRepository;
 
-    public ReIssueService(JWTUtil jwtUtil, RefreshRepository refreshRepository) {
+    public ReIssueService(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
+        this.userRepository = userRepository;
     }
 
     public ResponseEntity<?> reissueToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -99,10 +103,12 @@ public class ReIssueService {
         log.info("토큰 재생성 성공");
 
         //응답 바디
-        PrintWriter writer = response.getWriter();
-        writer.print("token reissue");
+        //PrintWriter writer = response.getWriter();
+        //writer.print("token reissue");
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        UserEntity userEntity = userRepository.findByEmail(email);
+
+        return new ResponseEntity<>(UserDTO.ToUserDTO(userEntity),HttpStatus.OK);
     }
 
     private Cookie createCookie(String key,String value){
@@ -128,5 +134,30 @@ public class ReIssueService {
         RefreshEntity refreshEntity = RefreshEntity.ToRefreshEntity(refreshDTO);
 
         refreshRepository.save(refreshEntity);
+    }
+
+    public ResponseEntity<?> AuthBy(HttpServletResponse response,String auth){
+
+        RefreshEntity byAuth = refreshRepository.findByAuth(auth);
+
+        refreshRepository.updateAuthToNullByAuth(auth);
+
+        if(byAuth == null){
+
+            return new ResponseEntity<>("token null",HttpStatus.OK);
+        }
+
+        String email = jwtUtil.getEmail(byAuth.getRefresh());
+        String role = jwtUtil.getRole(byAuth.getRefresh());
+
+        //access 토큰 재생성
+        String newAccess = jwtUtil.createJwt("access",email,role,600000L);
+
+        UserEntity userEntity = userRepository.findByEmail(email);
+
+        response.setHeader("access",newAccess);
+        response.addCookie(createCookie("refresh",byAuth.getRefresh()));
+
+        return new ResponseEntity<>(UserDTO.ToUserDTO(userEntity),HttpStatus.OK);
     }
 }

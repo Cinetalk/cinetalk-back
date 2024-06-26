@@ -6,13 +6,16 @@ import com.back.cinetalk.didnotwhatchmovie.entity.DidNotWhatchMovieEntity;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.user.dto.NickNameMergeDTO;
 import com.back.cinetalk.user.dto.UserDTO;
+import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Entity
@@ -29,6 +32,7 @@ public class UserEntity extends BaseEntity {
     private Long id;
 
     @NotEmpty
+    @Column(unique = true
     private String email;
 
     private String password;
@@ -63,6 +67,9 @@ public class UserEntity extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<BookmarkEntity> bookmarkEntityList = new ArrayList<BookmarkEntity>();
 
+    @OneToMany(mappedBy = "user")
+    private List<UserBadgeEntity> userBadgeEntityList = new ArrayList<UserBadgeEntity>();
+
     public static UserEntity ToUserEntity(UserDTO userDTO){
         return UserEntity.builder()
                 .id(userDTO.getId())
@@ -72,13 +79,27 @@ public class UserEntity extends BaseEntity {
                 .nickname(userDTO.getNickname())
                 .gender(userDTO.getGender())
                 .birthday(userDTO.getBirthday())
-                .profile(userDTO.getProfile())
+                .profile(TodecodeProfile(userDTO.getProfile()))
                 .provider(userDTO.getProvider())
                 .role(userDTO.getRole())
                 .build();
     }
+            
+    public static byte[] TodecodeProfile(String profileString){
+        if(profileString != null){
+            return Base64.getDecoder().decode(profileString);
+        }else {
+            return null;
+        }
+    }
 
-    // 승일
-    @OneToMany(mappedBy = "user")
-    private List<DidNotWhatchMovieEntity> didNotWhatchMovie = new ArrayList<>();
+    public void Update(NickNameMergeDTO dto){
+        this.nickname = dto.getNickname();
+        this.gender = dto.getGender();
+        this.birthday = dto.getBirthday();
+    }
+
+    public void UpdateProfile(byte[] profile){
+        this.profile = profile;
+    }
 }

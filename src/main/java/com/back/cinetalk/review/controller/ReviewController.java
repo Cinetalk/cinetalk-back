@@ -3,6 +3,7 @@ package com.back.cinetalk.review.controller;
 import com.back.cinetalk.review.dto.*;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.service.ReviewService;
+import com.back.cinetalk.user.jwt.JwtValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -10,10 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-// cicd test
 @RestController
 @RequestMapping("/reviews")
-
 @RequiredArgsConstructor
 public class ReviewController {
 
@@ -21,21 +20,21 @@ public class ReviewController {
 
     @PostMapping("/{movieId}/save")
     @Operation(summary = "리뷰 등록 API", description = "리뷰를 등록하는 API 입니다.")
-    public ReviewResponseDTO saveReview(HttpServletRequest request,
-                                        @PathVariable(name = "movieId") Long movieId,
-                                        @RequestBody @Valid ReviewRequestDTO reviewRequestDTO) {
+    public ReviewResponseDTO saveReview(@PathVariable(name = "movieId") Long movieId,
+                                        @RequestBody @Valid ReviewRequestDTO reviewRequestDTO,
+                                        @JwtValidation String email) {
 
-        ReviewEntity reviewEntity = reviewService.saveReview(request, movieId, reviewRequestDTO);
+        ReviewEntity reviewEntity = reviewService.saveReview(movieId, reviewRequestDTO, email);
         return ReviewResponseDTO.toReviewResponseDTO(reviewEntity);
     }
 
     @PostMapping("/{parentReviewId}/comments")
     @Operation(summary = "리뷰의 댓글 등록 API", description = "리뷰의 댓글을 등록하는 API 입니다.")
-    public CommentResponseDTO saveComment(HttpServletRequest request,
-                                          @PathVariable(name = "parentReviewId") Long parentReviewId,
-                                          @RequestBody @Valid CommentRequestDTO commentRequestDTO) {
+    public CommentResponseDTO saveComment(@PathVariable(name = "parentReviewId") Long parentReviewId,
+                                          @RequestBody @Valid CommentRequestDTO commentRequestDTO,
+                                          @JwtValidation String email) {
 
-        ReviewEntity reReviewEntity = reviewService.saveComment(request, parentReviewId, commentRequestDTO);
+        ReviewEntity reReviewEntity = reviewService.saveComment(parentReviewId, commentRequestDTO, email);
         return CommentResponseDTO.toCommentResponseDTO(reReviewEntity);
     }
 
@@ -59,30 +58,30 @@ public class ReviewController {
 
     @PatchMapping("/{reviewId}")
     @Operation(summary = "리뷰 수정 API", description = "리뷰를 수정하는 API 입니다.")
-    public ReviewResponseDTO updateReview(HttpServletRequest request,
-                                          @PathVariable(name = "reviewId") Long reviewId,
-                                          @RequestBody @Valid ReviewRequestDTO reviewRequestDTO) {
+    public ReviewResponseDTO updateReview(@PathVariable(name = "reviewId") Long reviewId,
+                                          @RequestBody @Valid ReviewRequestDTO reviewRequestDTO,
+                                          @JwtValidation String email) {
 
-        ReviewEntity reviewEntity = reviewService.updateReview(request, reviewId, reviewRequestDTO);
+        ReviewEntity reviewEntity = reviewService.updateReview(reviewId, reviewRequestDTO, email);
         return ReviewResponseDTO.toReviewResponseDTO(reviewEntity);
     }
 
     @PatchMapping("/comments/{commentId}")
     @Operation(summary = "댓글 수정 API", description = "댓글을 수정하는 API 입니다.")
-    public CommentResponseDTO updateComment(HttpServletRequest request,
-                                          @PathVariable(name = "commentId") Long commentId,
-                                          @RequestBody @Valid CommentRequestDTO commentRequestDTO) {
+    public CommentResponseDTO updateComment(@PathVariable(name = "commentId") Long commentId,
+                                            @RequestBody @Valid CommentRequestDTO commentRequestDTO,
+                                            @JwtValidation String email) {
 
-        ReviewEntity reviewEntity = reviewService.updateComment(request, commentId, commentRequestDTO);
+        ReviewEntity reviewEntity = reviewService.updateComment(commentId, commentRequestDTO, email);
         return CommentResponseDTO.toCommentResponseDTO(reviewEntity);
     }
 
     @DeleteMapping("/{reviewId}")
     @Operation(summary = "리뷰 or 댓글 삭제 API", description = "리뷰 혹은 댓글을 삭제하는 API 입니다.")
-    public StateRes deleteReview(HttpServletRequest request,
-                                 @PathVariable(name = "reviewId") Long reviewId) {
+    public StateRes deleteReview(@PathVariable(name = "reviewId") Long reviewId,
+                                 @JwtValidation String email) {
 
-        return reviewService.deleteReview(request, reviewId);
+        return reviewService.deleteReview(reviewId, email);
     }
 
 }

@@ -26,4 +26,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("UPDATE UserEntity u SET u.provider = :provider WHERE u.email = :email")
     void updateProviderByEmail(@Param("provider")String provider,@Param("email") String email);
 
+    Boolean existsByNickname(String nickname);
 }

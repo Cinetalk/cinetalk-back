@@ -30,7 +30,7 @@ public class UserDTO {
 
     private LocalDate birthday;
 
-    private byte[] profile;
+    private String profile;
 
     private String provider;
 
@@ -47,7 +47,7 @@ public class UserDTO {
                 .nickname(userEntity.getNickname())
                 .gender(userEntity.getGender())
                 .birthday(userEntity.getBirthday())
-                .profile(userEntity.getProfile())
+                .profile(Base64.getEncoder().encodeToString(userEntity.getProfile()))
                 .provider(userEntity.getProvider())
                 .role(userEntity.getRole())
                 .build();

@@ -15,8 +15,7 @@ import java.util.Arrays;
 @Configuration
 @OpenAPIDefinition(servers = {
         @Server(url = "https://cinetalk.kro.kr", description = "https"),
-        @Server(url = "http://localhost:80", description = "local"),
-        @Server(url = "http://3.37.21.244", description = "cicd")
+        @Server(url = "http://localhost:80", description = "local")
 })
 public class SwaggerConfig {
     @Bean
