@@ -1,33 +1,25 @@
 package com.back.cinetalk.didnotwhatchmovie.controller;
 
-import com.back.cinetalk.didnotwhatchmovie.dto.MovieRecommendationDTO;
-import com.back.cinetalk.didnotwhatchmovie.entity.DidNotWhatchMovieEntity;
-import com.back.cinetalk.didnotwhatchmovie.service.DidNotWhatchMovieService;
+import com.back.cinetalk.didnotwhatchmovie.service.DidNotWatchMovieService;
 import com.back.cinetalk.movie.entity.MovieEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import com.back.cinetalk.user.jwt.JwtValidation;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Slf4j
 @RestController
-@RequestMapping("/main")
-public class DidNotWhatchMovieController {
-    private final DidNotWhatchMovieService service;
+@RequestMapping("/")
+@RequiredArgsConstructor
+public class DidNotWatchMovieController {
+    private DidNotWatchMovieService didNotWatchMovieService;
 
-    @Autowired
-    public DidNotWhatchMovieController(DidNotWhatchMovieService service) {
-        this.service = service;
-    }
-
-    @PostMapping
-    public DidNotWhatchMovieEntity createReview(@RequestBody DidNotWhatchMovieEntity entity) {
-        return service.saveReview(entity);
-    }
-
-    @GetMapping("/recommend/{userId}")
-    public List<MovieEntity> recommendMovies(@PathVariable Long userId) {
-        List<MovieEntity> recommendedMovies = service.recommendMoviesByGenres(userId);
-
-        return null;
+    @GetMapping("/recommend")
+    public List<MovieEntity> getRecommend(@JwtValidation String email) {
+        return didNotWatchMovieService.getRecommendMovieList(email);
     }
 }
