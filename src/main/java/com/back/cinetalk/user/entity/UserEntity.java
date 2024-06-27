@@ -4,7 +4,6 @@ import com.back.cinetalk.bookmark.entity.BookmarkEntity;
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.rate.dislike.entity.ReviewDislikeEntity;
-import com.back.cinetalk.rate.entity.RateEntity;
 import com.back.cinetalk.rate.like.entity.ReviewLikeEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.NickNameMergeDTO;
@@ -56,9 +55,6 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<KeywordEntity> keywordEntityList = new ArrayList<KeywordEntity>();
-
-    @OneToMany(mappedBy = "user")
-    private List<RateEntity> rateEntityList = new ArrayList<RateEntity>();
 
     @OneToMany(mappedBy = "user")
     private List<BookmarkEntity> bookmarkEntityList = new ArrayList<BookmarkEntity>();
