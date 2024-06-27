@@ -10,7 +10,6 @@ import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.UserDTO;
-import com.back.cinetalk.user.entity.UserEntity;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +33,7 @@ public class FindService {
     private final JPAQueryFactory queryFactory;
 
 
+    //TODO 검색어 저장
     public ResponseEntity<?> WordSave(String findword){
 
         FindDTO findDTO = new FindDTO();
@@ -47,6 +47,7 @@ public class FindService {
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
+    //TODO 연관 검색어 출력
     public List<String> findText(String query) throws IOException {
 
         String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query="+query;
@@ -65,6 +66,7 @@ public class FindService {
         return returnList;
     }
 
+    //TODO 영화 검색 결과
     public List<Map<String,Object>> MovieResult(String query)throws Exception{
 
         String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query="+query;
@@ -76,6 +78,7 @@ public class FindService {
         return resultlist;
     }
 
+    //TODO 리뷰 검색 결과
     public List<FindReviewDTO> ReviewResult(String query) {
 
         QReviewEntity review = QReviewEntity.reviewEntity;
@@ -105,6 +108,7 @@ public class FindService {
         return returnList;
     }
 
+    //TODO 인기 검색어
     public ResponseEntity<?> PopularFind(){
 
         QFindEntity find = QFindEntity.findEntity;

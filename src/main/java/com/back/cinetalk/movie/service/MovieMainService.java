@@ -3,31 +3,20 @@ package com.back.cinetalk.movie.service;
 import com.back.cinetalk.movie.dto.MovieDTO;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
-import com.back.cinetalk.rate.entity.QRateEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
-import com.back.cinetalk.review.dto.ReviewRequestDTO;
-import com.back.cinetalk.review.dto.ReviewResponseDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
-import com.back.cinetalk.user.dto.UserDTO;
-import com.back.cinetalk.user.entity.QUserEntity;
-import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
-import com.querydsl.core.QueryFactory;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.servlet.http.HttpServletRequest;
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
 import kr.co.shineware.nlp.komoran.core.Komoran;
 import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -40,8 +29,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -56,9 +43,8 @@ public class MovieMainService {
     private final ReviewRepository reviewRepository;
 
     QReviewEntity review = QReviewEntity.reviewEntity;
-    QUserEntity user = QUserEntity.userEntity;
-    QRateEntity rate = QRateEntity.rateEntity;
 
+    //TODO 최신 영화 받아오기
     public List<Map<String, Object>> nowPlayingList() throws IOException {
 
         MovieEntity time = movieRepository.findFirstByOrderByCreatedAtAsc();
@@ -113,6 +99,7 @@ public class MovieMainService {
         return result;
     }
 
+    //TODO 영화 이름 으로 영화 정보 받기
     public Map<String, Object> getOneByName(String query) throws IOException {
 
         log.info("query : " + query);
@@ -132,6 +119,7 @@ public class MovieMainService {
         }
     }
 
+    //TODO movie_id 로 영화 정보 받기
     public Map<String, Object> getOneByID(Long movie_id) throws IOException {
 
         String url = "https://api.themoviedb.org/3/movie/" + movie_id + "?language=ko";
@@ -139,6 +127,7 @@ public class MovieMainService {
         return callAPI.callAPI(url);
     }
 
+    //TODO 숨겨진 명작
     public List<Map<String, Object>> HidingPiece() throws IOException {
 
         List<Tuple> movielist = queryFactory
@@ -158,8 +147,8 @@ public class MovieMainService {
 
             Long movieid = tuple.get(1, Long.class);
 
-            NumberTemplate<Long> rateCountSubquery = Expressions.numberTemplate(Long.class,
-                    "(select count(*) from RateEntity where rate = 1 and review.id = {0})", review.id);
+            NumberTemplate<Long> likeCountSubquery = Expressions.numberTemplate(Long.class,
+                    "(select count(*) from ReviewLikeEntity where review.id = {0})", review.id);
 
             NumberTemplate<Long> reReviewCountSubquery = Expressions.numberTemplate(Long.class,
                     "(select count(*) from ReviewEntity where parentReview.id = {0})", review.id);
@@ -169,12 +158,12 @@ public class MovieMainService {
 
             Tuple result = queryFactory
                     .select(review,
-                            rateCountSubquery.as("rateCount"),
+                            likeCountSubquery.as("rateCount"),
                             reReviewCountSubquery.as("reReviewCount"),
                             avgStarSubquery.as("avgStar"))
                     .from(review)
                     .where(review.movieId.eq(movieid).and(review.parentReview.isNull()))
-                    .orderBy(rateCountSubquery.desc())
+                    .orderBy(likeCountSubquery.desc())
                     .limit(1)
                     .fetchFirst();
 
@@ -205,6 +194,7 @@ public class MovieMainService {
         return resultlist;
     }
 
+    //TODO 자주 언급 되는 키워드
     public ResponseEntity<?> MentionKeyword() {
 
         // 오늘 날짜 설정
@@ -253,9 +243,6 @@ public class MovieMainService {
         List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
-
-        System.out.println(sortedList.size());
-
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         for (int i = 0; i<5; i++) {
@@ -275,8 +262,6 @@ public class MovieMainService {
                 ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(entity);
                 map.put("review",reviewDTO);
 
-                System.out.println(entity.getId());
-                System.out.println(entity.getUser().getId());
                 String nickname = entity.getUser().getNickname();
 
                 map.put("nickname",nickname);
@@ -294,6 +279,7 @@ public class MovieMainService {
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
+    //TODO 전체 리뷰 갯수
     public long TotalReviewCount(){
 
         return reviewRepository.count();

@@ -31,6 +31,7 @@ public class MyPage_BookmarkService {
 
     QBookmarkEntity bookmark = QBookmarkEntity.bookmarkEntity;
 
+    //TODO 유저의 찜한 영화 목록
     @Transactional(readOnly = true)
     public ResponseEntity<?> BookmarkByUser(HttpServletRequest request) throws IOException {
 
@@ -56,6 +57,7 @@ public class MyPage_BookmarkService {
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    //TODO 찜한 영화 삭제 처리
     @Transactional
     public ResponseEntity<?> BookmarkDelete(HttpServletRequest request,List<Long> BookmarkList){
 
