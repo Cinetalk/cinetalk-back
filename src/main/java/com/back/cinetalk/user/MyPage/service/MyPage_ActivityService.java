@@ -4,30 +4,21 @@ import com.back.cinetalk.bookmark.entity.QBookmarkEntity;
 import com.back.cinetalk.genre.entity.QGenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.service.MovieMainService;
-import com.back.cinetalk.rate.repository.RateRepository;
+import com.back.cinetalk.rate.like.entity.QReviewLikeEntity;
+import com.back.cinetalk.rate.like.repository.ReviewLikeRepository;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.reviewGenre.entity.QReviewGenreEntity;
-import com.back.cinetalk.reviewGenre.entity.ReviewGenreEntity;
 import com.back.cinetalk.user.MyPage.component.UserByAccess;
 import com.back.cinetalk.user.MyPage.dto.activity.*;
-import com.back.cinetalk.badge.entity.BadgeEntity;
-import com.back.cinetalk.badge.repository.BadgeRepository;
-import com.back.cinetalk.rate.entity.QRateEntity;
 import com.back.cinetalk.review.entity.QReviewEntity;
-import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.entity.UserEntity;
-import com.back.cinetalk.user.jwt.JWTUtil;
-import com.back.cinetalk.user.repository.UserRepository;
 import com.back.cinetalk.userBadge.entity.QUserBadgeEntity;
 import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import com.back.cinetalk.userBadge.repository.UserBadgeRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -41,29 +32,27 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.back.cinetalk.keyword.entity.QKeywordEntity.*;
 
 @Service
 @RequiredArgsConstructor
 public class MyPage_ActivityService {
 
-    private final UserRepository userRepository;
-    private final BadgeRepository badgeRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final JPAQueryFactory queryFactory;
     private final ReviewRepository reviewRepository;
-    private final RateRepository rateRepository;
     private final MovieMainService movieMainService;
     private final UserByAccess userByAccess;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     QReviewEntity review = QReviewEntity.reviewEntity;
-    QRateEntity rate = QRateEntity.rateEntity;
     QBookmarkEntity bookmark = QBookmarkEntity.bookmarkEntity;
     QKeywordEntity keyword = QKeywordEntity.keywordEntity;
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
     QGenreEntity genre = QGenreEntity.genreEntity;
     QUserBadgeEntity userBadge = QUserBadgeEntity.userBadgeEntity;
+    QReviewLikeEntity reviewLike = QReviewLikeEntity.reviewLikeEntity;
 
+    //TODO 유저의 뱃지 목록
     @Transactional(readOnly = true)
     public ResponseEntity<?> BadgeByUser(HttpServletRequest request){
 
@@ -88,6 +77,7 @@ public class MyPage_ActivityService {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    //TODO 유저의 장르별 댓글 갯수
     @Transactional(readOnly = true)
     public ResponseEntity<?> ReviewByGenreFromUser(HttpServletRequest request){
 
@@ -103,6 +93,7 @@ public class MyPage_ActivityService {
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    //TODO 뱃지 장착,해제 처리
     @Transactional
     public ResponseEntity<?> BadgeUseUpdate(HttpServletRequest request,List<Long> BadgeList){
 
@@ -120,15 +111,15 @@ public class MyPage_ActivityService {
         return new ResponseEntity<>("success",HttpStatus.OK);
     }
 
-
+    //TODO 유저의 좋아요, 댓글, 찜 갯수 모음
     @Transactional(readOnly = true)
     public ResponseEntity<?> CountSumByUser(HttpServletRequest request){
 
         UserEntity byEmail = userByAccess.getUserEntity(request);
 
-        Long rateCount = queryFactory.select(rate.count())
-                .from(rate)
-                .where(rate.review.user.id.eq(byEmail.getId()).and(rate.rate.eq(1)))
+        Long rateCount = queryFactory.select(reviewLike.count())
+                .from(reviewLike)
+                .where(reviewLike.review.user.eq(byEmail))
                 .fetchFirst();
 
         Long reviewCount = queryFactory.select(review.count())
@@ -150,6 +141,7 @@ public class MyPage_ActivityService {
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    //TODO 유저의 최근 댓글
     @Transactional(readOnly = true)
     public ResponseEntity<?> ReviewByUser(String sort,HttpServletRequest request) throws IOException {
 
@@ -169,7 +161,7 @@ public class MyPage_ActivityService {
 
             int RereviewCont = reviewRepository.countByParentReview(reviewEntity);
 
-            int rateCount = rateRepository.countByReviewAndAndRate(reviewEntity,1);
+            long rateCount = reviewLikeRepository.countByReviewId(reviewEntity.getId());
 
             Map<String, Object> oneByID = movieMainService.getOneByID(reviewEntity.getMovieId());
 
@@ -192,11 +184,12 @@ public class MyPage_ActivityService {
             result.add(responseDTO);
         }
         if(sort != null && sort.equals("like")){
-            result.sort(Comparator.comparingInt(ReviewByUserResponseDTO::getRateCount).reversed());
+            result.sort(Comparator.comparingLong(ReviewByUserResponseDTO::getRateCount).reversed());
         }
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    //TODO 유저의 평가(키워드,댓글) 날짜별 로그
     @Transactional(readOnly = true)
     public ResponseEntity<?> LogByUser(String sort,HttpServletRequest request) throws IOException {
 

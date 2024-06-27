@@ -17,7 +17,7 @@ public class ReviewByUserResponseDTO {
     private String poster_id;
     private Double star;
     private String content;
-    private int RateCount;
+    private Long RateCount;
     private int RereviewCount;
     private String regDate;
 }

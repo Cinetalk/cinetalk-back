@@ -35,6 +35,7 @@ public class MyPage_InfoService {
     private final UserRepository userRepository;
     private final RefreshRepository refreshRepository;
 
+    //TODO 유저의 정보 
     @Transactional(readOnly = true)
     public ResponseEntity<?> UserInfo(HttpServletRequest request){
 
@@ -47,11 +48,13 @@ public class MyPage_InfoService {
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
+    //TODO 닉네임 중복 체크
     @Transactional(readOnly = true)
     public Boolean NicknameCheck(String nickname){
         return userRepository.existsByNickname(nickname);
     }
 
+    //TODO 회원 가입 시 닉네임,성별,생일 변경처리
     @Transactional
     public ResponseEntity<?> nickNameMerge(HttpServletRequest request, NickNameMergeDTO dto){
 
@@ -70,6 +73,7 @@ public class MyPage_InfoService {
         return new ResponseEntity<>("success",HttpStatus.OK);
     }
 
+    //TODO 마이 페이지 - 유저 정보 수정
     @Transactional
     public ResponseEntity<?> userInfoMerge(HttpServletRequest request,String category,String value){
 
@@ -120,6 +124,7 @@ public class MyPage_InfoService {
         return new ResponseEntity<>("success",HttpStatus.OK);
     }
 
+    //TODO 유저의 프로필 사진 변경
     @Transactional
     public ResponseEntity<?> UserProfileChange(HttpServletRequest request,MultipartFile file){
 
@@ -158,6 +163,7 @@ public class MyPage_InfoService {
         return new ResponseEntity<>("success",HttpStatus.OK);
     }
 
+    //TODO 회원 탈퇴
     @Transactional
     public ResponseEntity<?> UserDelete(HttpServletRequest request,HttpServletResponse response){
 
