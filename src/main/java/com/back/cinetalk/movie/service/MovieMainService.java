@@ -158,8 +158,6 @@ public class MovieMainService {
 
             Long movieid = tuple.get(1, Long.class);
 
-
-
             NumberTemplate<Long> rateCountSubquery = Expressions.numberTemplate(Long.class,
                     "(select count(*) from RateEntity where rate = 1 and review.id = {0})", review.id);
 
@@ -182,24 +180,26 @@ public class MovieMainService {
 
             Map<String, Object> oneByID = getOneByID(movieid);
 
-            ReviewEntity reviewEntity = result.get(review);
+            if (result != null){
+                ReviewEntity reviewEntity = result.get(review);
 
-            LocalDateTime createdAt = result.get(review).getCreatedAt();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
-            String formattedDate = createdAt.format(formatter);
+                LocalDateTime createdAt = reviewEntity.getCreatedAt();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
+                String formattedDate = createdAt.format(formatter);
 
-            Map<String, Object> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>();
 
-            map.put("movieid",movieid);
-            map.put("star",reviewEntity.getStar());
-            map.put("content",reviewEntity.getContent());
-            map.put("regDate", formattedDate);
-            map.put("likeCount", result.get(1, Long.class));
-            map.put("rereviewCount", result.get(2, Long.class));
-            map.put("StarAvg", result.get(3, Double.class));
-            map.put("movieposter", "https://image.tmdb.org/t/p/original" + (String) oneByID.get("poster_path"));
+                map.put("movieid",movieid);
+                map.put("star",reviewEntity.getStar());
+                map.put("content",reviewEntity.getContent());
+                map.put("regDate", formattedDate);
+                map.put("likeCount", result.get(1, Long.class));
+                map.put("rereviewCount", result.get(2, Long.class));
+                map.put("StarAvg", result.get(3, Double.class));
+                map.put("movieposter", "https://image.tmdb.org/t/p/original" + (String) oneByID.get("poster_path"));
 
-            resultlist.add(map);
+                resultlist.add(map);
+            }
         }
 
         return resultlist;
