@@ -6,17 +6,19 @@ import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.genre.repository.GenreRepository;
+import com.back.cinetalk.rate.dislike.entity.ReviewDislikeEntity;
+import com.back.cinetalk.rate.dislike.repository.ReviewDislikeRepository;
+import com.back.cinetalk.rate.like.entity.ReviewLikeEntity;
+import com.back.cinetalk.rate.like.repository.ReviewLikeRepository;
 import com.back.cinetalk.review.dto.*;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.reviewGenre.entity.ReviewGenreEntity;
 import com.back.cinetalk.reviewGenre.repository.ReviewGenreRepository;
 import com.back.cinetalk.user.entity.UserEntity;
-import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
 import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import com.back.cinetalk.userBadge.repository.UserBadgeRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -38,7 +40,8 @@ public class ReviewService {
     private final ReviewGenreRepository reviewGenreRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final BadgeRepository badgeRepository;
-    private final JWTUtil jwtUtil;
+    private final ReviewLikeRepository reviewLikeRepository;
+    private final ReviewDislikeRepository reviewDislikeRepository;
 
     @Transactional
     public ReviewEntity saveReview(Long movieId, ReviewRequestDTO reviewRequestDTO, String email) {
@@ -210,6 +213,62 @@ public class ReviewService {
         if (!user.equals(reviewEntity.getUser())) {
             throw new RestApiException(CommonErrorCode.REVIEW_NOT_ALLOWED);
         }
+    }
+
+    @Transactional
+    public StateRes likeReview(Long reviewId, String email) {
+        UserEntity user = userRepository.findByEmail(email);
+
+        // 리뷰에 대해 사용자가 이미 좋아요를 눌렀는지 확인
+        if (reviewLikeRepository.existsByReviewIdAndUserId(reviewId, user.getId())) {
+            // 이미 좋아요를 눌렀다면, 좋아요를 취소 (삭제)
+            reviewLikeRepository.deleteByReviewIdAndUserId(reviewId, user.getId());
+        } else {
+            // 좋아요가 되어 있지 않다면, 싫어요를 눌렀는지 확인하고 삭제
+            if (reviewDislikeRepository.existsByReviewIdAndUserId(reviewId, user.getId())) {
+                reviewDislikeRepository.deleteByReviewIdAndUserId(reviewId, user.getId());
+            }
+
+            // 좋아요를 추가
+            ReviewEntity review = reviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new RestApiException(CommonErrorCode.REVIEW_NOT_FOUND));
+            ReviewLikeEntity like = ReviewLikeEntity.builder().review(review).user(user).build();
+            reviewLikeRepository.save(like);
+        }
+
+        return new StateRes(true);
+    }
+
+    @Transactional
+    public StateRes dislikeReview(Long reviewId, String email) {
+        UserEntity user = userRepository.findByEmail(email);
+
+        // 리뷰에 대해 사용자가 이미 싫어요를 눌렀는지 확인
+        if (reviewDislikeRepository.existsByReviewIdAndUserId(reviewId, user.getId())) {
+            // 이미 싫어요를 눌렀다면, 싫어요를 취소 (삭제)
+            reviewDislikeRepository.deleteByReviewIdAndUserId(reviewId, user.getId());
+        } else {
+            // 싫어요가 되어 있지 않다면, 좋아요를 눌렀는지 확인하고 삭제
+            if (reviewLikeRepository.existsByReviewIdAndUserId(reviewId, user.getId())) {
+                reviewLikeRepository.deleteByReviewIdAndUserId(reviewId, user.getId());
+            }
+
+            // 싫어요를 추가
+            ReviewEntity review = reviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new RestApiException(CommonErrorCode.REVIEW_NOT_FOUND));
+            ReviewDislikeEntity dislike = ReviewDislikeEntity.builder().review(review).user(user).build();
+            reviewDislikeRepository.save(dislike);
+        }
+
+        return new StateRes(true);
+    }
+
+    public long countLikes(Long reviewId) {
+        return reviewLikeRepository.countByReviewId(reviewId);
+    }
+
+    public long countDislikes(Long reviewId) {
+        return reviewDislikeRepository.countByReviewId(reviewId);
     }
 
 }
