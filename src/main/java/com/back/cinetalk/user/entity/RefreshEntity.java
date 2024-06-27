@@ -20,7 +20,9 @@ public class RefreshEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
     public String email;
+    public String ip;
     public String refresh;
+    public String access;
     public String expiration;
     public String auth;
 
@@ -28,9 +30,13 @@ public class RefreshEntity extends BaseEntity {
         return RefreshEntity.builder()
                 .id(refreshDTO.getId())
                 .email(refreshDTO.getEmail())
+                .ip(refreshDTO.getIp())
                 .refresh(refreshDTO.getRefresh())
+                .access(refreshDTO.getAccess())
                 .expiration(refreshDTO.getExpiration())
                 .auth(refreshDTO.getAuth())
                 .build();
     }
+
+    public void updateAccess(String access){ this.access = access;}
 }
