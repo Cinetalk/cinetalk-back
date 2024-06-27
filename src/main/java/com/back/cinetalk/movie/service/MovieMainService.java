@@ -158,8 +158,6 @@ public class MovieMainService {
 
             Long movieid = tuple.get(1, Long.class);
 
-
-
             NumberTemplate<Long> rateCountSubquery = Expressions.numberTemplate(Long.class,
                     "(select count(*) from RateEntity where rate = 1 and review.id = {0})", review.id);
 
@@ -182,24 +180,26 @@ public class MovieMainService {
 
             Map<String, Object> oneByID = getOneByID(movieid);
 
-            ReviewEntity reviewEntity = result.get(review);
+            if (result != null){
+                ReviewEntity reviewEntity = result.get(review);
 
-            LocalDateTime createdAt = result.get(review).getCreatedAt();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
-            String formattedDate = createdAt.format(formatter);
+                LocalDateTime createdAt = reviewEntity.getCreatedAt();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
+                String formattedDate = createdAt.format(formatter);
 
-            Map<String, Object> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>();
 
-            map.put("movieid",movieid);
-            map.put("star",reviewEntity.getStar());
-            map.put("content",reviewEntity.getContent());
-            map.put("regDate", formattedDate);
-            map.put("likeCount", result.get(1, Long.class));
-            map.put("rereviewCount", result.get(2, Long.class));
-            map.put("StarAvg", result.get(3, Double.class));
-            map.put("movieposter", "https://image.tmdb.org/t/p/original" + (String) oneByID.get("poster_path"));
+                map.put("movieid",movieid);
+                map.put("star",reviewEntity.getStar());
+                map.put("content",reviewEntity.getContent());
+                map.put("regDate", formattedDate);
+                map.put("likeCount", result.get(1, Long.class));
+                map.put("rereviewCount", result.get(2, Long.class));
+                map.put("StarAvg", result.get(3, Double.class));
+                map.put("movieposter", "https://image.tmdb.org/t/p/original" + (String) oneByID.get("poster_path"));
 
-            resultlist.add(map);
+                resultlist.add(map);
+            }
         }
 
         return resultlist;
@@ -228,7 +228,7 @@ public class MovieMainService {
         StringBuilder Review = new StringBuilder();
         //리뷰 직렬화
         for (String content : reviewList) {
-            Review.append(content);
+            Review.append(content+".");
         }
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
@@ -238,9 +238,11 @@ public class MovieMainService {
 
         List<Token> tokenList = komoran.analyze(String.valueOf(Review)).getTokenList();
 
+
         for (Token token : tokenList) {
             String pos = token.getPos();
             String morph = token.getMorph();
+
             if (pos.contains("NN") && morph.length() > 1) {
                 // 단어가 이미 존재하면 빈도수를 증가시키고, 없으면 새로운 키로 추가
                 wordFrequency.put(morph, wordFrequency.getOrDefault(morph, 0) + 1);
@@ -251,6 +253,8 @@ public class MovieMainService {
         List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
+
+        System.out.println(sortedList.size());
 
         List<Map<String, Object>> resultList = new ArrayList<>();
 

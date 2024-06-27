@@ -41,13 +41,23 @@ public class MyPage_InfoController {
         return myPageInfoService.NicknameCheck(nickname);
     }
     @PatchMapping("/nickNameMerge")
-    @Operation(summary = "개인정보 수정",description = "회원가입 시 닉네임,생년월일,성별을 수정하는 로직")
+    @Operation(summary = "회원가입 닉네임 수정",description = "회원가입 시 닉네임,생년월일,성별을 수정하는 로직")
     @ApiResponse(responseCode = "200",description = "success",content = @Content(schema = @Schema(implementation = String.class)))
     @ApiResponse(responseCode = "404",description = "닉네임이 옳바르지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
     public ResponseEntity<?> nickNameMerge(@Valid @RequestBody NickNameMergeDTO nameMergeDTO, HttpServletRequest request){
 
         return myPageInfoService.nickNameMerge(request,nameMergeDTO);
+    }
+
+    @PatchMapping("/userInfoMerge/{category}")
+    @Operation(summary = "개인정보 수정",description = "마이페이지 닉네임,생년월일,성별을 수정하는 로직")
+    @ApiResponse(responseCode = "200",description = "success",content = @Content(schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
+    public ResponseEntity<?> userInfoMerge(@RequestParam(name = "value")String value,
+                                            @PathVariable(name = "category",required = false) String category,HttpServletRequest request){
+
+        return myPageInfoService.userInfoMerge(request,category,value);
     }
 
     @PatchMapping("/UserProfileChange")
