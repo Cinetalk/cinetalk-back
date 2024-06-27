@@ -16,6 +16,7 @@ public enum CommonErrorCode implements ErrorCode {
 
     //유저 관련 에러
     NICKNAME_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
+    USER_CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 주소입니다."),
 
     // 리뷰 관련 에러
     REVIEW_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 작성한 리뷰입니다."),

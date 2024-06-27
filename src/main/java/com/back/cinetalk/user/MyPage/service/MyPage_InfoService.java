@@ -24,6 +24,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 
 @Slf4j
 @Service
@@ -65,6 +66,56 @@ public class MyPage_InfoService {
         }
 
         userEntity.Update(dto);
+
+        return new ResponseEntity<>("success",HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<?> userInfoMerge(HttpServletRequest request,String category,String value){
+
+        UserEntity userEntity = userByAccess.getUserEntity(request);
+
+        NickNameMergeDTO dto = new NickNameMergeDTO();
+
+        if(category.equals("nickname")){
+
+            Boolean nickYN = userRepository.existsByNickname(value);
+
+            if(nickYN){
+                throw new RestApiException(CommonErrorCode.NICKNAME_ALREADY_EXIST);
+
+            }
+            dto = NickNameMergeDTO.builder().
+                    nickname(value).
+                    gender(userEntity.getGender()).
+                    birthday(userEntity.getBirthday()).
+                    build();
+
+            userEntity.Update(dto);
+
+        } else if (category.equals("gender")) {
+
+            dto = NickNameMergeDTO.builder().
+                    nickname(userEntity.getNickname()).
+                    gender(value).
+                    birthday(userEntity.getBirthday()).
+                    build();
+
+            userEntity.Update(dto);
+
+        } else if (category.equals("birthday")) {
+
+            dto = NickNameMergeDTO.builder().
+                    nickname(userEntity.getNickname()).
+                    gender(userEntity.getGender()).
+                    birthday(LocalDate.parse(value)).
+                    build();
+
+            userEntity.Update(dto);
+        }else{
+
+            throw new RestApiException(CommonErrorCode.USER_CATEGORY_NOT_FOUND);
+        }
 
         return new ResponseEntity<>("success",HttpStatus.OK);
     }
