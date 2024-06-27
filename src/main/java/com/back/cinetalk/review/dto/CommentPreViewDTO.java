@@ -16,4 +16,8 @@ public class CommentPreViewDTO {
     String content;
 
     LocalDateTime createdAt;
+
+    long likeCount;
+
+    long dislikeCount;
 }

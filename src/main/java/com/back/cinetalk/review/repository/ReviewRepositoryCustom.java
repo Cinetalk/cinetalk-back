@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ReviewRepositoryCustom {
+
     Page<ReviewPreViewDTO> findAllByMovieId(Long movieId, Pageable pageable);
 
     Page<CommentPreViewDTO> findAllByParentReviewId(Long parentReviewId, Pageable pageable);

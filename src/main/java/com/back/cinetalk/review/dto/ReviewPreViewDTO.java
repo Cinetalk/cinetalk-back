@@ -21,4 +21,7 @@ public class ReviewPreViewDTO {
 
     boolean spoiler;
 
+    long likeCount;
+
+    long dislikeCount;
 }
