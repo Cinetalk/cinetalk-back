@@ -3,7 +3,8 @@ package com.back.cinetalk.user.entity;
 import com.back.cinetalk.bookmark.entity.BookmarkEntity;
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
-import com.back.cinetalk.rate.entity.RateEntity;
+import com.back.cinetalk.rate.dislike.entity.ReviewDislikeEntity;
+import com.back.cinetalk.rate.like.entity.ReviewLikeEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.NickNameMergeDTO;
 import com.back.cinetalk.user.dto.UserDTO;
@@ -56,15 +57,18 @@ public class UserEntity extends BaseEntity {
     private List<KeywordEntity> keywordEntityList = new ArrayList<KeywordEntity>();
 
     @OneToMany(mappedBy = "user")
-    private List<RateEntity> rateEntityList = new ArrayList<RateEntity>();
-
-    @OneToMany(mappedBy = "user")
     private List<BookmarkEntity> bookmarkEntityList = new ArrayList<BookmarkEntity>();
 
     @OneToMany(mappedBy = "user")
     private List<UserBadgeEntity> userBadgeEntityList = new ArrayList<UserBadgeEntity>();
 
-    public static UserEntity ToUserEntity(UserDTO userDTO){
+    @OneToMany(mappedBy = "user")
+    private List<ReviewLikeEntity> reviewLikeEntityList = new ArrayList<>(); // 좋아요 리스트
+
+    @OneToMany(mappedBy = "user")
+    private List<ReviewDislikeEntity> reviewDislikeEntityList = new ArrayList<>(); // 싫어요 리스트
+
+    public static UserEntity ToUserEntity(UserDTO userDTO) {
         return UserEntity.builder()
                 .id(userDTO.getId())
                 .email(userDTO.getEmail())
@@ -79,21 +83,21 @@ public class UserEntity extends BaseEntity {
                 .build();
     }
 
-    public static byte[] TodecodeProfile(String profileString){
-        if(profileString != null){
+    public static byte[] TodecodeProfile(String profileString) {
+        if (profileString != null) {
             return Base64.getDecoder().decode(profileString);
-        }else {
+        } else {
             return null;
         }
     }
 
-    public void Update(NickNameMergeDTO dto){
+    public void Update(NickNameMergeDTO dto) {
         this.nickname = dto.getNickname();
         this.gender = dto.getGender();
         this.birthday = dto.getBirthday();
     }
 
-    public void UpdateProfile(byte[] profile){
+    public void UpdateProfile(byte[] profile) {
         this.profile = profile;
     }
 }

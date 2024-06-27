@@ -5,7 +5,6 @@ import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.service.ReviewService;
 import com.back.cinetalk.user.jwt.JwtValidation;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -84,4 +83,15 @@ public class ReviewController {
         return reviewService.deleteReview(reviewId, email);
     }
 
+    @PostMapping("/{reviewId}/like")
+    public StateRes likeReview(@PathVariable Long reviewId, @JwtValidation String email) {
+
+        return reviewService.likeReview(reviewId, email);
+    }
+
+    @PostMapping("/{reviewId}/dislike")
+    public StateRes dislikeReview(@PathVariable Long reviewId, @JwtValidation String email) {
+
+        return reviewService.dislikeReview(reviewId, email);
+    }
 }

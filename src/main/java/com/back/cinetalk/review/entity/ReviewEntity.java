@@ -1,7 +1,8 @@
 package com.back.cinetalk.review.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
-import com.back.cinetalk.rate.entity.RateEntity;
+import com.back.cinetalk.rate.dislike.entity.ReviewDislikeEntity;
+import com.back.cinetalk.rate.like.entity.ReviewLikeEntity;
 import com.back.cinetalk.review.dto.CommentRequestDTO;
 import com.back.cinetalk.review.dto.ReviewRequestDTO;
 import com.back.cinetalk.reviewGenre.entity.ReviewGenreEntity;
@@ -51,8 +52,11 @@ public class ReviewEntity extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
     private List<ReviewGenreEntity> reviewGenreEntityList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "review")
-    private List<RateEntity> rateEntityList = new ArrayList<RateEntity>();
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    private List<ReviewLikeEntity> reviewLikeEntityList = new ArrayList<>(); // 좋아요 리스트
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    private List<ReviewDislikeEntity> reviewDislikeEntityList = new ArrayList<>(); // 싫어요 리스트
 
     public void updateReview(ReviewRequestDTO reviewRequestDTO) {
         this.star = reviewRequestDTO.getStar();
@@ -63,6 +67,4 @@ public class ReviewEntity extends BaseEntity {
     public void updateComment(CommentRequestDTO commentRequestDTO) {
         this.content = commentRequestDTO.getContent();
     }
-
-
 }
