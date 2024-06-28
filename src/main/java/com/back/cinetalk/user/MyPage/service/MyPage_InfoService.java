@@ -62,12 +62,13 @@ public class MyPage_InfoService {
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
 
-        Boolean nickYN = userRepository.existsByNickname(dto.getNickname());
+        if(!dto.getNickname().equals(userEntity.getNickname())){
 
-        if(nickYN){
-            throw new RestApiException(CommonErrorCode.NICKNAME_ALREADY_EXIST);
+            Boolean nickYN = userRepository.existsByNickname(dto.getNickname());
+            if(nickYN){
+                throw new RestApiException(CommonErrorCode.NICKNAME_ALREADY_EXIST);
+            }
         }
-
         userEntity.Update(dto);
 
         return new ResponseEntity<>("success",HttpStatus.OK);

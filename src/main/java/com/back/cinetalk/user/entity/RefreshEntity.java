@@ -37,6 +37,4 @@ public class RefreshEntity extends BaseEntity {
                 .auth(refreshDTO.getAuth())
                 .build();
     }
-
-    public void updateAccess(String access){ this.access = access;}
 }

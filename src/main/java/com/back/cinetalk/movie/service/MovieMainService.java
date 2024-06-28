@@ -218,7 +218,16 @@ public class MovieMainService {
         StringBuilder Review = new StringBuilder();
         //리뷰 직렬화
         for (String content : reviewList) {
-            Review.append(content+".");
+            Review.append(content
+                    .replaceAll("\\.","")
+                    .replaceAll("\\n", "")
+                    .replaceAll("~","")
+                    .replaceAll("\\)","")
+                    .replaceAll("\\(","")
+                    .replaceAll(",","")
+                    .replaceAll("ㅋ","")
+                    .replaceAll("ㅎ","")
+                    +".");
         }
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
@@ -227,7 +236,6 @@ public class MovieMainService {
         Map<String, Integer> wordFrequency = new HashMap<>();
 
         List<Token> tokenList = komoran.analyze(String.valueOf(Review)).getTokenList();
-
 
         for (Token token : tokenList) {
             String pos = token.getPos();
