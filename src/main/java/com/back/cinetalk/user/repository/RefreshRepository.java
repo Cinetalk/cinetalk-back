@@ -27,4 +27,9 @@ public interface RefreshRepository extends JpaRepository<RefreshEntity, Long> {
     @Query("UPDATE RefreshEntity e SET e.auth = NULL WHERE e.auth = :auth")
     void updateAuthToNullByAuth(@Param("auth") String auth);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE RefreshEntity e SET e.access = :access WHERE e.id = :id")
+    void updateAccessById(@Param("access") String access,@Param("id") Long id);
+
 }

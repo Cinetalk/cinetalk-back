@@ -155,6 +155,8 @@ public class ReIssueService {
 
         UserEntity userEntity = userRepository.findByEmail(email);
 
+        refreshRepository.updateAccessById(newAccess, byAuth.getId());
+
         response.setHeader("access",newAccess);
         response.addCookie(createCookie("refresh",byAuth.getRefresh()));
 

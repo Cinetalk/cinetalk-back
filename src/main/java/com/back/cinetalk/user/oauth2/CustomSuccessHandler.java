@@ -7,6 +7,7 @@ import com.back.cinetalk.user.entity.RefreshEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
 import com.back.cinetalk.user.service.AuthTokenCreate;
+import com.back.cinetalk.user.service.ClientIpAddress;
 import com.back.cinetalk.user.service.NicknameGenerator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -30,15 +31,16 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
     private final NicknameGenerator nicknameGenerator;
-
     private final AuthTokenCreate authTokenCreate;
+    private final ClientIpAddress clientIpAddress;
 
-    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository, NicknameGenerator nicknameGenerator, AuthTokenCreate authTokenCreate) {
+    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository, NicknameGenerator nicknameGenerator, AuthTokenCreate authTokenCreate, ClientIpAddress clientIpAddress) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
         this.userRepository = userRepository;
         this.nicknameGenerator = nicknameGenerator;
         this.authTokenCreate = authTokenCreate;
+        this.clientIpAddress = clientIpAddress;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String refresh = jwtUtil.createJwt("refresh",email, role, 86400000L);
 
         //토큰 DB에 저장
-        addRefreshEntity(email,refresh,86400000L,authToken);
+        addRefreshEntity(email,refresh,86400000L,authToken,request);
 
         String nickname = userRepository.findNicknameByEmail(email);
 
@@ -99,12 +101,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         return cookie;
     }
 
-    private void addRefreshEntity(String email,String refresh,Long expiredMs,String authToken){
+    private void addRefreshEntity(String email,String refresh,Long expiredMs,String authToken,HttpServletRequest request){
 
         Date date = new Date(System.currentTimeMillis() + expiredMs);
 
         RefreshDTO refreshDTO = new RefreshDTO();
         refreshDTO.setEmail(email);
+        refreshDTO.setIp(clientIpAddress.getClientIp(request));
         refreshDTO.setRefresh(refresh);
         refreshDTO.setExpiration(date.toString());
         refreshDTO.setAuth(authToken);
