@@ -84,12 +84,14 @@ public class ReviewController {
     }
 
     @PostMapping("/{reviewId}/like")
+    @Operation(summary = "리뷰 or 댓글 좋아요 API", description = "리뷰 혹은 댓글을 좋아요하는 API 입니다. 싫어요 API 요청 혹은 두번 API 요청시 좋아요가 취소됩니다.")
     public StateRes likeReview(@PathVariable Long reviewId, @JwtValidation String email) {
 
         return reviewService.likeReview(reviewId, email);
     }
 
     @PostMapping("/{reviewId}/dislike")
+    @Operation(summary = "리뷰 or 댓글 싫어요 API", description = "리뷰 혹은 댓글을 싫어요하는 API 입니다. 좋아요 API 요청 홋은 두번 API 요청시 싫어요가 취소됩니다.")
     public StateRes dislikeReview(@PathVariable Long reviewId, @JwtValidation String email) {
 
         return reviewService.dislikeReview(reviewId, email);
