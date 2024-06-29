@@ -74,7 +74,9 @@ public class MyPage_InfoController {
     @ApiResponse(responseCode = "200",description = "success",content = @Content(schema = @Schema(implementation = String.class)))
     @ApiResponse(responseCode = "404",description = "닉네임이 옳바르지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
-    public ResponseEntity<?> UserDelete(HttpServletRequest request, HttpServletResponse response){
-        return myPageInfoService.UserDelete(request, response);
+    public ResponseEntity<?> UserDelete(
+            @RequestParam(name = "IsDelete")String IsDelete
+            ,HttpServletRequest request, HttpServletResponse response){
+        return myPageInfoService.UserDelete(IsDelete,request, response);
     }
 }
