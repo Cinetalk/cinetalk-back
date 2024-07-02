@@ -1,5 +1,6 @@
 package com.back.cinetalk.review.controller;
 
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.review.dto.*;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.service.ReviewService;
