@@ -41,6 +41,14 @@ public class KeywordService {
     }
 
     @Transactional(readOnly = true)
+    public KeywordEntity getMyKeywordByMovie(Long movieId, String email) {
+        UserEntity user = userRepository.findByEmail(email);
+
+        return keywordRepository.findByMovieIdAndUser(movieId, user)
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.KEYWORD_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
     public List<KeywordResponseDTO> getTopKeywordListByMovie(Long movieId) {
         return keywordRepository.findKeywordsOrderByCountDesc(movieId);
     }

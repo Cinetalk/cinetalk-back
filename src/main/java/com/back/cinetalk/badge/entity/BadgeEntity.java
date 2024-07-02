@@ -28,6 +28,6 @@ public class BadgeEntity {
     @JoinColumn(name = "genre_id")
     private GenreEntity genre;
 
-    @OneToMany(mappedBy = "badge")
+    @OneToMany(mappedBy = "badge",cascade = CascadeType.ALL)
     private List<UserBadgeEntity> userBadgeEntityList;
 }

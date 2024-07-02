@@ -62,12 +62,13 @@ public class MyPage_InfoService {
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
 
-        Boolean nickYN = userRepository.existsByNickname(dto.getNickname());
+        if(!dto.getNickname().equals(userEntity.getNickname())){
 
-        if(nickYN){
-            throw new RestApiException(CommonErrorCode.NICKNAME_ALREADY_EXIST);
+            Boolean nickYN = userRepository.existsByNickname(dto.getNickname());
+            if(nickYN){
+                throw new RestApiException(CommonErrorCode.NICKNAME_ALREADY_EXIST);
+            }
         }
-
         userEntity.Update(dto);
 
         return new ResponseEntity<>("success",HttpStatus.OK);
@@ -165,13 +166,19 @@ public class MyPage_InfoService {
 
     //TODO 회원 탈퇴
     @Transactional
-    public ResponseEntity<?> UserDelete(HttpServletRequest request,HttpServletResponse response){
+    public ResponseEntity<?> UserDelete(String IsDelete,HttpServletRequest request,HttpServletResponse response){
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
 
         refreshRepository.deleteByEmail(userEntity.getEmail());
 
-        userRepository.deleteById(userEntity.getId());
+        if(IsDelete.equals("Y")){
+
+            userRepository.deleteById(userEntity.getId());
+        }else{
+
+            userEntity.DeleteUser(null,"탈퇴한 유저");
+        }
 
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);

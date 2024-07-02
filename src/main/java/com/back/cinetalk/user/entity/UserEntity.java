@@ -50,22 +50,22 @@ public class UserEntity extends BaseEntity {
 
     private String role;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<ReviewEntity> reviewEntityList = new ArrayList<ReviewEntity>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<KeywordEntity> keywordEntityList = new ArrayList<KeywordEntity>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<BookmarkEntity> bookmarkEntityList = new ArrayList<BookmarkEntity>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<UserBadgeEntity> userBadgeEntityList = new ArrayList<UserBadgeEntity>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<ReviewLikeEntity> reviewLikeEntityList = new ArrayList<>(); // 좋아요 리스트
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<ReviewDislikeEntity> reviewDislikeEntityList = new ArrayList<>(); // 싫어요 리스트
 
     public static UserEntity ToUserEntity(UserDTO userDTO) {
@@ -99,5 +99,10 @@ public class UserEntity extends BaseEntity {
 
     public void UpdateProfile(byte[] profile) {
         this.profile = profile;
+    }
+
+    public void DeleteUser(String email,String nickname){
+        this.email = email;
+        this.nickname = nickname;
     }
 }

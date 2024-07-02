@@ -3,6 +3,7 @@ package com.back.cinetalk.user.jwt;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.dto.CustomUserDetails;
 import com.back.cinetalk.user.dto.UserDTO;
+import com.back.cinetalk.user.service.ClientIpAddress;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
@@ -27,7 +28,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
         this.jwtUtil = jwtUtil;
     }
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -54,6 +54,13 @@ public class JWTFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
             //메소드 종료
+            return;
+        }
+
+        //토큰이 만료되었지만 로그인 url 일경우
+        if (requestUri.matches("^\\/oauth2(?:\\/.*)?$")) {
+
+            filterChain.doFilter(request, response);
             return;
         }
 
