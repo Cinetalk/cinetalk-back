@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,7 +55,7 @@ public class MovieController {
 
     @GetMapping("/MentionKeword")
     @Operation(summary = "자주 언급되는 키워드",description = "오늘 자 모든 리뷰의 자주 언급된 키워드 상위 5개가 들어간 리뷰 10개씩을 출력")
-    public ResponseEntity<?> MentionKeword(){
+    public ResponseEntity<?> MentionKeyword(){
 
         long startTime = System.currentTimeMillis();
 
@@ -78,7 +77,7 @@ public class MovieController {
 
     @GetMapping("/imagecolor")
     @Operation(summary = "상세페이지용 이미지 주요색 출력",description = "이미지의 url 입력시 이미지의 주요색 hex코드 반환 api(현재 사용안함)")
-    public String imagecolor(@RequestParam(value = "url") String url)throws  Exception{
+    public String imageColor(@RequestParam(value = "url") String url)throws  Exception{
 
         return mainColorExtract.ColorExtract(url);
     }

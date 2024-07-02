@@ -7,7 +7,6 @@ import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.keyword.service.KeywordService;
 import com.back.cinetalk.user.jwt.JwtValidation;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +28,15 @@ public class KeywordController {
                                             @JwtValidation String email) {
 
         KeywordEntity keywordEntity = keywordService.createKeyword(movieId, keywordRequestDTO, email);
+        return KeywordResponseDTO.toKeywordResponseDTO(keywordEntity);
+    }
+
+    @GetMapping("/{movieId}/myKeyword")
+    @Operation(summary = "특정 영화에 내가 작성한 키워드 조회 API", description = "특정 영화의 내가 작성한 키워드를 조회하는 API 입니다.")
+    public KeywordResponseDTO getMyKeywordByMovie(@PathVariable(name = "movieId") Long movieId,
+                                            @JwtValidation String email) {
+
+        KeywordEntity keywordEntity = keywordService.getMyKeywordByMovie(movieId, email);
         return KeywordResponseDTO.toKeywordResponseDTO(keywordEntity);
     }
 
