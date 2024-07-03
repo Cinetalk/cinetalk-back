@@ -1,5 +1,8 @@
 package com.back.cinetalk.movie.service;
 
+import com.back.cinetalk.genre.entity.GenreEntity;
+import com.back.cinetalk.genre.entity.QGenreEntity;
+import com.back.cinetalk.movie.dto.HoxyDTO;
 import com.back.cinetalk.movie.dto.MovieDTO;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
@@ -7,11 +10,16 @@ import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
+import com.back.cinetalk.reviewGenre.entity.QReviewGenreEntity;
+import com.back.cinetalk.user.MyPage.component.UserByAccess;
+import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.servlet.http.HttpServletRequest;
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
 import kr.co.shineware.nlp.komoran.core.Komoran;
 import kr.co.shineware.nlp.komoran.model.Token;
@@ -41,8 +49,12 @@ public class MovieMainService {
     public final JWTUtil jwtUtil;
     private final JPAQueryFactory queryFactory;
     private final ReviewRepository reviewRepository;
+    private final UserByAccess userByAccess;
 
     QReviewEntity review = QReviewEntity.reviewEntity;
+
+    QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
+
 
     //TODO 최신 영화 받아오기
     public List<Map<String, Object>> nowPlayingList() throws IOException {
@@ -282,6 +294,61 @@ public class MovieMainService {
             resultMap.put("keyword", keyword);
             resultMap.put("reviewList", result);
             resultList.add(resultMap);
+        }
+
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> HoxyWatching(HttpServletRequest request) throws IOException {
+
+        UserEntity userEntity = userByAccess.getUserEntity(request);
+
+        GenreEntity genreEntity = queryFactory.select(reviewGenre.genre).from(reviewGenre)
+                .where(reviewGenre.review.user.eq(userEntity).and(reviewGenre.review.parentReview.isNull()))
+                .groupBy(reviewGenre.genre)
+                .orderBy(reviewGenre.count().desc())
+                .limit(1)
+                .fetchOne();
+
+        List<Long> movieList = new ArrayList<>();
+
+        if(genreEntity == null){
+
+            movieList = queryFactory.select(review.movieId)
+                    .from(review)
+                    .where(review.parentReview.isNull())
+                    .groupBy(review.movieId)
+                    .orderBy(review.count().desc())
+                    .fetch();
+        }else{
+
+            movieList = queryFactory
+                    .select(reviewGenre.review.movieId).from(reviewGenre)
+                    .where(reviewGenre.genre.id.eq(genreEntity.getId())
+                            .and(reviewGenre.review.user.ne(userEntity))
+                            .and(reviewGenre.review.parentReview.isNull()))
+                    .groupBy(reviewGenre.review.movieId)
+                    .orderBy(reviewGenre.review.count().desc())
+                    .fetch();
+
+        }
+
+        List<HoxyDTO> resultList = new ArrayList<>();
+
+        for (Long  movieId: movieList) {
+
+            Map<String, Object> oneByID = getOneByID(movieId);
+
+            String movienm = oneByID.get("movie_name").toString();
+            String poster_path = oneByID.get("poster_path").toString();
+
+            HoxyDTO result = HoxyDTO.builder()
+                    .movieId(movieId)
+                    .movienm(movienm)
+                    .poster_path(poster_path)
+                    .build();
+
+            resultList.add(result);
         }
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);

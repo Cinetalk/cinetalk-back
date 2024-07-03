@@ -4,6 +4,7 @@ import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.dto.CustomUserDetails;
 import com.back.cinetalk.user.dto.UserDTO;
 import com.back.cinetalk.user.service.ClientIpAddress;
+import com.nimbusds.jose.shaded.gson.JsonObject;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
@@ -67,10 +68,16 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             jwtUtil.isExpired(accessToken);
         }catch (ExpiredJwtException | MalformedJwtException e){
-
             //응답 바디
             PrintWriter writer = response.getWriter();
-            writer.print("토큰이 만료되었거나 유효하지 않습니다.");
+            response.setContentType("application/json");
+
+            JsonObject jsonResponse = new JsonObject();
+            jsonResponse.addProperty("error", "토큰이 만료되었거나 유효하지 않습니다.");
+
+            // Gson 또는 JSON 라이브러리를 사용하여 JSON 문자열 생성
+            String jsonString = jsonResponse.toString();
+            writer.print(jsonString);
 
             //응답 코드 및 메소드 종료
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -84,7 +91,15 @@ public class JWTFilter extends OncePerRequestFilter {
 
             //응답 바디
             PrintWriter writer = response.getWriter();
-            writer.print("유효하지 않는 토큰입니다.");
+
+            response.setContentType("application/json");
+
+            JsonObject jsonResponse = new JsonObject();
+            jsonResponse.addProperty("error", "유효하지 않는 토큰입니다.");
+
+            // Gson 또는 JSON 라이브러리를 사용하여 JSON 문자열 생성
+            String jsonString = jsonResponse.toString();
+            writer.print(jsonString);
 
             //응답 코드 및 메소드 종료
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

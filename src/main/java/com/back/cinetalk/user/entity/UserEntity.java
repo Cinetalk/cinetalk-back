@@ -51,25 +51,25 @@ public class UserEntity extends BaseEntity {
 
     private String role;
 
-    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<ReviewEntity> reviewEntityList = new ArrayList<ReviewEntity>();
 
-    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<KeywordEntity> keywordEntityList = new ArrayList<KeywordEntity>();
 
-    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<BookmarkEntity> bookmarkEntityList = new ArrayList<BookmarkEntity>();
 
-    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<UserBadgeEntity> userBadgeEntityList = new ArrayList<UserBadgeEntity>();
 
-    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<ReviewLikeEntity> reviewLikeEntityList = new ArrayList<>(); // 좋아요 리스트
 
-    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<ReviewDislikeEntity> reviewDislikeEntityList = new ArrayList<>(); // 싫어요 리스트
 
-    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<ReportEntity> reportEntityList = new ArrayList<>(); // 신고 리스트
 
     public static UserEntity ToUserEntity(UserDTO userDTO) {
