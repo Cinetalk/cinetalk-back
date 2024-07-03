@@ -5,6 +5,7 @@ import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.rate.dislike.entity.ReviewDislikeEntity;
 import com.back.cinetalk.rate.like.entity.ReviewLikeEntity;
+import com.back.cinetalk.report.entity.ReportEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.NickNameMergeDTO;
 import com.back.cinetalk.user.dto.UserDTO;
@@ -50,23 +51,26 @@ public class UserEntity extends BaseEntity {
 
     private String role;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
     private List<ReviewEntity> reviewEntityList = new ArrayList<ReviewEntity>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
     private List<KeywordEntity> keywordEntityList = new ArrayList<KeywordEntity>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
     private List<BookmarkEntity> bookmarkEntityList = new ArrayList<BookmarkEntity>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
     private List<UserBadgeEntity> userBadgeEntityList = new ArrayList<UserBadgeEntity>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
     private List<ReviewLikeEntity> reviewLikeEntityList = new ArrayList<>(); // 좋아요 리스트
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
     private List<ReviewDislikeEntity> reviewDislikeEntityList = new ArrayList<>(); // 싫어요 리스트
+
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
+    private List<ReportEntity> reportEntityList = new ArrayList<>(); // 신고 리스트
 
     public static UserEntity ToUserEntity(UserDTO userDTO) {
         return UserEntity.builder()

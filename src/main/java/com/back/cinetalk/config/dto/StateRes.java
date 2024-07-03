@@ -1,4 +1,4 @@
-package com.back.cinetalk.review.dto;
+package com.back.cinetalk.config.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
