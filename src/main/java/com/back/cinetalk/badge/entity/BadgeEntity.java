@@ -30,4 +30,5 @@ public class BadgeEntity {
 
     @OneToMany(mappedBy = "badge",cascade = CascadeType.ALL)
     private List<UserBadgeEntity> userBadgeEntityList;
+
 }
