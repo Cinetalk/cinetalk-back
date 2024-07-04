@@ -1,5 +1,6 @@
 package com.back.cinetalk.report.entity;
 
+import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportEntity {
+public class ReportEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
