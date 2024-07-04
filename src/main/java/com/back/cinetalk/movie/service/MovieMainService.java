@@ -45,6 +45,10 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.back.cinetalk.review.entity.QReviewEntity.*;
+import static com.back.cinetalk.user.entity.QUserEntity.*;
+import static com.back.cinetalk.userBadge.entity.QUserBadgeEntity.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -58,7 +62,7 @@ public class MovieMainService {
     private final ReviewRepository reviewRepository;
     private final UserByAccess userByAccess;
 
-    QReviewEntity review = QReviewEntity.reviewEntity;
+    QReviewEntity review = reviewEntity;
 
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
     QBadgeEntity badge = QBadgeEntity.badgeEntity;
@@ -319,23 +323,29 @@ public class MovieMainService {
     public ResponseEntity<?> UserEqReviewers(HttpServletRequest request) throws IOException {
         UserEntity userEntity = userByAccess.getUserEntity(request);
 
+        QReviewEntity review = new QReviewEntity("review");
+        QUserEntity user = new QUserEntity("user");
+        QUserBadgeEntity userBadge = new QUserBadgeEntity("userBadge");
+
         // 유저가 갖고 있는 뱃지 목록 조회
-        List<Long> currentUserBadgeIds = queryFactory.select(QUserBadgeEntity.userBadgeEntity.badge.id)
-                .from(QUserBadgeEntity.userBadgeEntity)
-                .where(QUserBadgeEntity.userBadgeEntity.user.eq(userEntity))
+        List<Long> currentUserBadgeIds = queryFactory
+                .select(userBadge.badge.id)
+                .from(userBadge)
+                .where(userBadge.user.eq(user))
                 .fetch();
 
         // 리뷰를 많이 작성한 유저 조회
-        List<UserEntity> users = queryFactory.select(QUserEntity.userEntity)
-                .from(QReviewEntity.reviewEntity)
-                .join(QReviewEntity.reviewEntity.user, QUserEntity.userEntity)
-                .groupBy(QUserEntity.userEntity)
-                .orderBy(QReviewEntity.reviewEntity.count().desc())
+        List<UserEntity> moreReviewUsers = queryFactory
+                .select(user.userEntity)
+                .from(review)
+                .join(review.user, user.userEntity)
+                .groupBy(user.userEntity)
+                .orderBy(review.count().desc())
                 .fetch();
 
         List<UserEqDTO> resultList = new ArrayList<>();
 
-        for (UserEntity u : users) {
+        for (UserEntity u : moreReviewUsers) {
             List<String> badges = u.getUserBadgeEntityList().stream()
                     .map(ub -> ub.getBadge().getName())
                     .collect(Collectors.toList());
