@@ -63,10 +63,10 @@ public class MovieMainService {
     private final UserByAccess userByAccess;
 
     QReviewEntity review = reviewEntity;
-
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
     QBadgeEntity badge = QBadgeEntity.badgeEntity;
-
+    QUserEntity user = QUserEntity.userEntity;
+    QUserBadgeEntity userBadge = QUserBadgeEntity.userBadgeEntity;
 
     //TODO 최신 영화 받아오기
     public List<Map<String, Object>> nowPlayingList() throws IOException {
@@ -321,30 +321,41 @@ public class MovieMainService {
     * */
 
     public ResponseEntity<?> UserEqReviewers(HttpServletRequest request) throws IOException {
-        UserEntity userEntity = userByAccess.getUserEntity(request);
 
-        QReviewEntity review = new QReviewEntity("review");
-        QUserEntity user = new QUserEntity("user");
-        QUserBadgeEntity userBadge = new QUserBadgeEntity("userBadge");
+        UserEntity userEntity = userByAccess.getUserEntity(request);
 
         // 유저가 갖고 있는 뱃지 목록 조회
         List<Long> currentUserBadgeIds = queryFactory
                 .select(userBadge.badge.id)
                 .from(userBadge)
-                .where(userBadge.user.eq(user))
+                .where(userBadge.user.eq(userEntity))
                 .fetch();
 
         // 리뷰를 많이 작성한 유저 조회
-        List<UserEntity> moreReviewUsers = queryFactory
-                .select(user.userEntity)
+        List<UserEntity> fetch = queryFactory.select(review.user)
                 .from(review)
-                .join(review.user, user.userEntity)
-                .groupBy(user.userEntity)
+                .where(review.parentReview.isNull())
+                .groupBy(review.user)
                 .orderBy(review.count().desc())
                 .fetch();
 
+        if(currentUserBadgeIds.isEmpty()){
+
+            return new ResponseEntity<>(fetch,HttpStatus.OK);
+        }else{
+
+            List<UserEntity> fetch1 = queryFactory.select(userBadge.user)
+                    .from(userBadge)
+                    .where(userBadge.badge.id.in(currentUserBadgeIds))
+                    .groupBy(userBadge.user)
+                    .fetch();
+
+        }
+
+
         List<UserEqDTO> resultList = new ArrayList<>();
 
+        /*
         for (UserEntity u : moreReviewUsers) {
             List<String> badges = u.getUserBadgeEntityList().stream()
                     .map(ub -> ub.getBadge().getName())
@@ -357,6 +368,9 @@ public class MovieMainService {
                     .build();
             resultList.add(userEq);
         }
+
+
+         */
 
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
