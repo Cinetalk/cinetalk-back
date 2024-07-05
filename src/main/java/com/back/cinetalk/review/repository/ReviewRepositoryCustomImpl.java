@@ -1,11 +1,14 @@
 package com.back.cinetalk.review.repository;
 
+import com.back.cinetalk.badge.entity.QBadgeEntity;
 import com.back.cinetalk.rate.dislike.entity.QReviewDislikeEntity;
 import com.back.cinetalk.rate.like.entity.QReviewLikeEntity;
 import com.back.cinetalk.review.dto.CommentPreViewDTO;
+import com.back.cinetalk.review.dto.QReviewPreViewDTO;
 import com.back.cinetalk.review.dto.ReviewPreViewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.user.entity.QUserEntity;
+import com.back.cinetalk.userBadge.entity.QUserBadgeEntity;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -33,11 +36,13 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         QUserEntity userEntity = QUserEntity.userEntity;
         QReviewLikeEntity reviewLikeEntity = QReviewLikeEntity.reviewLikeEntity;
         QReviewDislikeEntity reviewDislikeEntity = QReviewDislikeEntity.reviewDislikeEntity;
+        QUserBadgeEntity userBadgeEntity = QUserBadgeEntity.userBadgeEntity;
+        QBadgeEntity badgeEntity = QBadgeEntity.badgeEntity;
 
         List<ReviewPreViewDTO> results = queryFactory
-                .select(Projections.constructor(
-                        ReviewPreViewDTO.class,
+                .select(new QReviewPreViewDTO(
                         reviewEntity.user.nickname,
+                        reviewEntity.user.profile,
                         reviewEntity.star,
                         reviewEntity.content,
                         reviewEntity.createdAt,
@@ -54,6 +59,17 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        for (ReviewPreViewDTO dto : results) {
+            List<String> badgeList = queryFactory
+                    .select(badgeEntity.name)
+                    .from(userBadgeEntity)
+                    .join(userBadgeEntity.badge, badgeEntity)
+                    .where(userBadgeEntity.user.nickname.eq(dto.getNickName())
+                            .and(userBadgeEntity.isUse.isTrue()))
+                    .fetch();
+            dto.setBadgeList(badgeList);
+        }
 
         Long total = queryFactory
                 .select(reviewEntity.count())
@@ -82,6 +98,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .select(Projections.constructor(
                         CommentPreViewDTO.class,
                         reviewEntity.user.nickname,
+                        reviewEntity.user.profile,
                         reviewEntity.content,
                         reviewEntity.createdAt,
                         reviewLikeEntity.countDistinct(),
