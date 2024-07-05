@@ -152,24 +152,19 @@ public class MovieMainService {
     }
 
     //TODO 숨겨진 명작
-    public List<Map<String, Object>> HidingPiece() throws IOException {
+    public ResponseEntity<?> HidingPiece() throws IOException {
 
-        List<Tuple> movielist = queryFactory
-                .select(review.count(), review.movieId)
+        List<Long> fetch = queryFactory.select(review.movieId)
                 .from(review)
                 .groupBy(review.movieId)
-                .orderBy(review.count().desc())
-                .orderBy(review.movieId.asc())
+                .having(review.count().between(5, 20).and(review.star.avg().goe(4)))
+                .orderBy(Expressions.numberTemplate(Double.class, "function('RAND')").asc())
                 .limit(10)
                 .fetch();
 
         List<Map<String, Object>> resultlist = new ArrayList<>();
 
-
-
-        for (Tuple tuple : movielist) {
-
-            Long movieid = tuple.get(1, Long.class);
+        for (Long movieid : fetch) {
 
             NumberTemplate<Long> likeCountSubquery = Expressions.numberTemplate(Long.class,
                     "(select count(*) from ReviewLikeEntity where review.id = {0})", review.id);
@@ -203,6 +198,7 @@ public class MovieMainService {
                 Map<String, Object> map = new HashMap<>();
 
                 map.put("movieid",movieid);
+                map.put("movienm",reviewEntity.getMovienm());
                 map.put("star",reviewEntity.getStar());
                 map.put("content",reviewEntity.getContent());
                 map.put("regDate", formattedDate);
@@ -215,7 +211,7 @@ public class MovieMainService {
             }
         }
 
-        return resultlist;
+        return new ResponseEntity<>(resultlist, HttpStatus.OK);
     }
 
     //TODO 자주 언급 되는 키워드

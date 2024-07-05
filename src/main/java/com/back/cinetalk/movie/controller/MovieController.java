@@ -51,12 +51,10 @@ public class MovieController {
     }
 
     @GetMapping("/HidingPiece")
-    @Operation(summary = "숨겨진 명작",description = "리뷰가 제일 많이 달린 영화 10개에 대한 정보 출력")
+    @Operation(summary = "숨겨진 명작",description = "리뷰가 5~20개 인 영화중 평점이 4점 이상인 랜덤한 영화 10개 표출")
     public ResponseEntity<?> HidingPiece() throws IOException {
-
-        List<Map<String, Object>> maps = movieMainService.HidingPiece();
-
-        return new ResponseEntity<>(maps, HttpStatus.OK);
+        
+        return movieMainService.HidingPiece();
     }
 
     @GetMapping("/MentionKeword")
