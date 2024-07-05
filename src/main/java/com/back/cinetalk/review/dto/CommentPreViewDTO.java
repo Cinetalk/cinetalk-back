@@ -13,6 +13,8 @@ public class CommentPreViewDTO {
 
     String nickName;
 
+    byte[] profileImg;
+
     String content;
 
     LocalDateTime createdAt;
