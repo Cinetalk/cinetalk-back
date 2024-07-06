@@ -1,37 +1,36 @@
 package com.back.cinetalk.user.entity;
 
-import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.user.dto.RefreshDTO;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
-@Entity
+@Setter
 @Getter
-@Table(name = "Refresh")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshEntity extends BaseEntity {
+@RedisHash(value = "refresh",timeToLive = 86400L)
+public class RefreshEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    @Indexed
+    public String refresh;
+    @Indexed
     public String email;
     public String ip;
-    public String refresh;
+    @Indexed
     public String access;
     public String expiration;
+    @Indexed
     public String auth;
 
     public static RefreshEntity ToRefreshEntity(RefreshDTO refreshDTO){
         return RefreshEntity.builder()
-                .id(refreshDTO.getId())
+                .refresh(refreshDTO.getRefresh())
                 .email(refreshDTO.getEmail())
                 .ip(refreshDTO.getIp())
-                .refresh(refreshDTO.getRefresh())
                 .access(refreshDTO.getAccess())
                 .expiration(refreshDTO.getExpiration())
                 .auth(refreshDTO.getAuth())
