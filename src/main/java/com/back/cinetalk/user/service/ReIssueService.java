@@ -28,11 +28,13 @@ public class ReIssueService {
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
+    private final ClientIpAddress clientIpAddress;
 
-    public ReIssueService(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository) {
+    public ReIssueService(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository, ClientIpAddress clientIpAddress) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
         this.userRepository = userRepository;
+        this.clientIpAddress = clientIpAddress;
     }
 
     public ResponseEntity<?> reissueToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -96,7 +98,7 @@ public class ReIssueService {
         String newRefresh = jwtUtil.createJwt("refresh",email,role,86400000L);
 
         refreshRepository.deleteByRefresh(refresh);
-        addRefreshEntity(email,newRefresh,86400000L);
+        addRefreshEntity(email,newRefresh,86400000L,request);
 
         response.setHeader("access",newAccess);
         response.addCookie(createCookie("refresh",newRefresh));
@@ -122,12 +124,13 @@ public class ReIssueService {
         return cookie;
     }
 
-    private void addRefreshEntity(String email,String refresh,Long expiredMs){
+    private void addRefreshEntity(String email,String refresh,Long expiredMs,HttpServletRequest request){
 
         Date date = new Date(System.currentTimeMillis() + expiredMs);
 
         RefreshDTO refreshDTO = new RefreshDTO();
         refreshDTO.setEmail(email);
+        refreshDTO.setIp(clientIpAddress.getClientIp(request));
         refreshDTO.setRefresh(refresh);
         refreshDTO.setExpiration(date.toString());
 
@@ -139,8 +142,6 @@ public class ReIssueService {
     public ResponseEntity<?> AuthBy(HttpServletResponse response,String auth){
 
         RefreshEntity byAuth = refreshRepository.findByAuth(auth);
-
-        refreshRepository.updateAuthToNullByAuth(auth);
 
         if(byAuth == null){
 
@@ -155,7 +156,10 @@ public class ReIssueService {
 
         UserEntity userEntity = userRepository.findByEmail(email);
 
-        refreshRepository.updateAccessById(newAccess, byAuth.getId());
+        byAuth.setAuth(null);
+        byAuth.setAccess(newAccess);
+
+        refreshRepository.save(byAuth);
 
         response.setHeader("access",newAccess);
         response.addCookie(createCookie("refresh",byAuth.getRefresh()));
