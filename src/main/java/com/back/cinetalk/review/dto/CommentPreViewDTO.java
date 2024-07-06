@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentPreViewDTO {
 
+    Long id;
+
     String nickName;
 
     byte[] profileImg;
