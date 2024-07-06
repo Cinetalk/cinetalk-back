@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
@@ -39,12 +41,27 @@ public class ReviewController {
     }
 
     @GetMapping("/{movieId}")
-    @Operation(summary = "특정 영화의 리뷰 목록 조회 API", description = "특정 영화 리뷰들의 목록을 조회하는 API 이며, 페이징을 포함합니다.")
+    @Operation(summary = "특정 영화의 리뷰 목록 조회 API", description = "특정 영화 전페 리뷰 목록을 조회하는 API 이며, 페이징을 포함합니다.")
     public ReviewPreViewListDTO getReviewListByMovie(@PathVariable(name = "movieId") Long movieId,
                                                      @RequestParam(name = "page") Integer page) {
 
         Page<ReviewPreViewDTO> reviewList = reviewService.getReviewList(movieId, page);
         return ReviewPreViewListDTO.toReviewPreViewListDTO(reviewList);
+    }
+
+    @GetMapping("/{movieId}/best")
+    @Operation(summary = "특정 영화의 Best 리뷰 목록 조회 API", description = "특정 영화의 Best 리뷰 목록을 조회하는 API 입니다.")
+    public List<ReviewPreViewDTO> getBestReviewsByMovie(@PathVariable(name = "movieId") Long movieId) {
+        return reviewService.getBestReviews(movieId);
+    }
+
+    @GetMapping("/{movieId}/general")
+    @Operation(summary = "특정 영화의 일반 리뷰 목록 조회 API", description = "특정 영화의 일반 리뷰 목록(Best 리뷰 제외)을 조회하는 API 이며, 페이징을 포함합니다.")
+    public ReviewPreViewListDTO getGeneralReviewsByMovie(@PathVariable(name = "movieId") Long movieId,
+                                                         @RequestParam(name = "page") Integer page) {
+
+        Page<ReviewPreViewDTO> reviewListExcludingBest = reviewService.getGeneralReviewsExcludingBest(movieId, page);
+        return ReviewPreViewListDTO.toReviewPreViewListDTO(reviewListExcludingBest);
     }
 
     @GetMapping("/{parentReviewId}/comments")

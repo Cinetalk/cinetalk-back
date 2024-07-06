@@ -133,6 +133,26 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
+    public List<ReviewPreViewDTO> getBestReviews(Long movieId) {
+        int bestReviewLimit = 3;
+        return reviewRepository.findBestReviews(movieId, bestReviewLimit);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReviewPreViewDTO> getGeneralReviewsExcludingBest(Long movieId, Integer page) {
+        int bestReviewLimit = 3;
+
+        // Best 리뷰 가져오기
+        List<ReviewPreViewDTO> bestReviews = reviewRepository.findBestReviews(movieId, bestReviewLimit);
+        List<Long> bestReviewIds = bestReviews.stream()
+                .map(ReviewPreViewDTO::getId)
+                .toList();
+
+        // 일반 리뷰 가져오기 (Best 리뷰 제외)
+        return reviewRepository.findGeneralReviewsExcludingBest(movieId, bestReviewIds, PageRequest.of(page, 10));
+    }
+
+    @Transactional(readOnly = true)
     public Page<CommentPreViewDTO> getCommentList(Long parentReviewId, Integer page) {
         return reviewRepository.findAllByParentReviewId(parentReviewId, PageRequest.of(page, 10));
     }
