@@ -2,6 +2,7 @@ package com.back.cinetalk.review.service;
 
 import com.back.cinetalk.badge.entity.BadgeEntity;
 import com.back.cinetalk.badge.repository.BadgeRepository;
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.genre.entity.GenreEntity;
@@ -262,13 +263,4 @@ public class ReviewService {
 
         return new StateRes(true);
     }
-
-    public long countLikes(Long reviewId) {
-        return reviewLikeRepository.countByReviewId(reviewId);
-    }
-
-    public long countDislikes(Long reviewId) {
-        return reviewDislikeRepository.countByReviewId(reviewId);
-    }
-
 }

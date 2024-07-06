@@ -1,15 +1,20 @@
 package com.back.cinetalk.movie.controller;
 
 import com.back.cinetalk.movie.dto.MovieDetailDTO;
+import com.back.cinetalk.movie.dto.UserEqDTO;
 import com.back.cinetalk.movie.service.MainColorExtract;
 import com.back.cinetalk.movie.service.MovieMainService;
 import com.back.cinetalk.movie.service.MovieDetailService;
+import com.back.cinetalk.user.MyPage.component.UserByAccess;
+import com.back.cinetalk.user.entity.UserEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +32,7 @@ public class MovieController {
     private final MovieDetailService movieDetailService;
     private final MovieMainService movieMainService;
     private final MainColorExtract mainColorExtract;
+    private final UserByAccess userByAccess;
 
     @GetMapping("/{movie_id}")
     @Operation(summary = "영화 상세정보 ",description = "영화 상세정보 api")
@@ -45,12 +51,10 @@ public class MovieController {
     }
 
     @GetMapping("/HidingPiece")
-    @Operation(summary = "숨겨진 명작",description = "리뷰가 제일 많이 달린 영화 10개에 대한 정보 출력")
+    @Operation(summary = "숨겨진 명작",description = "리뷰가 5~20개 인 영화중 평점이 4점 이상인 랜덤한 영화 10개 표출")
     public ResponseEntity<?> HidingPiece() throws IOException {
-
-        List<Map<String, Object>> maps = movieMainService.HidingPiece();
-
-        return new ResponseEntity<>(maps, HttpStatus.OK);
+        
+        return movieMainService.HidingPiece();
     }
 
     @GetMapping("/MentionKeword")
@@ -80,5 +84,28 @@ public class MovieController {
     public String imageColor(@RequestParam(value = "url") String url)throws  Exception{
 
         return mainColorExtract.ColorExtract(url);
+    }
+
+    @GetMapping("/HoxyWatching")
+    public ResponseEntity<?> HoxyWatching(HttpServletRequest request) throws IOException {
+
+        return movieMainService.HoxyWatching(request);
+    }
+
+    @GetMapping("/top-reviewers")
+    @Operation(summary = "나와 취향이 같은 사람들",description = "리뷰를 가장 많이 작성한 유저를 가져옴")
+    @ApiResponse(responseCode = "200",description = "출력완료",
+            content = @Content(schema = @Schema(implementation = ResponseBody.class
+            )))
+    public ResponseEntity<?> getTopReviewers(HttpServletRequest request) throws IOException {
+
+        UserEntity currentUser = userByAccess.getUserEntity(request);
+
+        if (currentUser == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.UNAUTHORIZED);
+        }
+
+        List<UserEqDTO> topReviewers = (List<UserEqDTO>) movieMainService.UserEqReviewers(request);
+        return new ResponseEntity<>(topReviewers, HttpStatus.OK);
     }
 }
