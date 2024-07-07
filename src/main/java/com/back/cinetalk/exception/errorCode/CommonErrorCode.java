@@ -14,6 +14,7 @@ public enum CommonErrorCode implements ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청이 있습니다"),
     INVALID_ACCESS_TOKEN(HttpStatus.FORBIDDEN, "유효하지 않은 토큰입니다."),
 
+
     //유저 관련 에러
     NICKNAME_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     USER_CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 주소입니다."),

@@ -73,7 +73,8 @@ public class JWTFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
 
             JsonObject jsonResponse = new JsonObject();
-            jsonResponse.addProperty("error", "토큰이 만료되었거나 유효하지 않습니다.");
+            jsonResponse.addProperty("code", "Token_isExpired");
+            jsonResponse.addProperty("message", "토큰이 만료되었거나 유효하지 않습니다.");
 
             // Gson 또는 JSON 라이브러리를 사용하여 JSON 문자열 생성
             String jsonString = jsonResponse.toString();
@@ -95,7 +96,8 @@ public class JWTFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
 
             JsonObject jsonResponse = new JsonObject();
-            jsonResponse.addProperty("error", "유효하지 않는 토큰입니다.");
+            jsonResponse.addProperty("code", "Token_not_authorized");
+            jsonResponse.addProperty("message", "유효하지 않는 토큰입니다.");
 
             // Gson 또는 JSON 라이브러리를 사용하여 JSON 문자열 생성
             String jsonString = jsonResponse.toString();
