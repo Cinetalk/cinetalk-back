@@ -3,6 +3,7 @@ package com.back.cinetalk.user.MyPage.service;
 import com.back.cinetalk.bookmark.entity.BookmarkEntity;
 import com.back.cinetalk.bookmark.entity.QBookmarkEntity;
 import com.back.cinetalk.bookmark.repository.BookmarkRepository;
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.movie.service.MovieMainService;
 import com.back.cinetalk.user.MyPage.component.UserByAccess;
 import com.back.cinetalk.user.MyPage.dto.bookmark.BookmarkByUserResponseDTO;
@@ -59,7 +60,7 @@ public class MyPage_BookmarkService {
 
     //TODO 찜한 영화 삭제 처리
     @Transactional
-    public ResponseEntity<?> BookmarkDelete(HttpServletRequest request,List<Long> BookmarkList){
+    public StateRes BookmarkDelete(HttpServletRequest request,List<Long> BookmarkList){
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
 
@@ -68,6 +69,6 @@ public class MyPage_BookmarkService {
                         .and(bookmark.id.in(BookmarkList)))
                 .execute();
 
-        return new ResponseEntity<>("success",HttpStatus.OK);
+        return new StateRes(true);
     }
 }

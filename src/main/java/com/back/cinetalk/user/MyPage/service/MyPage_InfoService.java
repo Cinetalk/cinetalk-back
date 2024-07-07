@@ -1,5 +1,6 @@
 package com.back.cinetalk.user.MyPage.service;
 
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.user.MyPage.component.UserByAccess;
@@ -56,7 +57,7 @@ public class MyPage_InfoService {
 
     //TODO 회원 가입 시 닉네임,성별,생일 변경처리
     @Transactional
-    public ResponseEntity<?> nickNameMerge(HttpServletRequest request, NickNameMergeDTO dto){
+    public StateRes nickNameMerge(HttpServletRequest request, NickNameMergeDTO dto){
 
         log.info("닉네임 재설정 로직");
 
@@ -71,12 +72,12 @@ public class MyPage_InfoService {
         }
         userEntity.Update(dto);
 
-        return new ResponseEntity<>("success",HttpStatus.OK);
+        return new StateRes(true);
     }
 
     //TODO 마이 페이지 - 유저 정보 수정
     @Transactional
-    public ResponseEntity<?> userInfoMerge(HttpServletRequest request,String category,String value){
+    public StateRes userInfoMerge(HttpServletRequest request,String category,String value){
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
 
@@ -122,12 +123,12 @@ public class MyPage_InfoService {
             throw new RestApiException(CommonErrorCode.USER_CATEGORY_NOT_FOUND);
         }
 
-        return new ResponseEntity<>("success",HttpStatus.OK);
+        return new StateRes(true);
     }
 
     //TODO 유저의 프로필 사진 변경
     @Transactional
-    public ResponseEntity<?> UserProfileChange(HttpServletRequest request,MultipartFile file){
+    public StateRes UserProfileChange(HttpServletRequest request,MultipartFile file){
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
 
@@ -156,17 +157,17 @@ public class MyPage_InfoService {
                 imageBytes = file.getBytes();
             }
         } catch (IOException e) {
-            return new ResponseEntity<>("이미지 등록 중 에러가 발생하였습니다.",HttpStatus.BAD_REQUEST);
+            throw new RestApiException(CommonErrorCode.USER_IMAGE_ERROR);
         }
 
         userEntity.UpdateProfile(imageBytes);
 
-        return new ResponseEntity<>("success",HttpStatus.OK);
+        return new StateRes(true);
     }
 
     //TODO 회원 탈퇴
     @Transactional
-    public ResponseEntity<?> UserDelete(HttpServletRequest request,HttpServletResponse response){
+    public StateRes UserDelete(HttpServletRequest request,HttpServletResponse response){
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
 
@@ -181,6 +182,6 @@ public class MyPage_InfoService {
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
 
-        return new ResponseEntity<>("success",HttpStatus.OK);
+        return new StateRes(true);
     }
 }

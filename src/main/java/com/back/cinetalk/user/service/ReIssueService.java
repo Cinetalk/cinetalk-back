@@ -1,5 +1,7 @@
 package com.back.cinetalk.user.service;
 
+import com.back.cinetalk.exception.errorCode.CommonErrorCode;
+import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.user.dto.UserDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.repository.RefreshRepository;
@@ -61,7 +63,7 @@ public class ReIssueService {
         if (refresh == null){
 
             //응답 코드 설정
-            return new ResponseEntity<>("refresh토큰이 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+            throw new RestApiException(CommonErrorCode.REFRESH_TOKEN_NULL);
         }
 
         //토큰 만료 체크
@@ -70,7 +72,7 @@ public class ReIssueService {
         }catch (ExpiredJwtException e){
 
             //응답 코드 설정
-            return new ResponseEntity<>("refresh토큰이 만료되었습니다.", HttpStatus.BAD_REQUEST);
+            throw new RestApiException(CommonErrorCode.REFRESH_TOKEN_ISEXPIRED);
         }
 
         String category = jwtUtil.getCategory(refresh);
@@ -78,7 +80,7 @@ public class ReIssueService {
         if(!category.equals("refresh")){
 
             //응답 코드 설정
-            return new ResponseEntity<>("refresh토큰이 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+            throw new RestApiException(CommonErrorCode.REFRESH_TOKEN_UNDIFINED);
         }
 
         Boolean isExist = refreshRepository.existsByRefresh(refresh);
@@ -86,7 +88,7 @@ public class ReIssueService {
         if(!isExist){
 
             //응답 코드 설정
-            return new ResponseEntity<>("저장된 토큰이 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
+            throw new RestApiException(CommonErrorCode.REFRESH_TOKEN_NOT_SAVED);
         }
 
         String email = jwtUtil.getEmail(refresh);
@@ -103,10 +105,6 @@ public class ReIssueService {
         response.setHeader("access",newAccess);
         response.addCookie(createCookie("refresh",newRefresh));
         log.info("토큰 재생성 성공");
-
-        //응답 바디
-        //PrintWriter writer = response.getWriter();
-        //writer.print("token reissue");
 
         UserEntity userEntity = userRepository.findByEmail(email);
 
