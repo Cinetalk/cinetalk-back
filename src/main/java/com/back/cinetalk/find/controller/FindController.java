@@ -1,5 +1,6 @@
 package com.back.cinetalk.find.controller;
 
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.find.dto.FindReviewDTO;
 import com.back.cinetalk.find.service.FindService;
 import com.back.cinetalk.movie.service.MovieDetailService;
@@ -28,8 +29,8 @@ public class FindController {
 
     @PostMapping("/findSave")
     @Operation(summary = "검색어 저장",description = "인기 검색어 순위를 위한 검색어 저장 프로세스")
-    @ApiResponse(responseCode = "200",description = "저장완료",content = @Content(schema = @Schema(implementation = HttpResponse.class)))
-    public ResponseEntity<?> WordSave(@RequestParam(value = "findword") String findword){
+    @ApiResponse(responseCode = "200",description = "저장완료",content = @Content(schema = @Schema(implementation = StateRes.class)))
+    public StateRes WordSave(@RequestParam(value = "findword") String findword){
 
         return findService.WordSave(findword);
     }

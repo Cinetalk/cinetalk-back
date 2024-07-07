@@ -1,5 +1,6 @@
 package com.back.cinetalk.find.service;
 
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.find.dto.FindDTO;
 import com.back.cinetalk.find.dto.FindReviewDTO;
 import com.back.cinetalk.find.entity.FindEntity;
@@ -34,7 +35,7 @@ public class FindService {
 
 
     //TODO 검색어 저장
-    public ResponseEntity<?> WordSave(String findword){
+    public StateRes WordSave(String findword){
 
         FindDTO findDTO = new FindDTO();
 
@@ -44,7 +45,7 @@ public class FindService {
 
         findRepository.save(findEntity);
 
-        return new ResponseEntity<>("success", HttpStatus.OK);
+        return new StateRes(true);
     }
 
     //TODO 연관 검색어 출력
