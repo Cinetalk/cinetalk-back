@@ -14,32 +14,24 @@ public class AdultContentFinder {
 
     private final CallAPI callAPI;
 
-    public String adultFinder(Long movieId) throws IOException {
+    public Boolean adultFinder(Long movieId) throws IOException {
 
         String url = "https://api.themoviedb.org/3/movie/"+movieId+"/keywords";
 
         List<Map<String,Object>> kewordList = (List<Map<String, Object>>) callAPI.callAPI(url).get("keywords");
 
         if(kewordList.isEmpty()){
-            return "pass";
+            return false;
         }
-
-        System.out.println("------------들어온 영화값"+movieId);
-
-        String value = "pass";
 
         for (Map<String,Object> keword : kewordList) {
 
             int id = (int) keword.get("id");
 
-            System.out.println(id);
-
             if(id == 155477){
-                value = "danger";
+                return true;
             }
         }
-
-        System.out.println("결과값:"+value);
-        return value;
+        return false;
     }
 }

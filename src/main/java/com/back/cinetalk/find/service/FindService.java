@@ -2,6 +2,7 @@ package com.back.cinetalk.find.service;
 
 import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.find.dto.FindDTO;
+import com.back.cinetalk.find.dto.FindMovieDTO;
 import com.back.cinetalk.find.dto.FindReviewDTO;
 import com.back.cinetalk.find.entity.FindEntity;
 import com.back.cinetalk.find.entity.QFindEntity;
@@ -65,7 +66,7 @@ public class FindService {
     }
 
     //TODO 영화 검색 결과
-    public List<Map<String,Object>> MovieResult(String query)throws Exception{
+    public List<FindMovieDTO> MovieResult(String query)throws Exception{
 
         String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query="+query;
 
@@ -77,24 +78,25 @@ public class FindService {
                 .map(result -> (Integer) result.get("id"))
                 .toList();
 
-        List<Map<String,Object>> returnList = new ArrayList<>();
+        List<FindMovieDTO> returnList = new ArrayList<>();
 
         for (int movieId : movieIdList) {
 
-            String value = adultContentFinder.adultFinder((long) movieId);
-
-            if(value.equals("pass")){
-
-                System.out.println("들어온 영화값"+movieId);
+            if(!adultContentFinder.adultFinder((long) movieId)){
 
                 String detailUrl = "https://api.themoviedb.org/3/movie/"+movieId+"?language=ko";
 
                 Map<String, Object> movie = callAPI.callAPI(detailUrl);
 
-                returnList.add(movie);
+                FindMovieDTO findMovieDTO = FindMovieDTO.builder()
+                        .id(Long.valueOf((Integer) movie.get("id")))
+                        .title((String) movie.get("title"))
+                        .poster_path((String) movie.get("poster_path"))
+                        .build();
+
+                returnList.add(findMovieDTO);
             }
         }
-
         return returnList;
     }
 
