@@ -1,6 +1,7 @@
 package com.back.cinetalk.find.controller;
 
 import com.back.cinetalk.config.dto.StateRes;
+import com.back.cinetalk.find.dto.FindMovieDTO;
 import com.back.cinetalk.find.dto.FindReviewDTO;
 import com.back.cinetalk.find.service.FindService;
 import com.back.cinetalk.movie.service.MovieDetailService;
@@ -54,7 +55,7 @@ public class FindController {
         Map<String,Object> result = new HashMap<>();
 
         //영화 결과 정렬
-        List<Map<String, Object>> movielist = findService.MovieResult(query);
+        List<FindMovieDTO> movielist = findService.MovieResult(query);
         if (movielist.size() > 6) {
             movielist = movielist.subList(0, 6);
         }
@@ -76,7 +77,7 @@ public class FindController {
     @Operation(summary = "(검색)영화 조회",description = "검색어에 따른 모든 영화 조회 프로세스")
     public ResponseEntity<?> findMovie(@RequestParam(value = "query")String query) throws Exception {
 
-        List<Map<String, Object>> movielist = findService.MovieResult(query);
+        List<FindMovieDTO> movielist = findService.MovieResult(query);
 
         return new ResponseEntity<>(movielist,HttpStatus.OK);
     }
