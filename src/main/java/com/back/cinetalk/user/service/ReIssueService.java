@@ -97,10 +97,10 @@ public class ReIssueService {
         //access 토큰 재생성
         String newAccess = jwtUtil.createJwt("access",email,role,600000L);
         //refresh 토큰 재생성
-        String newRefresh = jwtUtil.createJwt("refresh",email,role,86400000L);
+        String newRefresh = jwtUtil.createJwt("refresh",email,role,2592000000L);
 
         refreshRepository.deleteByRefresh(refresh);
-        addRefreshEntity(email,newRefresh,86400000L,request);
+        addRefreshEntity(email,newRefresh,2592000000L,request);
 
         response.setHeader("access",newAccess);
         response.addCookie(createCookie("refresh",newRefresh));
@@ -114,7 +114,7 @@ public class ReIssueService {
     private Cookie createCookie(String key,String value){
 
         Cookie cookie = new Cookie(key,value);
-        cookie.setMaxAge(24*60*60);
+        cookie.setMaxAge(24*60*60*30);
         cookie.setSecure(true);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
         cookie.setHttpOnly(false);

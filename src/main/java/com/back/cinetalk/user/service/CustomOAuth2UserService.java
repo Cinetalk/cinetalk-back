@@ -74,7 +74,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         userDTO.setName(oAuth2Response.getName());
         userDTO.setGender(oAuth2Response.getGender());
         userDTO.setBirthday(oAuth2Response.getBirthday());
-        userDTO.setProfile(Base64.getEncoder().encodeToString(oAuth2Response.getProfile()));
+        //프로필 받아오기 금지
+        //userDTO.setProfile(Base64.getEncoder().encodeToString(oAuth2Response.getProfile()));
+        userDTO.setProfile(null);
         userDTO.setProvider(oAuth2Response.getProvider());
 
         //DB에 존재하지 않을 경우 : 회원가입
