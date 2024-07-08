@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ReviewPreViewDTO {
 
+    Long id;
+
     String nickName;
 
     byte[] profileImage;
@@ -32,7 +34,8 @@ public class ReviewPreViewDTO {
     long dislikeCount;
 
     @QueryProjection
-    public ReviewPreViewDTO(String nickName, byte[] profileImage, Double star, String content, LocalDateTime createdAt, boolean spoiler, long likeCount, long dislikeCount) {
+    public ReviewPreViewDTO(Long id, String nickName, byte[] profileImage, Double star, String content, LocalDateTime createdAt, boolean spoiler, long likeCount, long dislikeCount) {
+        this.id = id;
         this.nickName = nickName;
         this.profileImage = profileImage;
         this.star = star;

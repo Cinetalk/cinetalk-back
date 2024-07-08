@@ -1,5 +1,7 @@
 package com.back.cinetalk.user.service;
 
+import com.back.cinetalk.exception.errorCode.CommonErrorCode;
+import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.user.dto.UserDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.repository.RefreshRepository;
@@ -28,11 +30,13 @@ public class ReIssueService {
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
+    private final ClientIpAddress clientIpAddress;
 
-    public ReIssueService(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository) {
+    public ReIssueService(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository, ClientIpAddress clientIpAddress) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
         this.userRepository = userRepository;
+        this.clientIpAddress = clientIpAddress;
     }
 
     public ResponseEntity<?> reissueToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -59,7 +63,7 @@ public class ReIssueService {
         if (refresh == null){
 
             //응답 코드 설정
-            return new ResponseEntity<>("refresh토큰이 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+            throw new RestApiException(CommonErrorCode.REFRESH_TOKEN_NULL);
         }
 
         //토큰 만료 체크
@@ -68,7 +72,7 @@ public class ReIssueService {
         }catch (ExpiredJwtException e){
 
             //응답 코드 설정
-            return new ResponseEntity<>("refresh토큰이 만료되었습니다.", HttpStatus.BAD_REQUEST);
+            throw new RestApiException(CommonErrorCode.REFRESH_TOKEN_ISEXPIRED);
         }
 
         String category = jwtUtil.getCategory(refresh);
@@ -76,7 +80,7 @@ public class ReIssueService {
         if(!category.equals("refresh")){
 
             //응답 코드 설정
-            return new ResponseEntity<>("refresh토큰이 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+            throw new RestApiException(CommonErrorCode.REFRESH_TOKEN_UNDIFINED);
         }
 
         Boolean isExist = refreshRepository.existsByRefresh(refresh);
@@ -84,7 +88,7 @@ public class ReIssueService {
         if(!isExist){
 
             //응답 코드 설정
-            return new ResponseEntity<>("저장된 토큰이 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
+            throw new RestApiException(CommonErrorCode.REFRESH_TOKEN_NOT_SAVED);
         }
 
         String email = jwtUtil.getEmail(refresh);
@@ -93,18 +97,14 @@ public class ReIssueService {
         //access 토큰 재생성
         String newAccess = jwtUtil.createJwt("access",email,role,600000L);
         //refresh 토큰 재생성
-        String newRefresh = jwtUtil.createJwt("refresh",email,role,86400000L);
+        String newRefresh = jwtUtil.createJwt("refresh",email,role,2592000000L);
 
         refreshRepository.deleteByRefresh(refresh);
-        addRefreshEntity(email,newRefresh,86400000L);
+        addRefreshEntity(email,newRefresh,2592000000L,request);
 
         response.setHeader("access",newAccess);
         response.addCookie(createCookie("refresh",newRefresh));
         log.info("토큰 재생성 성공");
-
-        //응답 바디
-        //PrintWriter writer = response.getWriter();
-        //writer.print("token reissue");
 
         UserEntity userEntity = userRepository.findByEmail(email);
 
@@ -114,7 +114,7 @@ public class ReIssueService {
     private Cookie createCookie(String key,String value){
 
         Cookie cookie = new Cookie(key,value);
-        cookie.setMaxAge(24*60*60);
+        cookie.setMaxAge(24*60*60*30);
         cookie.setSecure(true);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
         cookie.setHttpOnly(false);
@@ -122,12 +122,13 @@ public class ReIssueService {
         return cookie;
     }
 
-    private void addRefreshEntity(String email,String refresh,Long expiredMs){
+    private void addRefreshEntity(String email,String refresh,Long expiredMs,HttpServletRequest request){
 
         Date date = new Date(System.currentTimeMillis() + expiredMs);
 
         RefreshDTO refreshDTO = new RefreshDTO();
         refreshDTO.setEmail(email);
+        refreshDTO.setIp(clientIpAddress.getClientIp(request));
         refreshDTO.setRefresh(refresh);
         refreshDTO.setExpiration(date.toString());
 
@@ -139,8 +140,6 @@ public class ReIssueService {
     public ResponseEntity<?> AuthBy(HttpServletResponse response,String auth){
 
         RefreshEntity byAuth = refreshRepository.findByAuth(auth);
-
-        refreshRepository.updateAuthToNullByAuth(auth);
 
         if(byAuth == null){
 
@@ -155,7 +154,10 @@ public class ReIssueService {
 
         UserEntity userEntity = userRepository.findByEmail(email);
 
-        refreshRepository.updateAccessById(newAccess, byAuth.getId());
+        byAuth.setAuth(null);
+        byAuth.setAccess(newAccess);
+
+        refreshRepository.save(byAuth);
 
         response.setHeader("access",newAccess);
         response.addCookie(createCookie("refresh",byAuth.getRefresh()));

@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RefreshDTO {
 
-    public Long id;
     public String email;
     public String ip;
     public String refresh;
@@ -22,7 +21,6 @@ public class RefreshDTO {
 
     public static RefreshDTO ToRefreshDTO(RefreshEntity refreshEntity){
         return RefreshDTO.builder()
-                .id(refreshEntity.getId())
                 .email(refreshEntity.getEmail())
                 .ip(refreshEntity.getIp())
                 .refresh(refreshEntity.getRefresh())

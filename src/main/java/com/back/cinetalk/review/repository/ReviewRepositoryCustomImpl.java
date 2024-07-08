@@ -28,19 +28,20 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     @PersistenceContext
     private final EntityManager entityManager;
 
+    private final QReviewEntity reviewEntity = QReviewEntity.reviewEntity;
+    private final QUserEntity userEntity = QUserEntity.userEntity;
+    private final QReviewLikeEntity reviewLikeEntity = QReviewLikeEntity.reviewLikeEntity;
+    private final QReviewDislikeEntity reviewDislikeEntity = QReviewDislikeEntity.reviewDislikeEntity;
+    private final QUserBadgeEntity userBadgeEntity = QUserBadgeEntity.userBadgeEntity;
+    private final QBadgeEntity badgeEntity = QBadgeEntity.badgeEntity;
+
     @Override
     public Page<ReviewPreViewDTO> findAllByMovieId(Long movieId, Pageable pageable) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
-        QReviewEntity reviewEntity = QReviewEntity.reviewEntity;
-        QUserEntity userEntity = QUserEntity.userEntity;
-        QReviewLikeEntity reviewLikeEntity = QReviewLikeEntity.reviewLikeEntity;
-        QReviewDislikeEntity reviewDislikeEntity = QReviewDislikeEntity.reviewDislikeEntity;
-        QUserBadgeEntity userBadgeEntity = QUserBadgeEntity.userBadgeEntity;
-        QBadgeEntity badgeEntity = QBadgeEntity.badgeEntity;
-
         List<ReviewPreViewDTO> results = queryFactory
                 .select(new QReviewPreViewDTO(
+                        reviewEntity.id,
                         reviewEntity.user.nickname,
                         reviewEntity.user.profile,
                         reviewEntity.star,
@@ -60,16 +61,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        for (ReviewPreViewDTO dto : results) {
-            List<String> badgeList = queryFactory
-                    .select(badgeEntity.name)
-                    .from(userBadgeEntity)
-                    .join(userBadgeEntity.badge, badgeEntity)
-                    .where(userBadgeEntity.user.nickname.eq(dto.getNickName())
-                            .and(userBadgeEntity.isUse.isTrue()))
-                    .fetch();
-            dto.setBadgeList(badgeList);
-        }
+        insertGenreList(results, queryFactory);
 
         Long total = queryFactory
                 .select(reviewEntity.count())
@@ -89,14 +81,10 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     public Page<CommentPreViewDTO> findAllByParentReviewId(Long parentReviewId, Pageable pageable) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
-        QReviewEntity reviewEntity = QReviewEntity.reviewEntity;
-        QUserEntity userEntity = QUserEntity.userEntity;
-        QReviewLikeEntity reviewLikeEntity = QReviewLikeEntity.reviewLikeEntity;
-        QReviewDislikeEntity reviewDislikeEntity = QReviewDislikeEntity.reviewDislikeEntity;
-
         List<CommentPreViewDTO> results = queryFactory
                 .select(Projections.constructor(
                         CommentPreViewDTO.class,
+                        reviewEntity.id,
                         reviewEntity.user.nickname,
                         reviewEntity.user.profile,
                         reviewEntity.content,
@@ -124,5 +112,94 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         }
 
         return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override
+    public List<ReviewPreViewDTO> findBestReviews(Long movieId, int limit) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+
+        List<ReviewPreViewDTO> bestReviewList = queryFactory
+                .select(new QReviewPreViewDTO(
+                        reviewEntity.id,
+                        reviewEntity.user.nickname,
+                        reviewEntity.user.profile,
+                        reviewEntity.star,
+                        reviewEntity.content,
+                        reviewEntity.createdAt,
+                        reviewEntity.spoiler,
+                        reviewLikeEntity.countDistinct(),
+                        reviewDislikeEntity.countDistinct()))
+                .from(reviewEntity)
+                .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
+                .leftJoin(reviewDislikeEntity).on(reviewDislikeEntity.review.eq(reviewEntity))
+                .where(reviewEntity.movieId.eq(movieId))
+                .where(reviewEntity.parentReview.isNull())
+                .groupBy(reviewEntity.id)
+                .having(reviewLikeEntity.countDistinct().goe(10))
+                .having(reviewLikeEntity.countDistinct().divide(reviewDislikeEntity.countDistinct().add(1)).goe(0.5))
+                .orderBy(reviewLikeEntity.countDistinct().desc())
+                .limit(limit)
+                .fetch();
+
+        insertGenreList(bestReviewList, queryFactory);
+
+        return bestReviewList;
+    }
+
+    @Override
+    public Page<ReviewPreViewDTO> findGeneralReviewsExcludingBest(Long movieId, List<Long> bestReviewIds, Pageable pageable) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+
+        List<ReviewPreViewDTO> generalReviewList = queryFactory
+                .select(new QReviewPreViewDTO(
+                        reviewEntity.id,
+                        reviewEntity.user.nickname,
+                        reviewEntity.user.profile,
+                        reviewEntity.star,
+                        reviewEntity.content,
+                        reviewEntity.createdAt,
+                        reviewEntity.spoiler,
+                        reviewLikeEntity.countDistinct(),
+                        reviewDislikeEntity.countDistinct()))
+                .from(reviewEntity)
+                .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
+                .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
+                .leftJoin(reviewDislikeEntity).on(reviewDislikeEntity.review.eq(reviewEntity))
+                .where(reviewEntity.movieId.eq(movieId))
+                .where(reviewEntity.parentReview.isNull())
+                .where(reviewEntity.id.notIn(bestReviewIds))
+                .groupBy(reviewEntity.id)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        insertGenreList(generalReviewList, queryFactory);
+
+        Long total = queryFactory
+                .select(reviewEntity.count())
+                .from(reviewEntity)
+                .where(reviewEntity.movieId.eq(movieId))
+                .where(reviewEntity.parentReview.isNull())
+                .where(reviewEntity.id.notIn(bestReviewIds))
+                .fetchOne();
+
+        if (total == null) {
+            total = 0L;
+        }
+
+        return new PageImpl<>(generalReviewList, pageable, total);
+    }
+
+    private void insertGenreList(List<ReviewPreViewDTO> generalReviewList, JPAQueryFactory queryFactory) {
+        for (ReviewPreViewDTO dto : generalReviewList) {
+            List<String> badgeList = queryFactory
+                    .select(badgeEntity.name)
+                    .from(userBadgeEntity)
+                    .join(userBadgeEntity.badge, badgeEntity)
+                    .where(userBadgeEntity.user.nickname.eq(dto.getNickName())
+                            .and(userBadgeEntity.isUse.isTrue()))
+                    .fetch();
+            dto.setBadgeList(badgeList);
+        }
     }
 }

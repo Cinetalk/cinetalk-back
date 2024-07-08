@@ -1,6 +1,8 @@
 package com.back.cinetalk.find.service;
 
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.find.dto.FindDTO;
+import com.back.cinetalk.find.dto.FindMovieDTO;
 import com.back.cinetalk.find.dto.FindReviewDTO;
 import com.back.cinetalk.find.entity.FindEntity;
 import com.back.cinetalk.find.entity.QFindEntity;
@@ -23,6 +25,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +34,11 @@ public class FindService {
     private final FindRepository findRepository;
     private final CallAPI callAPI;
     private final JPAQueryFactory queryFactory;
+    private final AdultContentFinder adultContentFinder;
 
 
     //TODO 검색어 저장
-    public ResponseEntity<?> WordSave(String findword){
+    public StateRes WordSave(String findword){
 
         FindDTO findDTO = new FindDTO();
 
@@ -44,7 +48,7 @@ public class FindService {
 
         findRepository.save(findEntity);
 
-        return new ResponseEntity<>("success", HttpStatus.OK);
+        return new StateRes(true);
     }
 
     //TODO 연관 검색어 출력
@@ -56,26 +60,44 @@ public class FindService {
 
         List<Map<String,Object>> resultlist = (List<Map<String, Object>>) list.get("results");
 
-        List<String> returnList = new ArrayList<>();
-
-        for (Map<String,Object> result:resultlist) {
-
-            returnList.add((String) result.get("title"));
-        }
-
-        return returnList;
+        return resultlist.stream()
+                .map(result -> (String) result.get("title"))
+                .collect(Collectors.toList());
     }
 
     //TODO 영화 검색 결과
-    public List<Map<String,Object>> MovieResult(String query)throws Exception{
+    public List<FindMovieDTO> MovieResult(String query)throws Exception{
 
         String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query="+query;
 
         Map<String, Object> list = callAPI.callAPI(url);
 
-        List<Map<String,Object>> resultlist = (List<Map<String, Object>>) list.get("results");
+        List<Map<String,Object>> resultApi = (List<Map<String, Object>>) list.get("results");
 
-        return resultlist;
+        List<Integer> movieIdList = resultApi.stream()
+                .map(result -> (Integer) result.get("id"))
+                .toList();
+
+        List<FindMovieDTO> returnList = new ArrayList<>();
+
+        for (int movieId : movieIdList) {
+
+            if(!adultContentFinder.adultFinder((long) movieId)){
+
+                String detailUrl = "https://api.themoviedb.org/3/movie/"+movieId+"?language=ko";
+
+                Map<String, Object> movie = callAPI.callAPI(detailUrl);
+
+                FindMovieDTO findMovieDTO = FindMovieDTO.builder()
+                        .id(Long.valueOf((Integer) movie.get("id")))
+                        .title((String) movie.get("title"))
+                        .poster_path((String) movie.get("poster_path"))
+                        .build();
+
+                returnList.add(findMovieDTO);
+            }
+        }
+        return returnList;
     }
 
     //TODO 리뷰 검색 결과
@@ -124,4 +146,5 @@ public class FindService {
 
         return new ResponseEntity<>(list,HttpStatus.OK);
     }
+
 }

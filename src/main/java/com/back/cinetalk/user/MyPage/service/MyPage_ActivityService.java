@@ -1,6 +1,7 @@
 package com.back.cinetalk.user.MyPage.service;
 
 import com.back.cinetalk.bookmark.entity.QBookmarkEntity;
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.genre.entity.QGenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.service.MovieMainService;
@@ -95,7 +96,7 @@ public class MyPage_ActivityService {
 
     //TODO 뱃지 장착,해제 처리
     @Transactional
-    public ResponseEntity<?> BadgeUseUpdate(HttpServletRequest request,List<Long> BadgeList){
+    public StateRes BadgeUseUpdate(HttpServletRequest request,List<Long> BadgeList){
 
         UserEntity byEmail = userByAccess.getUserEntity(request);
 
@@ -108,7 +109,7 @@ public class MyPage_ActivityService {
                         .and(userBadge.badge.genre.id.in(BadgeList)))
                 .execute();
 
-        return new ResponseEntity<>("success",HttpStatus.OK);
+        return new StateRes(true);
     }
 
     //TODO 유저의 좋아요, 댓글, 찜 갯수 모음
