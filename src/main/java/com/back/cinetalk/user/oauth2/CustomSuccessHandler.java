@@ -62,10 +62,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 신규추가 240616 cross domain 을 위한 임시 토큰 생성
         String authToken = authTokenCreate.TokenCreate();
 
-        String refresh = jwtUtil.createJwt("refresh",email, role, 86400000L);
+        String refresh = jwtUtil.createJwt("refresh",email, role, 2592000000L);
 
-        //토큰 DB에 저장
-        addRefreshEntity(email,refresh,86400000L,authToken,request);
+        //토큰 DB에 저장 --30일
+        addRefreshEntity(email,refresh,2592000000L,authToken,request);
 
         String nickname = userRepository.findNicknameByEmail(email);
 
@@ -92,7 +92,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private Cookie createCookie(String key, String value){
 
         Cookie cookie = new Cookie(key,value);
-        cookie.setMaxAge(24*60*60); //1일
+        cookie.setMaxAge(24*60*60*30); //30일
         //https 만 쿠키전송
         cookie.setSecure(true);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발

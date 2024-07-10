@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.index.Indexed;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RedisHash(value = "refresh",timeToLive = 86400L)
+@RedisHash(value = "refresh",timeToLive = 2592000L)
 public class RefreshEntity{
 
     @Id
