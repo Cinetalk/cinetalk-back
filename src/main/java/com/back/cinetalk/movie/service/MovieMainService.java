@@ -388,11 +388,14 @@ public class MovieMainService {
 
         if(genreEntity == null){
 
+            System.out.println("장르없나봐");
+            
             movieList = queryFactory.select(review.movieId)
                     .from(review)
                     .where(review.parentReview.isNull())
                     .groupBy(review.movieId)
                     .orderBy(review.count().desc())
+                    .limit(10)
                     .fetch();
         }else{
 
@@ -403,6 +406,7 @@ public class MovieMainService {
                             .and(reviewGenre.review.parentReview.isNull()))
                     .groupBy(reviewGenre.review.movieId)
                     .orderBy(reviewGenre.review.count().desc())
+                    .limit(10)
                     .fetch();
 
         }
@@ -413,8 +417,8 @@ public class MovieMainService {
 
             Map<String, Object> oneByID = getOneByID(movieId);
 
-            String movienm = oneByID.get("movie_name").toString();
-            String poster_path = oneByID.get("poster_path").toString();
+            String movienm = oneByID.get("title").toString();
+            String poster_path = "https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString();
 
             HoxyDTO result = HoxyDTO.builder()
                     .movieId(movieId)
