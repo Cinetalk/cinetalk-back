@@ -395,6 +395,7 @@ public class MovieMainService {
                     .where(review.parentReview.isNull())
                     .groupBy(review.movieId)
                     .orderBy(review.count().desc())
+                    .limit(10)
                     .fetch();
         }else{
 
@@ -405,6 +406,7 @@ public class MovieMainService {
                             .and(reviewGenre.review.parentReview.isNull()))
                     .groupBy(reviewGenre.review.movieId)
                     .orderBy(reviewGenre.review.count().desc())
+                    .limit(10)
                     .fetch();
 
         }
