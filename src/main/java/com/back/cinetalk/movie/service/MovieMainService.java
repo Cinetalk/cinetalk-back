@@ -41,6 +41,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -429,6 +430,22 @@ public class MovieMainService {
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
+
+    //TODO 메인페이지 배너
+    public ResponseEntity<?> mainBanner(HttpServletRequest request) {
+
+        List<Long> MovieIdList = queryFactory.select(review.movieId).from(review)
+                .where(review.parentReview.isNull()
+                        .and(review.createdAt.after(LocalDateTime.now().minusDays(3).with(LocalTime.MIN))))
+                .groupBy(review.movieId)
+                .orderBy(review.count().desc())
+                .orderBy(review.movieId.asc())
+                .limit(3)
+                .fetch();
+
+        return new ResponseEntity<>(MovieIdList, HttpStatus.OK);
+    }
+
 
     //TODO 전체 리뷰 갯수
     public long TotalReviewCount(){
