@@ -372,7 +372,7 @@ public class MovieMainService {
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
-
+    //TODO 혹시 이 영화 보셨나요?
     public ResponseEntity<?> HoxyWatching(HttpServletRequest request) throws IOException {
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
@@ -387,8 +387,6 @@ public class MovieMainService {
         List<Long> movieList = new ArrayList<>();
 
         if(genreEntity == null){
-
-            System.out.println("장르없나봐");
             
             movieList = queryFactory.select(review.movieId)
                     .from(review)
