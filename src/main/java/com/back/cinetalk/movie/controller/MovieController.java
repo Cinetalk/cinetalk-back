@@ -87,6 +87,8 @@ public class MovieController {
     }
 
     @GetMapping("/HoxyWatching")
+    @Operation(summary = "혹시 이 영화 보셨나요?"
+            ,description = "사용자가 평가하지 않는 영화들 중 평가가 많은 영화 리스트 출력,사용자가 평가를 했다면 많이 평가한 장르의 영화를 보여줌")
     public ResponseEntity<?> HoxyWatching(HttpServletRequest request) throws IOException {
 
         return movieMainService.HoxyWatching(request);
@@ -107,5 +109,12 @@ public class MovieController {
 
         List<UserEqDTO> topReviewers = (List<UserEqDTO>) movieMainService.UserEqReviewers(request);
         return new ResponseEntity<>(topReviewers, HttpStatus.OK);
+    }
+
+    @GetMapping("/MainBanner")
+    @Operation(summary = "메인 페이지 배너",description = "최근 일주일 동안 리뷰가 가장 많이 달린 영화 TOP 3")
+    public ResponseEntity<?> MainBanner(HttpServletRequest request){
+
+        return movieMainService.mainBanner(request);
     }
 }
