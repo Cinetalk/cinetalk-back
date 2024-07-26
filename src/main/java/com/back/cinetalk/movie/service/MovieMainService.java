@@ -5,10 +5,7 @@ import com.back.cinetalk.badge.entity.QBadgeEntity;
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.genre.entity.QGenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
-import com.back.cinetalk.movie.dto.BannerDTO;
-import com.back.cinetalk.movie.dto.HoxyDTO;
-import com.back.cinetalk.movie.dto.MovieDTO;
-import com.back.cinetalk.movie.dto.UserEqDTO;
+import com.back.cinetalk.movie.dto.*;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.review.dto.ReviewDTO;
@@ -466,6 +463,15 @@ public class MovieMainService {
                     .limit(1)
                     .fetchOne();
 
+            List<BannerReviewDTO> ReviewList = queryFactory.select(Projections.constructor(BannerReviewDTO.class, review.star, review.content, review.createdAt))
+                    .from(review)
+                    .where(review.movieId.eq(movieId)
+                            .and(review.parentReview.isNull()
+                                    .and(review.spoiler.eq(false))))
+                    .orderBy(review.createdAt.desc())
+                    .limit(5)
+                    .fetch();
+
             BannerDTO result = BannerDTO.builder()
                     .movieId(movieId)
                     .movienm(oneByID.get("title").toString())
@@ -474,6 +480,7 @@ public class MovieMainService {
                     .genres((List<Map<String, Object>>) oneByID.get("genres"))
                     .rate(rate)
                     .keyword(topKeyword)
+                    .ReviewList(ReviewList)
                     .build();
 
             resultList.add(result);

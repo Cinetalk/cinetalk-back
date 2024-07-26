@@ -13,7 +13,6 @@ import java.util.Map;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BannerDTO {
 
     private Long movieId;
@@ -30,5 +29,5 @@ public class BannerDTO {
 
     private String keyword;
 
-
+    private List<BannerReviewDTO> ReviewList;
 }
