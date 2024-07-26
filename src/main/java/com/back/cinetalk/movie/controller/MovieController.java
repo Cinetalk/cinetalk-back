@@ -1,5 +1,6 @@
 package com.back.cinetalk.movie.controller;
 
+import com.back.cinetalk.movie.dto.BannerDTO;
 import com.back.cinetalk.movie.dto.MovieDetailDTO;
 import com.back.cinetalk.movie.dto.UserEqDTO;
 import com.back.cinetalk.movie.service.MainColorExtract;
@@ -113,6 +114,8 @@ public class MovieController {
 
     @GetMapping("/MainBanner")
     @Operation(summary = "메인 페이지 배너",description = "최근 일주일 동안 리뷰가 가장 많이 달린 영화 TOP 3")
+    @ApiResponse(responseCode = "200",description = "출력완료",
+            content = @Content(schema = @Schema(implementation = BannerDTO.class)))
     public ResponseEntity<?> MainBanner() throws IOException {
 
         return movieMainService.mainBanner();
