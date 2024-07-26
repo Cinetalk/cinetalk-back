@@ -113,8 +113,8 @@ public class MovieController {
 
     @GetMapping("/MainBanner")
     @Operation(summary = "메인 페이지 배너",description = "최근 일주일 동안 리뷰가 가장 많이 달린 영화 TOP 3")
-    public ResponseEntity<?> MainBanner(HttpServletRequest request){
+    public ResponseEntity<?> MainBanner() throws IOException {
 
-        return movieMainService.mainBanner(request);
+        return movieMainService.mainBanner();
     }
 }

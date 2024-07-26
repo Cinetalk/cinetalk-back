@@ -4,6 +4,8 @@ import com.back.cinetalk.badge.entity.BadgeEntity;
 import com.back.cinetalk.badge.entity.QBadgeEntity;
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.genre.entity.QGenreEntity;
+import com.back.cinetalk.keyword.entity.QKeywordEntity;
+import com.back.cinetalk.movie.dto.BannerDTO;
 import com.back.cinetalk.movie.dto.HoxyDTO;
 import com.back.cinetalk.movie.dto.MovieDTO;
 import com.back.cinetalk.movie.dto.UserEqDTO;
@@ -68,6 +70,7 @@ public class MovieMainService {
     QBadgeEntity badge = QBadgeEntity.badgeEntity;
     QUserEntity user = QUserEntity.userEntity;
     QUserBadgeEntity userBadge = QUserBadgeEntity.userBadgeEntity;
+    QKeywordEntity keyword = QKeywordEntity.keywordEntity;
 
     //TODO 최신 영화 받아오기
     public List<Map<String, Object>> nowPlayingList() throws IOException {
@@ -432,7 +435,7 @@ public class MovieMainService {
     }
 
     //TODO 메인페이지 배너
-    public ResponseEntity<?> mainBanner(HttpServletRequest request) {
+    public ResponseEntity<?> mainBanner() throws IOException {
 
         List<Long> MovieIdList = queryFactory.select(review.movieId).from(review)
                 .where(review.parentReview.isNull()
@@ -443,7 +446,40 @@ public class MovieMainService {
                 .limit(3)
                 .fetch();
 
-        return new ResponseEntity<>(MovieIdList, HttpStatus.OK);
+        List<BannerDTO> resultList = new ArrayList<BannerDTO>();
+
+        for(Long movieId: MovieIdList){
+
+            Map<String, Object> oneByID = getOneByID(movieId);
+
+            Double rate = queryFactory.select(review.star.avg())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.movieId.eq(movieId)))
+                    .fetchOne();
+
+            String topKeyword = queryFactory.select(keyword.keyword)
+                    .from(keyword)
+                    .where(keyword.movieId.eq(movieId))
+                    .groupBy(keyword.keyword)
+                    .orderBy(keyword.count.desc())
+                    .limit(1)
+                    .fetchOne();
+
+            BannerDTO result = BannerDTO.builder()
+                    .movieId(movieId)
+                    .movienm(oneByID.get("title").toString())
+                    .poster_path("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString())
+                    .backdrop_path("https://image.tmdb.org/t/p/original"+oneByID.get("backdrop_path").toString())
+                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
+                    .rate(rate)
+                    .keyword(topKeyword)
+                    .build();
+
+            resultList.add(result);
+        }
+
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
 
