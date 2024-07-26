@@ -436,7 +436,7 @@ public class MovieMainService {
 
         List<Long> MovieIdList = queryFactory.select(review.movieId).from(review)
                 .where(review.parentReview.isNull()
-                        .and(review.createdAt.after(LocalDateTime.now().minusDays(3).with(LocalTime.MIN))))
+                        .and(review.createdAt.after(LocalDateTime.now().minusDays(7).with(LocalTime.MIN))))
                 .groupBy(review.movieId)
                 .orderBy(review.count().desc())
                 .orderBy(review.movieId.asc())
@@ -487,6 +487,28 @@ public class MovieMainService {
         }
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
+
+    //TODO 영화톡 TOP10
+    public ResponseEntity<?> TopTenTalk(Long genreId){
+
+        if (genreId == 0){
+
+            List<Long> fetch = queryFactory.select(review.movieId)
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                    .and(review.spoiler.eq(false))
+                    .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN))))
+                    .groupBy(review.movieId)
+                    .orderBy(review.count().desc())
+                    .limit(10)
+                    .fetch();
+
+        }else{
+
+        }
+
+        return null;
     }
 
 
