@@ -29,4 +29,6 @@ public class BannerDTO {
     private double rate;
 
     private String keyword;
+
+
 }
