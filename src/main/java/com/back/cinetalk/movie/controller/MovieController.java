@@ -120,4 +120,11 @@ public class MovieController {
 
         return movieMainService.mainBanner();
     }
+
+    @GetMapping("/TopTenTalk")
+    @Operation(summary = "영화톡 Top10",description = "전체 또는 선택한 장르의 30일 까지의 리뷰많은 영화 10개,영화당 리뷰 3개 표시")
+    public ResponseEntity<?> TopTenTalk(Long genreId){
+
+        return movieMainService.TopTenTalk(genreId);
+    }
 }
