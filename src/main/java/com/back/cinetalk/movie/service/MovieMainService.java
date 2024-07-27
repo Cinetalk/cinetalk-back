@@ -64,8 +64,6 @@ public class MovieMainService {
 
     QReviewEntity review = reviewEntity;
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
-    QBadgeEntity badge = QBadgeEntity.badgeEntity;
-    QUserEntity user = QUserEntity.userEntity;
     QUserBadgeEntity userBadge = QUserBadgeEntity.userBadgeEntity;
     QKeywordEntity keyword = QKeywordEntity.keywordEntity;
 
@@ -490,11 +488,13 @@ public class MovieMainService {
     }
 
     //TODO 영화톡 TOP10
-    public ResponseEntity<?> TopTenTalk(Long genreId){
+    public ResponseEntity<?> TopTenTalk(Long genreId) throws IOException {
+
+        List<Long> movieIdList = new ArrayList<>();
 
         if (genreId == 0){
 
-            List<Long> fetch = queryFactory.select(review.movieId)
+            movieIdList = queryFactory.select(review.movieId)
                     .from(review)
                     .where(review.parentReview.isNull()
                     .and(review.spoiler.eq(false))
@@ -506,9 +506,37 @@ public class MovieMainService {
 
         }else{
 
+            movieIdList = queryFactory.select(reviewGenre.review.movieId)
+                    .from(reviewGenre)
+                    .where(reviewGenre.genre.id.eq(genreId)
+                            .and(review.spoiler.eq(false))
+                            .and(review.parentReview.isNull()
+                                    .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN)))))
+                    .groupBy(reviewGenre.review.movieId)
+                    .orderBy(reviewGenre.review.count().desc())
+                    .limit(10)
+                    .fetch();
         }
 
-        return null;
+        List<TopTenDTO> resultList = new ArrayList<>();
+
+        for(Long movieId: movieIdList){
+
+            Map<String, Object> oneByID = getOneByID(movieId);
+
+            TopTenDTO result = TopTenDTO.builder()
+                    .movieId(movieId)
+                    .movienm(oneByID.get("title").toString())
+                    .poster_path("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString())
+                    .release_date(oneByID.get("release_date").toString()) //문자열 잘라야됨
+                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
+                    .TMDBRate(Double.valueOf(oneByID.get("vote_average").toString()))
+                    .build();
+
+            resultList.add(result);
+        }
+
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
 
