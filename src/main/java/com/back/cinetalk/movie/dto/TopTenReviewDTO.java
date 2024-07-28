@@ -17,7 +17,7 @@ public class TopTenReviewDTO {
 
     private String content;
 
-    private int likeCount;
+    private Long likeCount;
 
     private byte[] profile;
 

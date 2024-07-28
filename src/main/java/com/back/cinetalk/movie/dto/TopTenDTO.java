@@ -28,5 +28,7 @@ public class TopTenDTO {
 
     private Double rate;
 
+    private Long reviewCount;
+
     private List<TopTenReviewDTO> reviewList;
 }
