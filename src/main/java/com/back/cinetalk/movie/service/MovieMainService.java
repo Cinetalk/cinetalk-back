@@ -8,6 +8,7 @@ import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.dto.*;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
+import com.back.cinetalk.rate.like.entity.QReviewLikeEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
@@ -66,6 +67,7 @@ public class MovieMainService {
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
     QUserBadgeEntity userBadge = QUserBadgeEntity.userBadgeEntity;
     QKeywordEntity keyword = QKeywordEntity.keywordEntity;
+    QReviewLikeEntity reviewLike = QReviewLikeEntity.reviewLikeEntity;
 
     //TODO 최신 영화 받아오기
     public List<Map<String, Object>> nowPlayingList() throws IOException {
@@ -524,6 +526,36 @@ public class MovieMainService {
 
             Map<String, Object> oneByID = getOneByID(movieId);
 
+            Double rate = queryFactory.select(review.star.avg())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.movieId.eq(movieId)))
+                    .fetchOne();
+
+            Long reviewCount = queryFactory.select(review.count())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.movieId.eq(movieId)))
+                    .fetchOne();
+
+            NumberTemplate<Long> likeCountSubquery = Expressions.numberTemplate(Long.class,
+                    "(select count(*) from ReviewLikeEntity where review.id = {0})", review.id);
+
+            List<TopTenReviewDTO> reviewList = queryFactory.select(Projections.constructor(
+                            TopTenReviewDTO.class,
+                            review.id.as("reviewId"),
+                            review.star,
+                            review.content,
+                            likeCountSubquery.as("likeCount"),
+                            review.user.profile))
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.spoiler.eq(false))
+                            .and(review.movieId.eq(movieId)))
+                    .orderBy(likeCountSubquery.desc())
+                    .limit(3)
+                    .fetch();
+
             TopTenDTO result = TopTenDTO.builder()
                     .movieId(movieId)
                     .movienm(oneByID.get("title").toString())
@@ -531,6 +563,9 @@ public class MovieMainService {
                     .release_date(oneByID.get("release_date").toString()) //문자열 잘라야됨
                     .genres((List<Map<String, Object>>) oneByID.get("genres"))
                     .TMDBRate(Double.valueOf(oneByID.get("vote_average").toString()))
+                    .rate(rate)
+                    .reviewCount(reviewCount)
+                    .reviewList(reviewList)
                     .build();
 
             resultList.add(result);
