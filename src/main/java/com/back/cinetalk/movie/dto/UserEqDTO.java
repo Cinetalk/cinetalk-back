@@ -14,8 +14,10 @@ import java.util.List;
 public class UserEqDTO {
 
     private Long userId;
-    private String userName;
-    private String email;
+    private String nickname;
+    private byte[] profile;
+    private Long reviewCount;
+    private Long rateCount;
     private List<String> badges;
 
 }

@@ -97,19 +97,10 @@ public class MovieController {
 
     @GetMapping("/top-reviewers")
     @Operation(summary = "나와 취향이 같은 사람들",description = "리뷰를 가장 많이 작성한 유저를 가져옴")
-    @ApiResponse(responseCode = "200",description = "출력완료",
-            content = @Content(schema = @Schema(implementation = ResponseBody.class
-            )))
+    @ApiResponse(responseCode = "200",description = "출력완료", content = @Content(schema = @Schema(implementation = ResponseBody.class)))
     public ResponseEntity<?> getTopReviewers(HttpServletRequest request) throws IOException {
 
-        UserEntity currentUser = userByAccess.getUserEntity(request);
-
-        if (currentUser == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.UNAUTHORIZED);
-        }
-
-        List<UserEqDTO> topReviewers = (List<UserEqDTO>) movieMainService.UserEqReviewers(request);
-        return new ResponseEntity<>(topReviewers, HttpStatus.OK);
+        return movieMainService.UserEqReviewers(request);
     }
 
     @GetMapping("/MainBanner")
