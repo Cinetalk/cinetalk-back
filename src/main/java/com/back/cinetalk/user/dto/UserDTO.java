@@ -38,6 +38,13 @@ public class UserDTO {
 
 
     public static UserDTO ToUserDTO(UserEntity userEntity){
+
+        String profileBase64 = null;
+        byte[] profileBytes = userEntity.getProfile();
+        if (profileBytes != null) {
+            profileBase64 = Base64.getEncoder().encodeToString(profileBytes);
+        }
+
         return UserDTO.builder()
                 .id(userEntity.getId())
                 .email(userEntity.getEmail())
@@ -45,7 +52,7 @@ public class UserDTO {
                 .nickname(userEntity.getNickname())
                 .gender(userEntity.getGender())
                 .birthday(userEntity.getBirthday())
-                .profile(Base64.getEncoder().encodeToString(userEntity.getProfile()))
+                .profile(profileBase64)
                 .provider(userEntity.getProvider())
                 .role(userEntity.getRole())
                 .build();
