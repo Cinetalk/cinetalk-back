@@ -1,5 +1,6 @@
 package com.back.cinetalk.movie.controller;
 
+import com.back.cinetalk.movie.dto.BannerDTO;
 import com.back.cinetalk.movie.dto.MovieDetailDTO;
 import com.back.cinetalk.movie.dto.UserEqDTO;
 import com.back.cinetalk.movie.service.MainColorExtract;
@@ -87,6 +88,8 @@ public class MovieController {
     }
 
     @GetMapping("/HoxyWatching")
+    @Operation(summary = "혹시 이 영화 보셨나요?"
+            ,description = "사용자가 평가하지 않는 영화들 중 평가가 많은 영화 리스트 출력,사용자가 평가를 했다면 많이 평가한 장르의 영화를 보여줌")
     public ResponseEntity<?> HoxyWatching(HttpServletRequest request) throws IOException {
 
         return movieMainService.HoxyWatching(request);
@@ -94,18 +97,25 @@ public class MovieController {
 
     @GetMapping("/top-reviewers")
     @Operation(summary = "나와 취향이 같은 사람들",description = "리뷰를 가장 많이 작성한 유저를 가져옴")
-    @ApiResponse(responseCode = "200",description = "출력완료",
-            content = @Content(schema = @Schema(implementation = ResponseBody.class
-            )))
+    @ApiResponse(responseCode = "200",description = "출력완료", content = @Content(schema = @Schema(implementation = ResponseBody.class)))
     public ResponseEntity<?> getTopReviewers(HttpServletRequest request) throws IOException {
 
-        UserEntity currentUser = userByAccess.getUserEntity(request);
+        return movieMainService.UserEqReviewers(request);
+    }
 
-        if (currentUser == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.UNAUTHORIZED);
-        }
+    @GetMapping("/MainBanner")
+    @Operation(summary = "메인 페이지 배너",description = "최근 일주일 동안 리뷰가 가장 많이 달린 영화 TOP 3")
+    @ApiResponse(responseCode = "200",description = "출력완료",
+            content = @Content(schema = @Schema(implementation = BannerDTO.class)))
+    public ResponseEntity<?> MainBanner() throws IOException {
 
-        List<UserEqDTO> topReviewers = (List<UserEqDTO>) movieMainService.UserEqReviewers(request);
-        return new ResponseEntity<>(topReviewers, HttpStatus.OK);
+        return movieMainService.mainBanner();
+    }
+
+    @GetMapping("/TopTenTalk")
+    @Operation(summary = "영화톡 Top10",description = "전체 또는 선택한 장르의 30일 까지의 리뷰많은 영화 10개,영화당 리뷰 3개 표시")
+    public ResponseEntity<?> TopTenTalk(@RequestParam(value = "genreId") Long genreId) throws IOException {
+
+        return movieMainService.TopTenTalk(genreId);
     }
 }

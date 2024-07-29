@@ -4,11 +4,11 @@ import com.back.cinetalk.badge.entity.BadgeEntity;
 import com.back.cinetalk.badge.entity.QBadgeEntity;
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.genre.entity.QGenreEntity;
-import com.back.cinetalk.movie.dto.HoxyDTO;
-import com.back.cinetalk.movie.dto.MovieDTO;
-import com.back.cinetalk.movie.dto.UserEqDTO;
+import com.back.cinetalk.keyword.entity.QKeywordEntity;
+import com.back.cinetalk.movie.dto.*;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
+import com.back.cinetalk.rate.like.entity.QReviewLikeEntity;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
@@ -41,6 +41,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,84 +65,9 @@ public class MovieMainService {
 
     QReviewEntity review = reviewEntity;
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
-    QBadgeEntity badge = QBadgeEntity.badgeEntity;
-    QUserEntity user = QUserEntity.userEntity;
     QUserBadgeEntity userBadge = QUserBadgeEntity.userBadgeEntity;
-
-    //TODO 최신 영화 받아오기
-    public List<Map<String, Object>> nowPlayingList() throws IOException {
-
-        MovieEntity time = movieRepository.findFirstByOrderByCreatedAtAsc();
-
-        LocalDate createdAt = time.getCreatedAt().toLocalDate();
-
-        LocalDate nowDate = LocalDate.now();
-
-        Duration duration = Duration.between(createdAt.atStartOfDay(), nowDate.atStartOfDay());
-        long days = duration.toDays();
-
-        List<Map<String, Object>> result = new ArrayList<>();
-
-        log.info("diffOfDay: " + days);
-
-        if (days > 6) {
-
-            movieRepository.deleteAll();
-
-            List<Map<String, Object>> list = getNewMovie.MainList();
-
-            for (Map<String, Object> info : list) {
-
-                Map<String, Object> map = getOneByName((String) info.get("movieNm"));
-
-                if (map != null) {
-
-                    MovieDTO movieDTO = new MovieDTO();
-
-                    int movieid = (int) map.get("id");
-                    movieDTO.setMovieId(Long.valueOf(movieid));
-                    movieDTO.setMovienm((String) map.get("title"));
-                    movieDTO.setAudiAcc(Integer.parseInt((String) info.get("audiAcc")));
-
-                    MovieEntity movieEntity = MovieEntity.ToMovieEntity(movieDTO);
-
-                    movieRepository.save(movieEntity);
-
-                    result.add(map);
-                }
-            }
-        } else {
-
-            List<MovieEntity> list = movieRepository.findAll();
-
-            for (MovieEntity movieEntity : list) {
-                Long movieId = movieEntity.getMovieId();
-
-                result.add(getOneByID(movieId));
-            }
-        }
-        return result;
-    }
-
-    //TODO 영화 이름 으로 영화 정보 받기
-    public Map<String, Object> getOneByName(String query) throws IOException {
-
-        log.info("query : " + query);
-
-        String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query=" + query;
-
-        Map<String, Object> responsebody = callAPI.callAPI(url);
-
-
-        List<Map<String, Object>> resultList = (List<Map<String, Object>>) responsebody.get("results");
-
-        if (!resultList.isEmpty()) {
-
-            return resultList.get(0);
-        } else {
-            return null;
-        }
-    }
+    QKeywordEntity keyword = QKeywordEntity.keywordEntity;
+    QReviewLikeEntity reviewLike = QReviewLikeEntity.reviewLikeEntity;
 
     //TODO movie_id 로 영화 정보 받기
     public Map<String, Object> getOneByID(Long movie_id) throws IOException {
@@ -219,8 +145,6 @@ public class MovieMainService {
 
         // 오늘 날짜 설정
         LocalDate currentDate = LocalDate.now();
-
-        log.info("RegDate :" + currentDate);
 
         // 오늘 자 리뷰 가져오기
         List<String> reviewList = queryFactory
@@ -307,25 +231,14 @@ public class MovieMainService {
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
-    /*
-    나와 취향이 비슷한 사람들
-    case 1. 내가 장착한 뱃지를 기준으로 작성한 리뷰가 많은 사용자 순
-    casw 2. 리뷰가 많은 사용자
-
-    1. 리뷰를 많이 작성한 유저를 가져오고
-    2. 그 중에서 내가 장착한 뱃지가 있으면 먼저 가져온다
-    * */
-
+    //TODO 나와 취향이 비슷한 사람들
     public ResponseEntity<?> UserEqReviewers(HttpServletRequest request) throws IOException {
 
-        UserEntity userEntity = userByAccess.getUserEntity(request);
+        String access = request.getHeader("access");
 
-        // 유저가 갖고 있는 뱃지 목록 조회
-        List<Long> currentUserBadgeIds = queryFactory
-                .select(userBadge.badge.id)
-                .from(userBadge)
-                .where(userBadge.user.eq(userEntity))
-                .fetch();
+        NumberTemplate<Long> likeCountSubquery = Expressions.numberTemplate(Long.class,
+                "(select count(*) from ReviewLikeEntity where review.id = {0})", review.id);
+
 
         // 리뷰를 많이 작성한 유저 조회
         List<UserEntity> fetch = queryFactory.select(review.user)
@@ -334,6 +247,20 @@ public class MovieMainService {
                 .groupBy(review.user)
                 .orderBy(review.count().desc())
                 .fetch();
+
+        if(access == null){
+
+
+        }
+
+        // 유저가 갖고 있는 뱃지 목록 조회
+        List<Long> currentUserBadgeIds = queryFactory
+                .select(userBadge.badge.id)
+                .from(userBadge)
+                .where(userBadge.user.eq(userEntity))
+                .fetch();
+
+
 
         if(currentUserBadgeIds.isEmpty()){
 
@@ -351,28 +278,11 @@ public class MovieMainService {
 
         List<UserEqDTO> resultList = new ArrayList<>();
 
-        /*
-        for (UserEntity u : moreReviewUsers) {
-            List<String> badges = u.getUserBadgeEntityList().stream()
-                    .map(ub -> ub.getBadge().getName())
-                    .collect(Collectors.toList());
-            UserEqDTO userEq = UserEqDTO.builder()
-                    .userId(u.getId())
-                    .userName(u.getNickname())
-                    .email(u.getEmail())
-                    .badges(badges)
-                    .build();
-            resultList.add(userEq);
-        }
-
-
-         */
-
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
-
+    //TODO 혹시 이 영화 보셨나요?
     public ResponseEntity<?> HoxyWatching(HttpServletRequest request) throws IOException {
 
         UserEntity userEntity = userByAccess.getUserEntity(request);
@@ -387,8 +297,6 @@ public class MovieMainService {
         List<Long> movieList = new ArrayList<>();
 
         if(genreEntity == null){
-
-            System.out.println("장르없나봐");
             
             movieList = queryFactory.select(review.movieId)
                     .from(review)
@@ -432,9 +340,228 @@ public class MovieMainService {
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
+    //TODO 메인페이지 배너
+    public ResponseEntity<?> mainBanner() throws IOException {
+
+        List<Long> MovieIdList = queryFactory.select(review.movieId).from(review)
+                .where(review.parentReview.isNull()
+                        .and(review.createdAt.after(LocalDateTime.now().minusDays(7).with(LocalTime.MIN))))
+                .groupBy(review.movieId)
+                .orderBy(review.count().desc())
+                .orderBy(review.movieId.asc())
+                .limit(3)
+                .fetch();
+
+        List<BannerDTO> resultList = new ArrayList<BannerDTO>();
+
+        for(Long movieId: MovieIdList){
+
+            Map<String, Object> oneByID = getOneByID(movieId);
+
+            Double rate = queryFactory.select(review.star.avg())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.movieId.eq(movieId)))
+                    .fetchOne();
+
+            String topKeyword = queryFactory.select(keyword.keyword)
+                    .from(keyword)
+                    .where(keyword.movieId.eq(movieId))
+                    .groupBy(keyword.keyword)
+                    .orderBy(keyword.count.desc())
+                    .limit(1)
+                    .fetchOne();
+
+            List<BannerReviewDTO> ReviewList = queryFactory.select(Projections.constructor(BannerReviewDTO.class, review.star, review.content, review.createdAt))
+                    .from(review)
+                    .where(review.movieId.eq(movieId)
+                            .and(review.parentReview.isNull()
+                                    .and(review.spoiler.eq(false))))
+                    .orderBy(review.createdAt.desc())
+                    .limit(5)
+                    .fetch();
+
+            BannerDTO result = BannerDTO.builder()
+                    .movieId(movieId)
+                    .movienm(oneByID.get("title").toString())
+                    .poster_path("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString())
+                    .backdrop_path("https://image.tmdb.org/t/p/original"+oneByID.get("backdrop_path").toString())
+                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
+                    .rate(rate)
+                    .keyword(topKeyword)
+                    .ReviewList(ReviewList)
+                    .build();
+
+            resultList.add(result);
+        }
+
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
+
+    //TODO 영화톡 TOP10
+    public ResponseEntity<?> TopTenTalk(Long genreId) throws IOException {
+
+        List<Long> movieIdList = new ArrayList<>();
+
+        if (genreId == 0){
+
+            movieIdList = queryFactory.select(review.movieId)
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                    .and(review.spoiler.eq(false))
+                    .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN))))
+                    .groupBy(review.movieId)
+                    .orderBy(review.count().desc())
+                    .limit(10)
+                    .fetch();
+
+        }else{
+
+            movieIdList = queryFactory.select(reviewGenre.review.movieId)
+                    .from(reviewGenre)
+                    .where(reviewGenre.genre.id.eq(genreId)
+                            .and(review.spoiler.eq(false))
+                            .and(review.parentReview.isNull()
+                                    .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN)))))
+                    .groupBy(reviewGenre.review.movieId)
+                    .orderBy(reviewGenre.review.count().desc())
+                    .limit(10)
+                    .fetch();
+        }
+
+        List<TopTenDTO> resultList = new ArrayList<>();
+
+        for(Long movieId: movieIdList){
+
+            Map<String, Object> oneByID = getOneByID(movieId);
+
+            Double rate = queryFactory.select(review.star.avg())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.movieId.eq(movieId)))
+                    .fetchOne();
+
+            Long reviewCount = queryFactory.select(review.count())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.movieId.eq(movieId)))
+                    .fetchOne();
+
+            NumberTemplate<Long> likeCountSubquery = Expressions.numberTemplate(Long.class,
+                    "(select count(*) from ReviewLikeEntity where review.id = {0})", review.id);
+
+            List<TopTenReviewDTO> reviewList = queryFactory.select(Projections.constructor(
+                            TopTenReviewDTO.class,
+                            review.id.as("reviewId"),
+                            review.star,
+                            review.content,
+                            likeCountSubquery.as("likeCount"),
+                            review.user.profile))
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.spoiler.eq(false))
+                            .and(review.movieId.eq(movieId)))
+                    .orderBy(likeCountSubquery.desc())
+                    .limit(3)
+                    .fetch();
+
+            TopTenDTO result = TopTenDTO.builder()
+                    .movieId(movieId)
+                    .movienm(oneByID.get("title").toString())
+                    .poster_path("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString())
+                    .release_date(oneByID.get("release_date").toString()) //문자열 잘라야됨
+                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
+                    .TMDBRate(Double.valueOf(oneByID.get("vote_average").toString()))
+                    .rate(rate)
+                    .reviewCount(reviewCount)
+                    .reviewList(reviewList)
+                    .build();
+
+            resultList.add(result);
+        }
+
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
+
+
     //TODO 전체 리뷰 갯수
     public long TotalReviewCount(){
 
         return reviewRepository.count();
+    }
+
+    //TODO 최신 영화 받아오기
+    public List<Map<String, Object>> nowPlayingList() throws IOException {
+
+        MovieEntity time = movieRepository.findFirstByOrderByCreatedAtAsc();
+
+        LocalDate createdAt = time.getCreatedAt().toLocalDate();
+
+        LocalDate nowDate = LocalDate.now();
+
+        Duration duration = Duration.between(createdAt.atStartOfDay(), nowDate.atStartOfDay());
+        long days = duration.toDays();
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        log.info("diffOfDay: " + days);
+
+        if (days > 6) {
+
+            movieRepository.deleteAll();
+
+            List<Map<String, Object>> list = getNewMovie.MainList();
+
+            for (Map<String, Object> info : list) {
+
+                Map<String, Object> map = getOneByName((String) info.get("movieNm"));
+
+                if (map != null) {
+
+                    MovieDTO movieDTO = new MovieDTO();
+
+                    int movieid = (int) map.get("id");
+                    movieDTO.setMovieId(Long.valueOf(movieid));
+                    movieDTO.setMovienm((String) map.get("title"));
+                    movieDTO.setAudiAcc(Integer.parseInt((String) info.get("audiAcc")));
+
+                    MovieEntity movieEntity = MovieEntity.ToMovieEntity(movieDTO);
+
+                    movieRepository.save(movieEntity);
+
+                    result.add(map);
+                }
+            }
+        } else {
+
+            List<MovieEntity> list = movieRepository.findAll();
+
+            for (MovieEntity movieEntity : list) {
+                Long movieId = movieEntity.getMovieId();
+
+                result.add(getOneByID(movieId));
+            }
+        }
+        return result;
+    }
+
+    //TODO 영화 이름 으로 영화 정보 받기
+    public Map<String, Object> getOneByName(String query) throws IOException {
+
+        log.info("query : " + query);
+
+        String url = "https://api.themoviedb.org/3/search/movie?include_adult=true&language=ko&page=1&query=" + query;
+
+        Map<String, Object> responsebody = callAPI.callAPI(url);
+
+
+        List<Map<String, Object>> resultList = (List<Map<String, Object>>) responsebody.get("results");
+
+        if (!resultList.isEmpty()) {
+
+            return resultList.get(0);
+        } else {
+            return null;
+        }
     }
 }

@@ -5,19 +5,21 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEqDTO {
+public class TopTenReviewDTO {
 
-    private Long userId;
-    private String nickname;
+    private Long reviewId;
+
+    private Double star;
+
+    private String content;
+
+    private Long likeCount;
+
     private byte[] profile;
-    private Long reviewCount;
-    private Long rateCount;
-    private List<String> badges;
+
 
 }
