@@ -236,48 +236,78 @@ public class MovieMainService {
 
         String access = request.getHeader("access");
 
-        NumberTemplate<Long> likeCountSubquery = Expressions.numberTemplate(Long.class,
-                "(select count(*) from ReviewLikeEntity where review.id = {0})", review.id);
+        List<Long> BadgeIds = new ArrayList<>();
 
-
-        // 리뷰를 많이 작성한 유저 조회
-        List<UserEntity> fetch = queryFactory.select(review.user)
-                .from(review)
-                .where(review.parentReview.isNull())
-                .groupBy(review.user)
-                .orderBy(review.count().desc())
-                .fetch();
-
-        if(access == null){
-
-
+        if(access != null){
+            // 유저가 갖고 있는 뱃지 목록 조회
+            BadgeIds = queryFactory
+                    .select(userBadge.badge.id)
+                    .from(userBadge)
+                    .where(userBadge.user.eq(userEntity))
+                    .fetch();
         }
 
-        // 유저가 갖고 있는 뱃지 목록 조회
-        List<Long> currentUserBadgeIds = queryFactory
-                .select(userBadge.badge.id)
-                .from(userBadge)
-                .where(userBadge.user.eq(userEntity))
-                .fetch();
+        List<UserEntity> userList = new ArrayList<>();
 
+        if(BadgeIds.isEmpty()){
 
-
-        if(currentUserBadgeIds.isEmpty()){
-
-            return new ResponseEntity<>(fetch,HttpStatus.OK);
-        }else{
-
-            List<UserEntity> fetch1 = queryFactory.select(userBadge.user)
-                    .from(userBadge)
-                    .where(userBadge.badge.id.in(currentUserBadgeIds))
-                    .groupBy(userBadge.user)
+            // 리뷰를 많이 작성한 유저 조회
+            userList = queryFactory.select(review.user)
+                    .from(review)
+                    .where(review.parentReview.isNull())
+                    .groupBy(review.user)
+                    .orderBy(review.count().desc())
+                    .limit(10)
                     .fetch();
 
-        }
+        }else{
 
+            userList = queryFactory.select(review.user)
+                    .from(review)
+                    .leftJoin(userBadge).on(review.user.eq(userBadge.user))
+                    .where(review.parentReview.isNull()
+                            .and(userBadge.id.in(BadgeIds)))
+                    .groupBy(review.user)
+                    .orderBy(review.count().desc())
+                    .limit(10)
+                    .fetch();
+        }
 
         List<UserEqDTO> resultList = new ArrayList<>();
 
+
+        for (UserEntity userEntity : userList) {
+
+            Long reviewCount = queryFactory.select(review.count())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.user.id.eq(userEntity.getId())))
+                    .fetchOne();
+
+            Long rateCount = queryFactory.select(reviewLike.count())
+                    .from(reviewLike)
+                    .where(reviewLike.review.parentReview.isNull()
+                            .and(reviewLike.review.user.id.eq(userEntity.getId())))
+                    .groupBy(reviewLike.review.user)
+                    .fetchOne();
+
+            List<BadgeEntity> badges = queryFactory.select(userBadge.badge)
+                    .from(userBadge)
+                    .where(userBadge.user.id.eq(userEntity.getId()))
+                    .fetch();
+
+
+            UserEqDTO result = UserEqDTO.builder()
+                    .userId(userEntity.getId())
+                    .nickname(userEntity.getNickname())
+                    .profile(userEntity.getProfile())
+                    .reviewCount(reviewCount)
+                    .rateCount(rateCount)
+                    .badges(badges)
+                    .build();
+
+            resultList.add(result);
+        }
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
