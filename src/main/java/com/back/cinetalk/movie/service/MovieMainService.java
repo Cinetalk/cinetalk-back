@@ -247,22 +247,24 @@ public class MovieMainService {
                     .fetch();
         }
 
-        List<UserEntity> userList = new ArrayList<>();
+        List<UserEqUserDTO> userList = new ArrayList<>();
 
         if(BadgeIds.isEmpty()){
 
             // 리뷰를 많이 작성한 유저 조회
-            userList = queryFactory.select(review.user)
+            userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
+                            review.user.id,review.user.nickname,review.user.profile))
                     .from(review)
                     .where(review.parentReview.isNull())
-                    .groupBy(review.user)
+                    .groupBy(review.user.id)
                     .orderBy(review.count().desc())
                     .limit(10)
                     .fetch();
 
         }else{
 
-            userList = queryFactory.select(review.user)
+            userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
+                            review.user.id,review.user.nickname,review.user.profile))
                     .from(review)
                     .leftJoin(userBadge).on(review.user.eq(userBadge.user))
                     .where(review.parentReview.isNull()
@@ -276,29 +278,30 @@ public class MovieMainService {
         List<UserEqDTO> resultList = new ArrayList<>();
 
 
-        for (UserEntity userEntity : userList) {
+        for (UserEqUserDTO userEntity : userList) {
 
             Long reviewCount = queryFactory.select(review.count())
                     .from(review)
                     .where(review.parentReview.isNull()
-                            .and(review.user.id.eq(userEntity.getId())))
+                            .and(review.user.id.eq(userEntity.getUserId())))
                     .fetchOne();
 
             Long rateCount = queryFactory.select(reviewLike.count())
                     .from(reviewLike)
                     .where(reviewLike.review.parentReview.isNull()
-                            .and(reviewLike.review.user.id.eq(userEntity.getId())))
+                            .and(reviewLike.review.user.id.eq(userEntity.getUserId())))
                     .groupBy(reviewLike.review.user)
                     .fetchOne();
 
-            List<BadgeEntity> badges = queryFactory.select(userBadge.badge)
+            List<UserEqBadgeDTO> badges = queryFactory.select(Projections.constructor(UserEqBadgeDTO.class,
+                            userBadge.badge.id.as("badge_id"),userBadge.badge.name.as("badge_name")))
                     .from(userBadge)
-                    .where(userBadge.user.id.eq(userEntity.getId()))
+                    .where(userBadge.user.id.eq(userEntity.getUserId()))
                     .fetch();
 
 
             UserEqDTO result = UserEqDTO.builder()
-                    .userId(userEntity.getId())
+                    .userId(userEntity.getUserId())
                     .nickname(userEntity.getNickname())
                     .profile(userEntity.getProfile())
                     .reviewCount(reviewCount)
