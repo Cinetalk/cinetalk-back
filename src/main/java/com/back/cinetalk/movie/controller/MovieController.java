@@ -89,7 +89,7 @@ public class MovieController {
 
     @GetMapping("/HoxyWatching")
     @Operation(summary = "혹시 이 영화 보셨나요?"
-            ,description = "사용자가 평가하지 않는 영화들 중 평가가 많은 영화 리스트 출력,사용자가 평가를 했다면 많이 평가한 장르의 영화를 보여줌")
+            ,description = "사용자가 평가하지 않는 영화들 중 평가가 많은 영화 리스트 출력,사용자가 평가를 했다면 많이 평가한 장르의 영화를 보여줌,비로그인 시 평가가 많은 영화보여줌")
     public ResponseEntity<?> HoxyWatching(HttpServletRequest request) throws IOException {
 
         return movieMainService.HoxyWatching(request);
