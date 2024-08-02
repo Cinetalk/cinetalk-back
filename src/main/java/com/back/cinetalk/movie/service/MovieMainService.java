@@ -18,6 +18,7 @@ import com.back.cinetalk.user.MyPage.component.UserByAccess;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
+import com.back.cinetalk.user.repository.UserRepository;
 import com.back.cinetalk.userBadge.entity.QUserBadgeEntity;
 import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import com.querydsl.core.Tuple;
@@ -62,6 +63,7 @@ public class MovieMainService {
     private final JPAQueryFactory queryFactory;
     private final ReviewRepository reviewRepository;
     private final UserByAccess userByAccess;
+    private final UserRepository userRepository;
 
     QReviewEntity review = reviewEntity;
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
@@ -318,19 +320,12 @@ public class MovieMainService {
     //TODO 혹시 이 영화 보셨나요?
     public ResponseEntity<?> HoxyWatching(HttpServletRequest request) throws IOException {
 
-        UserEntity userEntity = userByAccess.getUserEntity(request);
-
-        GenreEntity genreEntity = queryFactory.select(reviewGenre.genre).from(reviewGenre)
-                .where(reviewGenre.review.user.eq(userEntity).and(reviewGenre.review.parentReview.isNull()))
-                .groupBy(reviewGenre.genre)
-                .orderBy(reviewGenre.count().desc())
-                .limit(1)
-                .fetchOne();
+        String access = request.getHeader("access");
 
         List<Long> movieList = new ArrayList<>();
 
-        if(genreEntity == null){
-            
+        if(access == null){
+
             movieList = queryFactory.select(review.movieId)
                     .from(review)
                     .where(review.parentReview.isNull())
@@ -338,18 +333,42 @@ public class MovieMainService {
                     .orderBy(review.count().desc())
                     .limit(10)
                     .fetch();
+
         }else{
 
-            movieList = queryFactory
-                    .select(reviewGenre.review.movieId).from(reviewGenre)
-                    .where(reviewGenre.genre.id.eq(genreEntity.getId())
-                            .and(reviewGenre.review.user.ne(userEntity))
-                            .and(reviewGenre.review.parentReview.isNull()))
-                    .groupBy(reviewGenre.review.movieId)
-                    .orderBy(reviewGenre.review.count().desc())
-                    .limit(10)
-                    .fetch();
+            String email = jwtUtil.getEmail(access);
 
+            UserEntity userEntity = userRepository.findByEmail(email);
+
+            GenreEntity genreEntity = queryFactory.select(reviewGenre.genre).from(reviewGenre)
+                    .where(reviewGenre.review.user.eq(userEntity).and(reviewGenre.review.parentReview.isNull()))
+                    .groupBy(reviewGenre.genre)
+                    .orderBy(reviewGenre.count().desc())
+                    .limit(1)
+                    .fetchOne();
+
+            if(genreEntity == null){
+
+                movieList = queryFactory.select(review.movieId)
+                        .from(review)
+                        .where(review.parentReview.isNull())
+                        .groupBy(review.movieId)
+                        .orderBy(review.count().desc())
+                        .limit(10)
+                        .fetch();
+            }else{
+
+                movieList = queryFactory
+                        .select(reviewGenre.review.movieId).from(reviewGenre)
+                        .where(reviewGenre.genre.id.eq(genreEntity.getId())
+                                .and(reviewGenre.review.user.ne(userEntity))
+                                .and(reviewGenre.review.parentReview.isNull()))
+                        .groupBy(reviewGenre.review.movieId)
+                        .orderBy(reviewGenre.review.count().desc())
+                        .limit(10)
+                        .fetch();
+
+            }
         }
 
         List<HoxyDTO> resultList = new ArrayList<>();
