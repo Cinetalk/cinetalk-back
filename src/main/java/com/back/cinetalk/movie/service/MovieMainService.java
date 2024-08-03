@@ -1,26 +1,23 @@
 package com.back.cinetalk.movie.service;
 
-import com.back.cinetalk.badge.entity.BadgeEntity;
-import com.back.cinetalk.badge.entity.QBadgeEntity;
 import com.back.cinetalk.genre.entity.GenreEntity;
-import com.back.cinetalk.genre.entity.QGenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.dto.*;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.rate.like.entity.QReviewLikeEntity;
+import com.back.cinetalk.rate.like.repository.ReviewLikeRepository;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.reviewGenre.entity.QReviewGenreEntity;
 import com.back.cinetalk.user.MyPage.component.UserByAccess;
-import com.back.cinetalk.user.entity.QUserEntity;
+import com.back.cinetalk.user.MyPage.dto.activity.ReviewByUserResponseDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
 import com.back.cinetalk.user.repository.UserRepository;
 import com.back.cinetalk.userBadge.entity.QUserBadgeEntity;
-import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -42,14 +39,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.back.cinetalk.review.entity.QReviewEntity.*;
 import static com.back.cinetalk.user.entity.QUserEntity.*;
-import static com.back.cinetalk.userBadge.entity.QUserBadgeEntity.*;
 
 @Slf4j
 @Service
@@ -64,6 +58,7 @@ public class MovieMainService {
     private final ReviewRepository reviewRepository;
     private final UserByAccess userByAccess;
     private final UserRepository userRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     QReviewEntity review = reviewEntity;
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
@@ -279,7 +274,6 @@ public class MovieMainService {
 
         List<UserEqDTO> resultList = new ArrayList<>();
 
-
         for (UserEqUserDTO userEntity : userList) {
 
             Long reviewCount = queryFactory.select(review.count())
@@ -301,6 +295,8 @@ public class MovieMainService {
                     .where(userBadge.user.id.eq(userEntity.getUserId()))
                     .fetch();
 
+            List<ReviewByUserResponseDTO> reviews = ReviewByUser(userEntity.getUserId());
+
 
             UserEqDTO result = UserEqDTO.builder()
                     .userId(userEntity.getUserId())
@@ -309,12 +305,60 @@ public class MovieMainService {
                     .reviewCount(reviewCount)
                     .rateCount(rateCount)
                     .badges(badges)
+                    .reviews(reviews)
                     .build();
 
             resultList.add(result);
         }
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
+
+    public List<ReviewByUserResponseDTO> ReviewByUser(Long userId) throws IOException {
+
+        //UserEntity user = userByAccess.getUserEntity(request);
+
+        //List<ReviewEntity> reviewList = new ArrayList<>();
+
+        //reviewList = reviewRepository.findByUserAndParentReviewIsNullOrderByCreatedAtDesc(user);
+
+        List<ReviewEntity> reviewList = queryFactory.select(review)
+                .from(review)
+                .where(review.parentReview.isNull()
+                        .and(review.user.id.eq(userId)))
+                .orderBy(review.createdAt.desc())
+                .limit(10)
+                .fetch();
+
+        List<ReviewByUserResponseDTO> result = new ArrayList<>();
+
+        for (ReviewEntity reviewEntity: reviewList) {
+
+            int RereviewCont = reviewRepository.countByParentReview(reviewEntity);
+
+            long rateCount = reviewLikeRepository.countByReviewId(reviewEntity.getId());
+
+            Map<String, Object> oneByID = getOneByID(reviewEntity.getMovieId());
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
+
+            String regDate = reviewEntity.getCreatedAt().format(formatter);
+
+            ReviewByUserResponseDTO responseDTO = ReviewByUserResponseDTO.builder()
+                    .review_id(reviewEntity.getId())
+                    .movie_id(reviewEntity.getMovieId())
+                    .moviewnm(reviewEntity.getMovienm())
+                    .poster_id("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path"))
+                    .star(reviewEntity.getStar())
+                    .content(reviewEntity.getContent())
+                    .RateCount(rateCount)
+                    .RereviewCount(RereviewCont)
+                    .regDate(regDate)
+                    .build();
+
+            result.add(responseDTO);
+        }
+        return result;
     }
 
     //TODO 혹시 이 영화 보셨나요?
