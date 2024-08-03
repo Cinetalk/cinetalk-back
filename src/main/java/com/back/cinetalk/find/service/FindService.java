@@ -82,12 +82,18 @@ public class FindService {
 
         for (int movieId : movieIdList) {
 
-            if(!adultContentFinder.adultFinder((long) movieId)){
+            String detailUrl = "https://api.themoviedb.org/3/movie/"+movieId+"?append_to_response=keywords&language=ko";
 
-                String detailUrl = "https://api.themoviedb.org/3/movie/"+movieId+"?language=ko";
+            Map<String, Object> movie = callAPI.callAPI(detailUrl);
 
-                Map<String, Object> movie = callAPI.callAPI(detailUrl);
+            Map<String, Object> kewordsMap = (Map<String, Object>) movie.get("keywords");
 
+            List<Map<String,Object>> kewords = (List<Map<String, Object>>) kewordsMap.get("keywords");
+
+            boolean check = kewords.stream()
+                    .anyMatch(keyword -> 155477 == (Integer) keyword.get("id"));
+
+            if(!check){
                 FindMovieDTO findMovieDTO = FindMovieDTO.builder()
                         .id(Long.valueOf((Integer) movie.get("id")))
                         .title((String) movie.get("title"))
