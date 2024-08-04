@@ -8,6 +8,7 @@ import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -17,6 +18,7 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public StateRes bookmarkMovie(Long movieId, String email) {
         UserEntity user = userRepository.findByEmail(email);
 

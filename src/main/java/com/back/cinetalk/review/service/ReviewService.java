@@ -284,7 +284,7 @@ public class ReviewService {
         return new StateRes(true);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ReviewEntity getMyReviewByMovie(Long movieId, String email) {
         UserEntity user = userRepository.findByEmail(email);
         return reviewRepository.findByUserIdAndMovieId(user.getId(), movieId)
