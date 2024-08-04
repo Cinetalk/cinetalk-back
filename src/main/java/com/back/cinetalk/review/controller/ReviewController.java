@@ -116,7 +116,7 @@ public class ReviewController {
     }
 
     @GetMapping("/my")
-    @Operation(summary = "리뷰 or 댓글 싫어요 API", description = "리뷰 혹은 댓글을 싫어요하는 API 입니다. 좋아요 API 요청 홋은 두번 API 요청시 싫어요가 취소됩니다.")
+    @Operation(summary = "내가 작성한 리뷰 조회 API", description = "특정 영화의 내가 작성한 리뷰를 조회하는 API 입니다.")
     public MyReviewResponseDTO getMyReviewByMovie(@RequestParam Long movieId, @JwtValidation String email) {
 
         ReviewEntity myReviewByMovie = reviewService.getMyReviewByMovie(movieId, email);
