@@ -316,12 +316,6 @@ public class MovieMainService {
 
     public List<ReviewByUserResponseDTO> ReviewByUser(Long userId) throws IOException {
 
-        //UserEntity user = userByAccess.getUserEntity(request);
-
-        //List<ReviewEntity> reviewList = new ArrayList<>();
-
-        //reviewList = reviewRepository.findByUserAndParentReviewIsNullOrderByCreatedAtDesc(user);
-
         List<ReviewEntity> reviewList = queryFactory.select(review)
                 .from(review)
                 .where(review.parentReview.isNull()
@@ -347,7 +341,7 @@ public class MovieMainService {
             ReviewByUserResponseDTO responseDTO = ReviewByUserResponseDTO.builder()
                     .review_id(reviewEntity.getId())
                     .movie_id(reviewEntity.getMovieId())
-                    .moviewnm(reviewEntity.getMovienm())
+                    .movienm(reviewEntity.getMovienm())
                     .poster_id("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path"))
                     .star(reviewEntity.getStar())
                     .content(reviewEntity.getContent())
@@ -423,11 +417,14 @@ public class MovieMainService {
 
             String movienm = oneByID.get("title").toString();
             String poster_path = "https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString();
+            String releaseDate = oneByID.get("release_date").toString().substring(0, 4);
 
             HoxyDTO result = HoxyDTO.builder()
                     .movieId(movieId)
                     .movienm(movienm)
                     .poster_path(poster_path)
+                    .release_date(Integer.parseInt(releaseDate))
+                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
                     .build();
 
             resultList.add(result);
