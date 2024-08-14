@@ -42,6 +42,9 @@ public enum CommonErrorCode implements ErrorCode {
     // 뱃지 관련 에러
     BADGE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 뱃지를 찾을 수 없습니다"),
 
+    // 검색 관련 에러
+    FiND_NOT_FOUND(HttpStatus.BAD_REQUEST, "검색 도중 에러가 발생하였습니다."),
+
     // 신고 관련 에러
     REPORT_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 신고한 리뷰입니다."),;
 

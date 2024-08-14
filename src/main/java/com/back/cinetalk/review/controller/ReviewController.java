@@ -114,4 +114,12 @@ public class ReviewController {
 
         return reviewService.dislikeReview(reviewId, email);
     }
+
+    @GetMapping("/my")
+    @Operation(summary = "내가 작성한 리뷰 조회 API", description = "특정 영화의 내가 작성한 리뷰를 조회하는 API 입니다.")
+    public MyReviewResponseDTO getMyReviewByMovie(@RequestParam Long movieId, @JwtValidation String email) {
+
+        ReviewEntity myReviewByMovie = reviewService.getMyReviewByMovie(movieId, email);
+        return MyReviewResponseDTO.toMyReviewResponseDTO(myReviewByMovie);
+    }
 }

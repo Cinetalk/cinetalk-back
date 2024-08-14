@@ -1,6 +1,8 @@
 package com.back.cinetalk.find.service;
 
 import com.back.cinetalk.config.dto.StateRes;
+import com.back.cinetalk.exception.errorCode.CommonErrorCode;
+import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.find.dto.FindDTO;
 import com.back.cinetalk.find.dto.FindMovieDTO;
 import com.back.cinetalk.find.dto.FindReviewDTO;
@@ -80,23 +82,33 @@ public class FindService {
 
         List<FindMovieDTO> returnList = new ArrayList<>();
 
-        for (int movieId : movieIdList) {
-
-            if(!adultContentFinder.adultFinder((long) movieId)){
-
-                String detailUrl = "https://api.themoviedb.org/3/movie/"+movieId+"?language=ko";
+        // 각 movieId에 대해 처리
+        movieIdList.forEach(movieId -> {
+            try {
+                String detailUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=keywords&language=ko";
 
                 Map<String, Object> movie = callAPI.callAPI(detailUrl);
 
-                FindMovieDTO findMovieDTO = FindMovieDTO.builder()
-                        .id(Long.valueOf((Integer) movie.get("id")))
-                        .title((String) movie.get("title"))
-                        .poster_path((String) movie.get("poster_path"))
-                        .build();
+                Map<String, Object> keywordsMap = (Map<String, Object>) movie.get("keywords");
+                List<Map<String, Object>> keywords = (List<Map<String, Object>>) keywordsMap.get("keywords");
 
-                returnList.add(findMovieDTO);
+                boolean containsKeywordId = keywords.stream()
+                        .anyMatch(keyword -> 155477 == (Integer) keyword.get("id"));
+
+                if (!containsKeywordId) {
+                    FindMovieDTO findMovieDTO = FindMovieDTO.builder()
+                            .id((long) movieId)
+                            .title((String) movie.get("title"))
+                            .poster_path((String) movie.get("poster_path"))
+                            .build();
+
+                    returnList.add(findMovieDTO);
+                }
+            } catch (Exception e) {
+                throw new RestApiException(CommonErrorCode.FiND_NOT_FOUND);
             }
-        }
+        });
+
         return returnList;
     }
 

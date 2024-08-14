@@ -1,5 +1,7 @@
 package com.back.cinetalk.movie.dto;
 
+import com.back.cinetalk.badge.entity.BadgeEntity;
+import com.back.cinetalk.user.MyPage.dto.activity.ReviewByUserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +20,7 @@ public class UserEqDTO {
     private byte[] profile;
     private Long reviewCount;
     private Long rateCount;
-    private List<String> badges;
+    private List<UserEqBadgeDTO> badges;
+    private List<ReviewByUserResponseDTO> reviews;
 
 }

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , QuerydslPredicateExecutor<ReviewEntity>, ReviewRepositoryCustom {
@@ -26,4 +27,6 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , Qu
 
    @Query("SELECT COUNT(rg) FROM ReviewGenreEntity rg JOIN rg.review r WHERE r.user = :user AND rg.genre = :genre")
    long countByUserAndGenre(@Param("user") UserEntity user, @Param("genre") GenreEntity genre);
+
+   Optional<ReviewEntity> findByUserIdAndMovieId(Long userId, Long movieId);
 }

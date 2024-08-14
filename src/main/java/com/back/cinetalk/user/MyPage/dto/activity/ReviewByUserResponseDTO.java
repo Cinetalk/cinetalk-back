@@ -13,7 +13,7 @@ public class ReviewByUserResponseDTO {
 
     private Long review_id;
     private Long movie_id;
-    private String moviewnm;
+    private String movienm;
     private String poster_id;
     private Double star;
     private String content;

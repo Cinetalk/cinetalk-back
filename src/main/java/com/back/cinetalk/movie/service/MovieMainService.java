@@ -1,25 +1,23 @@
 package com.back.cinetalk.movie.service;
 
-import com.back.cinetalk.badge.entity.BadgeEntity;
-import com.back.cinetalk.badge.entity.QBadgeEntity;
 import com.back.cinetalk.genre.entity.GenreEntity;
-import com.back.cinetalk.genre.entity.QGenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.dto.*;
 import com.back.cinetalk.movie.entity.MovieEntity;
 import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.rate.like.entity.QReviewLikeEntity;
+import com.back.cinetalk.rate.like.repository.ReviewLikeRepository;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.reviewGenre.entity.QReviewGenreEntity;
 import com.back.cinetalk.user.MyPage.component.UserByAccess;
-import com.back.cinetalk.user.entity.QUserEntity;
+import com.back.cinetalk.user.MyPage.dto.activity.ReviewByUserResponseDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
+import com.back.cinetalk.user.repository.UserRepository;
 import com.back.cinetalk.userBadge.entity.QUserBadgeEntity;
-import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -41,14 +39,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.back.cinetalk.review.entity.QReviewEntity.*;
 import static com.back.cinetalk.user.entity.QUserEntity.*;
-import static com.back.cinetalk.userBadge.entity.QUserBadgeEntity.*;
 
 @Slf4j
 @Service
@@ -62,6 +57,8 @@ public class MovieMainService {
     private final JPAQueryFactory queryFactory;
     private final ReviewRepository reviewRepository;
     private final UserByAccess userByAccess;
+    private final UserRepository userRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     QReviewEntity review = reviewEntity;
     QReviewGenreEntity reviewGenre = QReviewGenreEntity.reviewGenreEntity;
@@ -236,68 +233,137 @@ public class MovieMainService {
 
         String access = request.getHeader("access");
 
-        NumberTemplate<Long> likeCountSubquery = Expressions.numberTemplate(Long.class,
-                "(select count(*) from ReviewLikeEntity where review.id = {0})", review.id);
+        List<Long> BadgeIds = new ArrayList<>();
 
-
-        // 리뷰를 많이 작성한 유저 조회
-        List<UserEntity> fetch = queryFactory.select(review.user)
-                .from(review)
-                .where(review.parentReview.isNull())
-                .groupBy(review.user)
-                .orderBy(review.count().desc())
-                .fetch();
-
-        if(access == null){
-
-
+        if(access != null){
+            // 유저가 갖고 있는 뱃지 목록 조회
+            BadgeIds = queryFactory
+                    .select(userBadge.badge.id)
+                    .from(userBadge)
+                    .where(userBadge.user.eq(userEntity))
+                    .fetch();
         }
 
-        // 유저가 갖고 있는 뱃지 목록 조회
-        List<Long> currentUserBadgeIds = queryFactory
-                .select(userBadge.badge.id)
-                .from(userBadge)
-                .where(userBadge.user.eq(userEntity))
-                .fetch();
+        List<UserEqUserDTO> userList = new ArrayList<>();
 
+        if(BadgeIds.isEmpty()){
 
-
-        if(currentUserBadgeIds.isEmpty()){
-
-            return new ResponseEntity<>(fetch,HttpStatus.OK);
-        }else{
-
-            List<UserEntity> fetch1 = queryFactory.select(userBadge.user)
-                    .from(userBadge)
-                    .where(userBadge.badge.id.in(currentUserBadgeIds))
-                    .groupBy(userBadge.user)
+            // 리뷰를 많이 작성한 유저 조회
+            userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
+                            review.user.id,review.user.nickname,review.user.profile))
+                    .from(review)
+                    .where(review.parentReview.isNull())
+                    .groupBy(review.user.id)
+                    .orderBy(review.count().desc())
+                    .limit(10)
                     .fetch();
 
-        }
+        }else{
 
+            userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
+                            review.user.id,review.user.nickname,review.user.profile))
+                    .from(review)
+                    .leftJoin(userBadge).on(review.user.eq(userBadge.user))
+                    .where(review.parentReview.isNull()
+                            .and(userBadge.id.in(BadgeIds)))
+                    .groupBy(review.user)
+                    .orderBy(review.count().desc())
+                    .limit(10)
+                    .fetch();
+        }
 
         List<UserEqDTO> resultList = new ArrayList<>();
 
+        for (UserEqUserDTO userEntity : userList) {
+
+            Long reviewCount = queryFactory.select(review.count())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.user.id.eq(userEntity.getUserId())))
+                    .fetchOne();
+
+            Long rateCount = queryFactory.select(reviewLike.count())
+                    .from(reviewLike)
+                    .where(reviewLike.review.parentReview.isNull()
+                            .and(reviewLike.review.user.id.eq(userEntity.getUserId())))
+                    .groupBy(reviewLike.review.user)
+                    .fetchOne();
+
+            List<UserEqBadgeDTO> badges = queryFactory.select(Projections.constructor(UserEqBadgeDTO.class,
+                            userBadge.badge.id.as("badge_id"),userBadge.badge.name.as("badge_name")))
+                    .from(userBadge)
+                    .where(userBadge.user.id.eq(userEntity.getUserId()))
+                    .fetch();
+
+            List<ReviewByUserResponseDTO> reviews = ReviewByUser(userEntity.getUserId());
+
+
+            UserEqDTO result = UserEqDTO.builder()
+                    .userId(userEntity.getUserId())
+                    .nickname(userEntity.getNickname())
+                    .profile(userEntity.getProfile())
+                    .reviewCount(reviewCount)
+                    .rateCount(rateCount)
+                    .badges(badges)
+                    .reviews(reviews)
+                    .build();
+
+            resultList.add(result);
+        }
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
+
+    public List<ReviewByUserResponseDTO> ReviewByUser(Long userId) throws IOException {
+
+        List<ReviewEntity> reviewList = queryFactory.select(review)
+                .from(review)
+                .where(review.parentReview.isNull()
+                        .and(review.user.id.eq(userId)))
+                .orderBy(review.createdAt.desc())
+                .limit(10)
+                .fetch();
+
+        List<ReviewByUserResponseDTO> result = new ArrayList<>();
+
+        for (ReviewEntity reviewEntity: reviewList) {
+
+            int RereviewCont = reviewRepository.countByParentReview(reviewEntity);
+
+            long rateCount = reviewLikeRepository.countByReviewId(reviewEntity.getId());
+
+            Map<String, Object> oneByID = getOneByID(reviewEntity.getMovieId());
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
+
+            String regDate = reviewEntity.getCreatedAt().format(formatter);
+
+            ReviewByUserResponseDTO responseDTO = ReviewByUserResponseDTO.builder()
+                    .review_id(reviewEntity.getId())
+                    .movie_id(reviewEntity.getMovieId())
+                    .movienm(reviewEntity.getMovienm())
+                    .poster_id("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path"))
+                    .star(reviewEntity.getStar())
+                    .content(reviewEntity.getContent())
+                    .RateCount(rateCount)
+                    .RereviewCount(RereviewCont)
+                    .regDate(regDate)
+                    .build();
+
+            result.add(responseDTO);
+        }
+        return result;
     }
 
     //TODO 혹시 이 영화 보셨나요?
     public ResponseEntity<?> HoxyWatching(HttpServletRequest request) throws IOException {
 
-        UserEntity userEntity = userByAccess.getUserEntity(request);
-
-        GenreEntity genreEntity = queryFactory.select(reviewGenre.genre).from(reviewGenre)
-                .where(reviewGenre.review.user.eq(userEntity).and(reviewGenre.review.parentReview.isNull()))
-                .groupBy(reviewGenre.genre)
-                .orderBy(reviewGenre.count().desc())
-                .limit(1)
-                .fetchOne();
+        String access = request.getHeader("access");
 
         List<Long> movieList = new ArrayList<>();
 
-        if(genreEntity == null){
-            
+        if(access == null){
+
             movieList = queryFactory.select(review.movieId)
                     .from(review)
                     .where(review.parentReview.isNull())
@@ -305,18 +371,42 @@ public class MovieMainService {
                     .orderBy(review.count().desc())
                     .limit(10)
                     .fetch();
+
         }else{
 
-            movieList = queryFactory
-                    .select(reviewGenre.review.movieId).from(reviewGenre)
-                    .where(reviewGenre.genre.id.eq(genreEntity.getId())
-                            .and(reviewGenre.review.user.ne(userEntity))
-                            .and(reviewGenre.review.parentReview.isNull()))
-                    .groupBy(reviewGenre.review.movieId)
-                    .orderBy(reviewGenre.review.count().desc())
-                    .limit(10)
-                    .fetch();
+            String email = jwtUtil.getEmail(access);
 
+            UserEntity userEntity = userRepository.findByEmail(email);
+
+            GenreEntity genreEntity = queryFactory.select(reviewGenre.genre).from(reviewGenre)
+                    .where(reviewGenre.review.user.eq(userEntity).and(reviewGenre.review.parentReview.isNull()))
+                    .groupBy(reviewGenre.genre)
+                    .orderBy(reviewGenre.count().desc())
+                    .limit(1)
+                    .fetchOne();
+
+            if(genreEntity == null){
+
+                movieList = queryFactory.select(review.movieId)
+                        .from(review)
+                        .where(review.parentReview.isNull())
+                        .groupBy(review.movieId)
+                        .orderBy(review.count().desc())
+                        .limit(10)
+                        .fetch();
+            }else{
+
+                movieList = queryFactory
+                        .select(reviewGenre.review.movieId).from(reviewGenre)
+                        .where(reviewGenre.genre.id.eq(genreEntity.getId())
+                                .and(reviewGenre.review.user.ne(userEntity))
+                                .and(reviewGenre.review.parentReview.isNull()))
+                        .groupBy(reviewGenre.review.movieId)
+                        .orderBy(reviewGenre.review.count().desc())
+                        .limit(10)
+                        .fetch();
+
+            }
         }
 
         List<HoxyDTO> resultList = new ArrayList<>();
@@ -327,11 +417,14 @@ public class MovieMainService {
 
             String movienm = oneByID.get("title").toString();
             String poster_path = "https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString();
+            String releaseDate = oneByID.get("release_date").toString().substring(0, 4);
 
             HoxyDTO result = HoxyDTO.builder()
                     .movieId(movieId)
                     .movienm(movienm)
                     .poster_path(poster_path)
+                    .release_date(Integer.parseInt(releaseDate))
+                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
                     .build();
 
             resultList.add(result);
