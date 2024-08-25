@@ -236,11 +236,16 @@ public class MovieMainService {
         List<Long> BadgeIds = new ArrayList<>();
 
         if(access != null){
+
+            String email = jwtUtil.getEmail(access);
+
+            UserEntity byEmail = userRepository.findByEmail(email);
+
             // 유저가 갖고 있는 뱃지 목록 조회
             BadgeIds = queryFactory
                     .select(userBadge.badge.id)
                     .from(userBadge)
-                    .where(userBadge.user.eq(userEntity))
+                    .where(userBadge.user.eq(byEmail))
                     .fetch();
         }
 
