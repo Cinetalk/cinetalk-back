@@ -236,11 +236,16 @@ public class MovieMainService {
         List<Long> BadgeIds = new ArrayList<>();
 
         if(access != null){
+
+            String email = jwtUtil.getEmail(access);
+
+            UserEntity byEmail = userRepository.findByEmail(email);
+
             // 유저가 갖고 있는 뱃지 목록 조회
             BadgeIds = queryFactory
                     .select(userBadge.badge.id)
                     .from(userBadge)
-                    .where(userBadge.user.eq(userEntity))
+                    .where(userBadge.user.eq(byEmail))
                     .fetch();
         }
 
@@ -513,9 +518,9 @@ public class MovieMainService {
             movieIdList = queryFactory.select(reviewGenre.review.movieId)
                     .from(reviewGenre)
                     .where(reviewGenre.genre.id.eq(genreId)
-                            .and(review.spoiler.eq(false))
-                            .and(review.parentReview.isNull()
-                                    .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN)))))
+                            .and(reviewGenre.review.spoiler.eq(false))
+                            .and(reviewGenre.review.parentReview.isNull()
+                                    .and(reviewGenre.review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN)))))
                     .groupBy(reviewGenre.review.movieId)
                     .orderBy(reviewGenre.review.count().desc())
                     .limit(10)

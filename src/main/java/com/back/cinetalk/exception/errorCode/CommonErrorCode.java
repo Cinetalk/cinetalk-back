@@ -46,7 +46,11 @@ public enum CommonErrorCode implements ErrorCode {
     FiND_NOT_FOUND(HttpStatus.BAD_REQUEST, "검색 도중 에러가 발생하였습니다."),
 
     // 신고 관련 에러
-    REPORT_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 신고한 리뷰입니다."),;
+    REPORT_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 신고한 리뷰입니다."),
+
+    // 피드백 관련 에러
+    FEEDBACK_CONTENT_WRONG(HttpStatus.BAD_REQUEST,"피드백 내용이 옳바르지 않습니다.")
+    ;
 
 
     private final HttpStatus httpStatus;
