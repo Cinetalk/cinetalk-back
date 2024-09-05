@@ -23,7 +23,7 @@ import java.io.IOException;
 public class MyPage_InfoController {
 
     private final MyPage_InfoService myPageInfoService;
-    @PostMapping("/userInfo")
+    @GetMapping("/userInfo")
     @Operation(summary = "마이페이지 상단 유저정보",description = "토큰과 같이 요청시 유저 정보 반환")
     @ApiResponse(responseCode = "200",description = "정보 발급 성공")
     @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
