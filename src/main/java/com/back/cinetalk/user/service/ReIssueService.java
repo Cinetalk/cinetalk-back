@@ -104,6 +104,7 @@ public class ReIssueService {
 
         response.setHeader("access",newAccess);
         response.addCookie(createCookie("refresh",newRefresh));
+        response.addCookie(createAccessCookie("access",newAccess));
         log.info("토큰 재생성 성공");
 
         UserEntity userEntity = userRepository.findByEmail(email);
@@ -117,7 +118,18 @@ public class ReIssueService {
         cookie.setMaxAge(24*60*60*30);
         cookie.setSecure(true);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
-        cookie.setHttpOnly(false);
+        cookie.setHttpOnly(true);
+        cookie.setAttribute("SameSite","Lax");
+        return cookie;
+    }
+
+    private Cookie createAccessCookie(String key,String value){
+
+        Cookie cookie = new Cookie(key,value);
+        cookie.setMaxAge(10*60);
+        cookie.setSecure(false);
+        cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
+        cookie.setHttpOnly(true);
         cookie.setAttribute("SameSite","None");
         return cookie;
     }
@@ -161,6 +173,7 @@ public class ReIssueService {
 
         response.setHeader("access",newAccess);
         response.addCookie(createCookie("refresh",byAuth.getRefresh()));
+        response.addCookie(createAccessCookie("access",newAccess));
 
         return new ResponseEntity<>(UserDTO.ToUserDTO(userEntity),HttpStatus.OK);
     }

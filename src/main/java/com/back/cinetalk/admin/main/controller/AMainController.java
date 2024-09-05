@@ -1,7 +1,7 @@
 package com.back.cinetalk.admin.main.controller;
 
+import com.back.cinetalk.admin.main.dto.MainResponseDTO;
 import com.back.cinetalk.admin.main.service.AMainService;
-import com.back.cinetalk.admin.report.dto.AReportListDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,11 +23,31 @@ public class AMainController {
 
     @GetMapping("/userCountList")
     @Operation(summary = "관리자: 6개월간 가입한 회원 수 ",description = "이번달을 포함한 지난 6달 간의 가입한 회원 수")
-    @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = AReportListDTO.class)))
+    @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = MainResponseDTO.class)))
     @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
     public ResponseEntity<?> userCountList(){
 
         return mainService.userCountList();
+    }
+
+    @GetMapping("/reviewCountList")
+    @Operation(summary = "관리자: 6개월간 등록된 리뷰 수 ",description = "이번달을 포함한 지난 6달 간의 등록된 리뷰 수")
+    @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = MainResponseDTO.class)))
+    @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
+    @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
+    public ResponseEntity<?> reviewCountList(){
+
+        return mainService.reviewCountList();
+    }
+
+    @GetMapping("/keywordList")
+    @Operation(summary = "관리자: 6개월간 등록된 키워드 수 ",description = "이번달을 포함한 지난 6달 간의 등록된 키워드 수")
+    @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = MainResponseDTO.class)))
+    @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
+    @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
+    public ResponseEntity<?> keywordList(){
+
+        return mainService.keywordList();
     }
 }
