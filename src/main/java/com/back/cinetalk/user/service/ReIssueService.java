@@ -119,7 +119,7 @@ public class ReIssueService {
         cookie.setSecure(true);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
         cookie.setHttpOnly(true);
-        cookie.setAttribute("SameSite","Lax");
+        cookie.setAttribute("SameSite","None");
         return cookie;
     }
 
@@ -130,7 +130,7 @@ public class ReIssueService {
         cookie.setSecure(false);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
         cookie.setHttpOnly(true);
-        cookie.setAttribute("SameSite","None");
+        cookie.setAttribute("SameSite","Lax");
         return cookie;
     }
 
