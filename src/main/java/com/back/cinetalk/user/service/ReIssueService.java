@@ -117,7 +117,7 @@ public class ReIssueService {
         cookie.setMaxAge(24*60*60*30);
         cookie.setSecure(true);
         cookie.setPath("/"); //이거 안해 주면 시발 특정 경로에서 쿠키 보내야 받을수있음 시발
-        cookie.setHttpOnly(false);
+        cookie.setHttpOnly(true);
         cookie.setAttribute("SameSite","None");
         return cookie;
     }
