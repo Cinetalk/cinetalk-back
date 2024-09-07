@@ -10,4 +10,8 @@ import java.util.List;
 @Repository
 public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> {
     List<BookmarkEntity> findByUserOrderByCreatedAtDesc(UserEntity user);
+
+    boolean existsByUserAndAndMovieId(UserEntity user, Long movieId);
+
+    void deleteByUserAndAndMovieId(UserEntity user, Long movieId);
 }
