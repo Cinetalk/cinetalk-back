@@ -22,12 +22,20 @@ public class BookmarkService {
     public StateRes bookmarkMovie(Long movieId, String email) {
         UserEntity user = userRepository.findByEmail(email);
 
-        BookmarkEntity bookmarkEntity = BookmarkEntity.builder()
-                .user(user)
-                .movieId(movieId)
-                .build();
+        boolean check = bookmarkRepository.existsByUserAndAndMovieId(user, movieId);
 
-        bookmarkRepository.save(bookmarkEntity);
+        if(check){
+
+            bookmarkRepository.deleteByUserAndAndMovieId(user, movieId);
+        }else{
+
+            BookmarkEntity bookmarkEntity = BookmarkEntity.builder()
+                    .user(user)
+                    .movieId(movieId)
+                    .build();
+
+            bookmarkRepository.save(bookmarkEntity);
+        }
         return new StateRes(true);
     }
 }
