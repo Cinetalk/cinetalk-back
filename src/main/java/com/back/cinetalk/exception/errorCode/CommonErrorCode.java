@@ -49,7 +49,10 @@ public enum CommonErrorCode implements ErrorCode {
     REPORT_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 신고한 리뷰입니다."),
 
     // 피드백 관련 에러
-    FEEDBACK_CONTENT_WRONG(HttpStatus.BAD_REQUEST,"피드백 내용이 옳바르지 않습니다.")
+    FEEDBACK_CONTENT_WRONG(HttpStatus.BAD_REQUEST,"피드백 내용이 옳바르지 않습니다."),
+
+    //메인 페이지 관련 에러
+    MENTIONKEYWORD_LESS(HttpStatus.BAD_REQUEST,"충분한 키워드가 모이지 않았습니다.")
     ;
 
 

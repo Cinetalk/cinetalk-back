@@ -1,5 +1,7 @@
 package com.back.cinetalk.movie.service;
 
+import com.back.cinetalk.exception.errorCode.CommonErrorCode;
+import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.dto.*;
@@ -193,6 +195,11 @@ public class MovieMainService {
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
         List<Map<String, Object>> resultList = new ArrayList<>();
+
+        if(sortedList.size()<5){
+            log.info("Mention_Keyword_Count : "+sortedList.size());
+            throw new RestApiException(CommonErrorCode.MENTION_KEYWORD_LESS);
+        }
 
         for (int i = 0; i<5; i++) {
 

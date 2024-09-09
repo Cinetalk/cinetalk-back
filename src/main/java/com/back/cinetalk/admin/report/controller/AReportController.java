@@ -31,14 +31,4 @@ public class AReportController {
 
         return reportService.aReportList();
     }
-
-    @GetMapping("/{reportId}")
-    @Operation(summary = "관리자:신고 받은 댓글 상세 페이지",description = "신고 받은 댓글의 상세페이지")
-    @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = AReportListDTO.class)))
-    @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
-    @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
-    public  ResponseEntity<?> aReportDetail(@PathVariable("reportId") Long reportId) {
-
-        return reportService.aReportDetail(reportId);
-    }
 }
