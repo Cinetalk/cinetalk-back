@@ -198,7 +198,7 @@ public class MovieMainService {
 
         if(sortedList.size()<5){
             log.info("Mention_Keyword_Count : "+sortedList.size());
-            throw new RestApiException(CommonErrorCode.MENTION_KEYWORD_LESS);
+            throw new RestApiException(CommonErrorCode.MENTIONKEYWORD_LESS);
         }
 
         for (int i = 0; i<5; i++) {
