@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,5 +25,7 @@ public interface KeywordRepository extends JpaRepository<KeywordEntity, Long>, K
     boolean existsByUserIdAndMovieId(Long userId, Long movieId);
 
     Optional<KeywordEntity> findByMovieIdAndUser(Long movieId, UserEntity user);
+
+    Long countByCreatedAtBetween(LocalDateTime fromDate, LocalDateTime toDate);
 }
 

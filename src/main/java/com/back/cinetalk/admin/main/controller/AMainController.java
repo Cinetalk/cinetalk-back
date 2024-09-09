@@ -41,13 +41,13 @@ public class AMainController {
         return mainService.reviewCountList();
     }
 
-    @GetMapping("/keywordList")
+    @GetMapping("/keywordCountList")
     @Operation(summary = "관리자: 6개월간 등록된 키워드 수 ",description = "이번달을 포함한 지난 6달 간의 등록된 키워드 수")
     @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = MainResponseDTO.class)))
     @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
-    public ResponseEntity<?> keywordList(){
+    public ResponseEntity<?> keywordCountList(){
 
-        return mainService.keywordList();
+        return mainService.keywordCountList();
     }
 }
