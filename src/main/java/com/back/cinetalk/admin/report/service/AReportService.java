@@ -43,26 +43,4 @@ public class AReportService {
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
-
-    public ResponseEntity<?> aReportDetail(Long id){
-
-        AReportListDTO result = queryFactory.select(Projections.constructor(
-                        AReportListDTO.class,
-                        report.id,
-                        report.category,
-                        report.content,
-                        report.status,
-                        report.review.content.as("review_content"),
-                        report.user.email.as("user_email"),
-                        report.user.nickname,
-                        report.createdAt
-                ))
-                .from(report)
-                .where(report.status.eq(false)
-                .and(report.id.eq(id)))
-                .fetchOne();
-
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
 }
