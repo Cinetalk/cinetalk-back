@@ -9,6 +9,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +30,6 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , Qu
    long countByUserAndGenre(@Param("user") UserEntity user, @Param("genre") GenreEntity genre);
 
    Optional<ReviewEntity> findByUserIdAndMovieId(Long userId, Long movieId);
+
+   Long countByParentReviewIsNullAndCreatedAtBetween(LocalDateTime fromDate, LocalDateTime toDate);
 }

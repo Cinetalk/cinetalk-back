@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Boolean existsByEmail(String email);
@@ -27,4 +29,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     void updateProviderByEmail(@Param("provider")String provider,@Param("email") String email);
 
     Boolean existsByNickname(String nickname);
+
+    Long countByCreatedAtBetween(LocalDateTime fromDate, LocalDateTime toDate);
 }
