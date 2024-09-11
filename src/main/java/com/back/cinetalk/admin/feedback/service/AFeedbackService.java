@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class AFeedbackService {
 
     QFeedbackEntity feedback = QFeedbackEntity.feedbackEntity;
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> feedBackList(){
 
         List<FeedBackListDTO> resultList = queryFactory.select(Projections.constructor(

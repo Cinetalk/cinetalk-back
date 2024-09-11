@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class AReportService {
     QUserEntity user = QUserEntity.userEntity;
     QReportEntity report = QReportEntity.reportEntity;
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> aReportList(){
 
         List<AReportListDTO> resultList = queryFactory.select(Projections.constructor(

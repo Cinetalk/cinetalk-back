@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,17 +49,20 @@ public class AMainService {
         return resultList;
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<List<MainResponseDTO>> userCountList() {
         List<MainResponseDTO> resultList = getCountList(userRepository::countByCreatedAtBetween);
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<List<MainResponseDTO>> reviewCountList() {
         List<MainResponseDTO> resultList = getCountList((fromDate, toDate) ->
                 reviewRepository.countByParentReviewIsNullAndCreatedAtBetween(fromDate, toDate));
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<List<MainResponseDTO>> keywordCountList() {
         List<MainResponseDTO> resultList = getCountList(keywordRepository::countByCreatedAtBetween);
         return new ResponseEntity<>(resultList, HttpStatus.OK);
