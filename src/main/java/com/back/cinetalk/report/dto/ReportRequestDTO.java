@@ -7,5 +7,5 @@ public class ReportRequestDTO {
 
     private String category;
 
-    private String content;
+    private int date;
 }
