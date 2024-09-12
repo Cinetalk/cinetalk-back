@@ -10,13 +10,15 @@ public class SpringTests {
     @Test
     public void test() {
 
-        LocalDateTime sixAgo = LocalDate.now()
-                .minusMonths(10)
-                .withDayOfMonth(1)
-                .atStartOfDay();
 
-        String s = String.valueOf(sixAgo).substring(0,7);
+        LocalDateTime time = LocalDateTime.now();
+        LocalDate today = LocalDate.now();
 
-        System.out.println(s);
+        LocalDate day = today.minusDays(300);
+
+
+        System.out.println(time);
+        System.out.println(today);
+        System.out.println(day);
     }
 }

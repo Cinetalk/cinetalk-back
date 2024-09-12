@@ -1,17 +1,14 @@
 package com.back.cinetalk.admin.damage.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DamageRequestDTO {
 
-    private int report_id;
+    private String category;
 
     private int date;
 }
