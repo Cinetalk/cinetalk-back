@@ -32,4 +32,5 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , Qu
    Optional<ReviewEntity> findByUserIdAndMovieId(Long userId, Long movieId);
 
    Long countByParentReviewIsNullAndCreatedAtBetween(LocalDateTime fromDate, LocalDateTime toDate);
+
 }

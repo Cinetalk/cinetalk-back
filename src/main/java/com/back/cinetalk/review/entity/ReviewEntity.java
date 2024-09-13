@@ -59,7 +59,7 @@ public class ReviewEntity extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
     private List<ReviewDislikeEntity> reviewDislikeEntityList = new ArrayList<>(); // 싫어요 리스트
 
-    @OneToMany(mappedBy = "review")
+    @OneToMany(mappedBy = "review",cascade = CascadeType.ALL)
     private List<ReportEntity> reportEntityList = new ArrayList<>(); // 신고 리스트
 
     public void updateReview(ReviewRequestDTO reviewRequestDTO) {

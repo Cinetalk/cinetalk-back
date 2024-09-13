@@ -61,6 +61,8 @@ public class ADamageService {
 
         report.UpdateReview(null);
 
+        reportRepository.save(report);
+
         reviewRepository.deleteById(id);
 
         return new StateRes(true);
