@@ -48,9 +48,19 @@ public class ADamageService {
         damageRepository.save(damage);
 
         //신고에는 신고완료로 체크
-        report.UpdateReport(true);
+        report.UpdateStatus(true);
 
-        //제재 받은 댓글은 삭제
+        return new StateRes(true);
+    }
+
+    public StateRes DeleteReview(Long report_id){
+
+        ReportEntity report = reportRepository.findById(report_id).orElse(null);
+
+        Long id = report.getReview().getId();
+
+        report.UpdateReview(null);
+
         reviewRepository.deleteById(id);
 
         return new StateRes(true);
