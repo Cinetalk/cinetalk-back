@@ -36,8 +36,11 @@ public class ReportEntity extends BaseEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private ReviewEntity review;
 
-    public void UpdateReport(Boolean status){
-        this.review = null;
+    public void UpdateStatus(Boolean status){
         this.status=status;
+    }
+
+    public void UpdateReview(ReviewEntity review){
+        this.review=review;
     }
 }
