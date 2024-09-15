@@ -19,6 +19,6 @@ public class AReportListDTO {
     private boolean status;
     private String review_content;
     private String user_email;
-    private String nickname;
+    private String user_nickName;
     private LocalDateTime createdAt;
 }

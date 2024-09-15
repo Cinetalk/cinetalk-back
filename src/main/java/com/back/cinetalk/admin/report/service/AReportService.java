@@ -19,9 +19,6 @@ import java.util.List;
 public class AReportService {
 
     private final JPAQueryFactory queryFactory;
-
-    QReviewEntity review = QReviewEntity.reviewEntity;
-    QUserEntity user = QUserEntity.userEntity;
     QReportEntity report = QReportEntity.reportEntity;
 
     @Transactional(readOnly = true)
@@ -35,7 +32,7 @@ public class AReportService {
                 report.status,
                 report.review.content.as("review_content"),
                 report.user.email.as("user_email"),
-                report.user.nickname,
+                report.user.nickname.as("user_nickName"),
                 report.createdAt
                 ))
                 .from(report)
