@@ -469,6 +469,8 @@ public class MovieMainService {
                             .and(review.movieId.eq(movieId)))
                     .fetchOne();
 
+            rate = Math.round(rate * 10.0) / 10.0;
+
             String topKeyword = queryFactory.select(keyword.keyword)
                     .from(keyword)
                     .where(keyword.movieId.eq(movieId))

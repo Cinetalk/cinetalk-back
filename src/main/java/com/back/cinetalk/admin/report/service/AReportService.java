@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,11 +19,9 @@ import java.util.List;
 public class AReportService {
 
     private final JPAQueryFactory queryFactory;
-
-    QReviewEntity review = QReviewEntity.reviewEntity;
-    QUserEntity user = QUserEntity.userEntity;
     QReportEntity report = QReportEntity.reportEntity;
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> aReportList(){
 
         List<AReportListDTO> resultList = queryFactory.select(Projections.constructor(
@@ -33,7 +32,7 @@ public class AReportService {
                 report.status,
                 report.review.content.as("review_content"),
                 report.user.email.as("user_email"),
-                report.user.nickname,
+                report.user.nickname.as("user_nickName"),
                 report.createdAt
                 ))
                 .from(report)

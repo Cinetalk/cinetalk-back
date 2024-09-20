@@ -5,6 +5,8 @@ import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -31,5 +33,14 @@ public class ReportEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private ReviewEntity review;
+
+    public void UpdateStatus(Boolean status){
+        this.status=status;
+    }
+
+    public void UpdateReview(ReviewEntity review){
+        this.review=review;
+    }
 }
