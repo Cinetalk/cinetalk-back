@@ -8,6 +8,7 @@ import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.report.entity.ReportEntity;
 import com.back.cinetalk.report.repository.ReportRepository;
+import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -53,17 +54,15 @@ public class ADamageService {
         return new StateRes(true);
     }
 
-    public StateRes DeleteReview(Long report_id){
+    public StateRes ADamageReview(Long report_id){
 
         ReportEntity report = reportRepository.findById(report_id).orElse(null);
 
-        Long id = report.getReview().getId();
+        ReviewEntity review = report.getReview();
 
-        report.UpdateReview(null);
+        review.updateReviewContent("<신고된 리뷰 입니다.>");
 
-        reportRepository.save(report);
-
-        reviewRepository.deleteById(id);
+        reviewRepository.save(review);
 
         return new StateRes(true);
     }
