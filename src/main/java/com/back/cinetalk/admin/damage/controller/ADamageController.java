@@ -27,14 +27,13 @@ public class ADamageController {
         return adamageService.ADamage(report_id,requestDTO);
     }
 
-    @DeleteMapping("/delete/{report_id}")
-    @Operation(summary = "관리자: 댓글 삭제 ",description = "해당 신고의 댓글을 삭제시키는 처리")
+    @PatchMapping("/damage/{report_id}")
+    @Operation(summary = "관리자: 댓글 삭제 ",description = "해당 신고의 댓글의 내용을 <신고된 리뷰 입니다.> 로 변경하는 처리")
     @ApiResponse(responseCode = "200",description = "처리 완료",content = @Content(schema = @Schema(implementation = StateRes.class)))
     @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
     public StateRes DeleteReview(@PathVariable("report_id") Long report_id){
 
-        return adamageService.DeleteReview(report_id);
+        return adamageService.ADamageReview(report_id);
     }
-
 }

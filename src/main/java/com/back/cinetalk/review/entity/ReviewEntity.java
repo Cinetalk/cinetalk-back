@@ -68,6 +68,10 @@ public class ReviewEntity extends BaseEntity {
         this.spoiler = reviewRequestDTO.isSpoiler();
     }
 
+    public void updateReviewContent(String content) {
+        this.content = content;
+    }
+
     public void updateComment(CommentRequestDTO commentRequestDTO) {
         this.content = commentRequestDTO.getContent();
     }

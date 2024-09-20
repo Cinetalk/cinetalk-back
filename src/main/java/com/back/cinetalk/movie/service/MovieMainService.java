@@ -36,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -150,7 +151,8 @@ public class MovieMainService {
                 .select(review.content)
                 .from(review)
                 // review.createdAt의 날짜 부분만 비교하기 위해 LocalDate로 변환 후 비교
-                .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX)).and(review.parentReview.isNull()))
+                .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX))
+                        .and(review.parentReview.isNull()))
                 .fetch();
 
         if(reviewList.isEmpty()){
@@ -198,6 +200,7 @@ public class MovieMainService {
 
         if(sortedList.size()<5){
             log.info("Mention_Keyword_Count : "+sortedList.size());
+
             throw new RestApiException(CommonErrorCode.MENTIONKEYWORD_LESS);
         }
 
@@ -206,6 +209,8 @@ public class MovieMainService {
             Map.Entry<String, Integer> entry = sortedList.get(i);
 
             String keyword = entry.getKey();
+
+            int count = entry.getValue();
 
             List<ReviewEntity> list = reviewRepository.findTop10ByContentContainingAndParentReviewIsNullOrderByCreatedAtAsc(keyword);
 
@@ -228,6 +233,7 @@ public class MovieMainService {
             Map<String, Object> resultMap = new HashMap<>();
 
             resultMap.put("keyword", keyword);
+            resultMap.put("count", count);
             resultMap.put("reviewList", result);
             resultList.add(resultMap);
         }
