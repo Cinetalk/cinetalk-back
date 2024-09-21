@@ -434,12 +434,14 @@ public class MovieMainService {
             Map<String, Object> oneByID = getOneByID(movieId);
 
             String movienm = oneByID.get("title").toString();
+            String overview = oneByID.get("overview").toString();
             String poster_path = "https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString();
             String releaseDate = oneByID.get("release_date").toString().substring(0, 4);
 
             HoxyDTO result = HoxyDTO.builder()
                     .movieId(movieId)
                     .movienm(movienm)
+                    .overview(overview)
                     .poster_path(poster_path)
                     .release_date(Integer.parseInt(releaseDate))
                     .genres((List<Map<String, Object>>) oneByID.get("genres"))

@@ -16,6 +16,7 @@ public class HoxyDTO {
 
     private Long movieId;
     private String movienm;
+    private String overview;
     private String poster_path;
     private int release_date;
     private List<Map<String,Object>> genres;

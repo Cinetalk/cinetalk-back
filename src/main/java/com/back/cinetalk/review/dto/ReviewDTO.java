@@ -4,6 +4,8 @@ import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.dto.UserDTO;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -26,7 +28,10 @@ public class ReviewDTO {
 
     private ReviewEntity parentReview;
 
+    private String createdAt;
+
     public static ReviewDTO toReviewDTO(ReviewEntity reviewEntity){
+
         return ReviewDTO.builder()
                 .id(reviewEntity.getId())
                 .movieId(reviewEntity.getMovieId())
@@ -34,6 +39,7 @@ public class ReviewDTO {
                 .star(reviewEntity.getStar())
                 .content(reviewEntity.getContent())
                 .spoiler(reviewEntity.isSpoiler())
+                .createdAt(String.valueOf(reviewEntity.getCreatedAt()).substring(0,4))
                 .build();
     }
 }
