@@ -28,6 +28,11 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("UPDATE UserEntity u SET u.provider = :provider WHERE u.email = :email")
     void updateProviderByEmail(@Param("provider")String provider,@Param("email") String email);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE UserEntity u SET u.profile = :profile WHERE u.email = :email")
+    void updateProfileByEmail(@Param("email") String email, @Param("profile") byte[] profile);
+
     Boolean existsByNickname(String nickname);
 
     Long countByCreatedAtBetween(LocalDateTime fromDate, LocalDateTime toDate);
