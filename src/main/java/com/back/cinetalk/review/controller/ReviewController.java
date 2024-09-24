@@ -69,8 +69,8 @@ public class ReviewController {
     public CommentPreViewListDTO getCommentListByParentReview(@PathVariable(name = "parentReviewId") Long parentReviewId,
                                                               @RequestParam(name = "page") Integer page) {
 
-        Page<CommentPreViewDTO> reReviewList = reviewService.getCommentList(parentReviewId, page);
-        return CommentPreViewListDTO.toReReviewPreViewListDTO(reReviewList);
+        Page<CommentPreViewDTO> commentList = reviewService.getCommentList(parentReviewId, page);
+        return CommentPreViewListDTO.toReReviewPreViewListDTO(commentList);
     }
 
     @PatchMapping("/{reviewId}")
