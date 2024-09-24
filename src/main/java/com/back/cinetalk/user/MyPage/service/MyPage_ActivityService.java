@@ -173,7 +173,7 @@ public class MyPage_ActivityService {
             ReviewByUserResponseDTO responseDTO = ReviewByUserResponseDTO.builder()
                     .review_id(reviewEntity.getId())
                     .movie_id(reviewEntity.getMovieId())
-                    .movienm(reviewEntity.getMovienm())
+                    .movienm((String) oneByID.get("title"))
                     .poster_id("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path"))
                     .star(reviewEntity.getStar())
                     .content(reviewEntity.getContent())

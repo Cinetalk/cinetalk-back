@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -74,8 +75,11 @@ public class FindService {
 
         Map<String, Object> list = callAPI.callAPI(url);
 
-        List<Map<String,Object>> resultApi = (List<Map<String, Object>>) list.get("results");
+        List<Map<String, Object>> results = (List<Map<String, Object>>) list.get("results");
 
+
+
+        /*
         List<Integer> movieIdList = resultApi.stream()
                 .map(result -> (Integer) result.get("id"))
                 .toList();
@@ -83,6 +87,8 @@ public class FindService {
         List<FindMovieDTO> returnList = new ArrayList<>();
 
         // 각 movieId에 대해 처리
+        //영화 검색 제재 제거
+
         movieIdList.forEach(movieId -> {
             try {
                 String detailUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=keywords&language=ko";
@@ -108,6 +114,17 @@ public class FindService {
                 throw new RestApiException(CommonErrorCode.FiND_NOT_FOUND);
             }
         });
+        */
+
+        List<FindMovieDTO> returnList = results.stream()
+                .map(result -> {
+                    FindMovieDTO dto = new FindMovieDTO();
+                    dto.setId(Long.valueOf((Integer) result.get("id")));
+                    dto.setTitle((String) result.get("title"));
+                    dto.setPoster_path((String) result.get("poster_path"));
+                    return dto;
+                })
+                .collect(Collectors.toList());
 
         return returnList;
     }

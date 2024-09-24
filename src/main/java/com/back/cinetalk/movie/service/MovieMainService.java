@@ -36,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -120,10 +121,11 @@ public class MovieMainService {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
                 String formattedDate = createdAt.format(formatter);
 
+
                 Map<String, Object> map = new HashMap<>();
 
                 map.put("movieid",movieid);
-                map.put("movienm",reviewEntity.getMovienm());
+                map.put("movienm",oneByID.get("title"));
                 map.put("star",reviewEntity.getStar());
                 map.put("content",reviewEntity.getContent());
                 map.put("regDate", formattedDate);
@@ -150,7 +152,8 @@ public class MovieMainService {
                 .select(review.content)
                 .from(review)
                 // review.createdAt의 날짜 부분만 비교하기 위해 LocalDate로 변환 후 비교
-                .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX)).and(review.parentReview.isNull()))
+                .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX))
+                        .and(review.parentReview.isNull()))
                 .fetch();
 
         if(reviewList.isEmpty()){
@@ -198,6 +201,7 @@ public class MovieMainService {
 
         if(sortedList.size()<5){
             log.info("Mention_Keyword_Count : "+sortedList.size());
+
             throw new RestApiException(CommonErrorCode.MENTIONKEYWORD_LESS);
         }
 
@@ -206,6 +210,8 @@ public class MovieMainService {
             Map.Entry<String, Integer> entry = sortedList.get(i);
 
             String keyword = entry.getKey();
+
+            int count = entry.getValue();
 
             List<ReviewEntity> list = reviewRepository.findTop10ByContentContainingAndParentReviewIsNullOrderByCreatedAtAsc(keyword);
 
@@ -228,6 +234,7 @@ public class MovieMainService {
             Map<String, Object> resultMap = new HashMap<>();
 
             resultMap.put("keyword", keyword);
+            resultMap.put("count", count);
             resultMap.put("reviewList", result);
             resultList.add(resultMap);
         }
@@ -353,7 +360,7 @@ public class MovieMainService {
             ReviewByUserResponseDTO responseDTO = ReviewByUserResponseDTO.builder()
                     .review_id(reviewEntity.getId())
                     .movie_id(reviewEntity.getMovieId())
-                    .movienm(reviewEntity.getMovienm())
+                    .movienm((String) oneByID.get("title"))
                     .poster_id("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path"))
                     .star(reviewEntity.getStar())
                     .content(reviewEntity.getContent())
@@ -428,12 +435,14 @@ public class MovieMainService {
             Map<String, Object> oneByID = getOneByID(movieId);
 
             String movienm = oneByID.get("title").toString();
+            String overview = oneByID.get("overview").toString();
             String poster_path = "https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString();
             String releaseDate = oneByID.get("release_date").toString().substring(0, 4);
 
             HoxyDTO result = HoxyDTO.builder()
                     .movieId(movieId)
                     .movienm(movienm)
+                    .overview(overview)
                     .poster_path(poster_path)
                     .release_date(Integer.parseInt(releaseDate))
                     .genres((List<Map<String, Object>>) oneByID.get("genres"))
