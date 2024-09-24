@@ -5,7 +5,6 @@ import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.user.jwt.JwtValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,9 +23,9 @@ public class BookmarkController {
     }
 
     @GetMapping("/{movieId}/check")
-    @Operation(summary = "영화 찜 상태 알려주는API", description = "특정 영화의 찜 상태를 알려주는 API 입니다.")
-    public ResponseEntity<?> bookmarkCheck(@PathVariable(name = "movieId") Long movieId,
-                                           @JwtValidation String email) {
+    @Operation(summary = "영화 찜 상태를 알려주는 API", description = "특정 영화의 찜 상태를 알려주는 API 입니다.")
+    public StateRes bookmarkCheck(@PathVariable(name = "movieId") Long movieId,
+                                  @JwtValidation String email) {
 
         return bookmarkService.bookmarkCheck(movieId, email);
     }

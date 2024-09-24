@@ -10,6 +10,7 @@ import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.userBadge.entity.QUserBadgeEntity;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -49,7 +50,11 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         reviewEntity.createdAt,
                         reviewEntity.spoiler,
                         reviewLikeEntity.countDistinct(),
-                        reviewDislikeEntity.countDistinct()))
+                        reviewDislikeEntity.countDistinct(),
+                        JPAExpressions.select(reviewEntity.count())
+                                .from(reviewEntity)
+                                .where(reviewEntity.parentReview.eq(reviewEntity))
+                ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
                 .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
@@ -128,7 +133,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         reviewEntity.createdAt,
                         reviewEntity.spoiler,
                         reviewLikeEntity.countDistinct(),
-                        reviewDislikeEntity.countDistinct()))
+                        reviewDislikeEntity.countDistinct(), JPAExpressions.select(reviewEntity.count()).from(reviewEntity).where(reviewEntity.parentReview.eq(reviewEntity))))
                 .from(reviewEntity)
                 .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
                 .leftJoin(reviewDislikeEntity).on(reviewDislikeEntity.review.eq(reviewEntity))
@@ -141,6 +146,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .limit(limit)
                 .fetch();
 
+        insertCommentCount(bestReviewList, queryFactory);
         insertGenreList(bestReviewList, queryFactory);
 
         return bestReviewList;
@@ -150,6 +156,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     public Page<ReviewPreViewDTO> findGeneralReviewsExcludingBest(Long movieId, List<Long> bestReviewIds, Pageable pageable) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
+        System.out.println( JPAExpressions.select(reviewEntity.count()).from(reviewEntity).where(reviewEntity.parentReview.eq(reviewEntity)));
         List<ReviewPreViewDTO> generalReviewList = queryFactory
                 .select(new QReviewPreViewDTO(
                         reviewEntity.id,
@@ -160,7 +167,10 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         reviewEntity.createdAt,
                         reviewEntity.spoiler,
                         reviewLikeEntity.countDistinct(),
-                        reviewDislikeEntity.countDistinct()))
+                        reviewDislikeEntity.countDistinct(),
+                        JPAExpressions.select(reviewEntity.count())
+                                .from(reviewEntity)
+                                .where(reviewEntity.parentReview.id.eq(reviewEntity.id))))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
                 .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
@@ -173,6 +183,8 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        // 자식 리뷰(댓글) 개수 추가
+        insertCommentCount(generalReviewList, queryFactory);
         insertGenreList(generalReviewList, queryFactory);
 
         Long total = queryFactory
@@ -189,6 +201,26 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 
         return new PageImpl<>(generalReviewList, pageable, total);
     }
+
+    private void insertCommentCount(List<ReviewPreViewDTO> reviewList, JPAQueryFactory queryFactory) {
+        for (ReviewPreViewDTO review : reviewList) {
+            // 각 리뷰에 대한 자식 리뷰(댓글)의 개수를 세는 쿼리
+            Long commentCount = queryFactory
+                    .select(reviewEntity.count())
+                    .from(reviewEntity)
+                    .where(reviewEntity.parentReview.id.eq(review.getId())) // 부모 리뷰 ID가 해당 리뷰 ID인 경우
+                    .fetchOne();
+
+            // commentCount가 null일 경우 0으로 설정
+            if (commentCount == null) {
+                commentCount = 0L;
+            }
+
+            // DTO에 commentCount를 설정
+            review.setCommentCount(commentCount.intValue());
+        }
+    }
+
 
     private void insertGenreList(List<ReviewPreViewDTO> generalReviewList, JPAQueryFactory queryFactory) {
         for (ReviewPreViewDTO dto : generalReviewList) {
