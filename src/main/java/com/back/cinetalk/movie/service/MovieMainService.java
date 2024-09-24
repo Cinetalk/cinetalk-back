@@ -121,10 +121,11 @@ public class MovieMainService {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
                 String formattedDate = createdAt.format(formatter);
 
+
                 Map<String, Object> map = new HashMap<>();
 
                 map.put("movieid",movieid);
-                map.put("movienm",reviewEntity.getMovienm());
+                map.put("movienm",oneByID.get("title"));
                 map.put("star",reviewEntity.getStar());
                 map.put("content",reviewEntity.getContent());
                 map.put("regDate", formattedDate);
