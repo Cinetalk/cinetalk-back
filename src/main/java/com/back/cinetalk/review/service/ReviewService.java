@@ -260,6 +260,12 @@ public class ReviewService {
         return new StateRes(true);
     }
 
+    public StateRes checkLikeReview(Long reviewId, String email) {
+        UserEntity user = userRepository.findByEmail(email);
+        boolean checkLike = reviewLikeRepository.existsByReviewIdAndUserId(reviewId, user.getId());
+        return new StateRes(checkLike);
+    }
+
     @Transactional
     public StateRes dislikeReview(Long reviewId, String email) {
         UserEntity user = userRepository.findByEmail(email);
@@ -282,6 +288,12 @@ public class ReviewService {
         }
 
         return new StateRes(true);
+    }
+
+    public StateRes checkDislikeReview(Long reviewId, String email) {
+        UserEntity user = userRepository.findByEmail(email);
+        boolean checkDislike = reviewDislikeRepository.existsByReviewIdAndUserId(reviewId, user.getId());
+        return new StateRes(checkDislike);
     }
 
     @Transactional(readOnly = true)
