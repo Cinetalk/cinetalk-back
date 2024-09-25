@@ -2,6 +2,8 @@ package com.back.cinetalk.user.MyPage.service;
 
 import com.back.cinetalk.bookmark.entity.QBookmarkEntity;
 import com.back.cinetalk.config.dto.StateRes;
+import com.back.cinetalk.damage.entity.DamageEntity;
+import com.back.cinetalk.damage.entity.QDamageEntity;
 import com.back.cinetalk.genre.entity.QGenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.service.MovieMainService;
@@ -29,8 +31,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -52,6 +56,7 @@ public class MyPage_ActivityService {
     QGenreEntity genre = QGenreEntity.genreEntity;
     QUserBadgeEntity userBadge = QUserBadgeEntity.userBadgeEntity;
     QReviewLikeEntity reviewLike = QReviewLikeEntity.reviewLikeEntity;
+    QDamageEntity damage = QDamageEntity.damageEntity;
 
     //TODO 유저의 뱃지 목록
     @Transactional(readOnly = true)
@@ -243,5 +248,32 @@ public class MyPage_ActivityService {
         }
 
         return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+    //TODO 유저의 제재 현황
+    public ResponseEntity<?> DamageByUser(HttpServletRequest request){
+
+        UserEntity userEntity = userByAccess.getUserEntity(request);
+
+        LocalDate now = LocalDate.now();
+
+        DamageByUserResponseDTO userDamage = queryFactory.select(Projections.constructor(
+                DamageByUserResponseDTO.class,
+                        damage.content.as("review_content"),
+                        damage.category,
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%y.%m.%d')",damage.startDate).as("startDate"),
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%y.%m.%d')",damage.endDate).as("endDate"),
+                        Expressions.numberTemplate(Long.class, "DATEDIFF({0}, {1}) + 1", damage.endDate, damage.startDate).as("date")
+                        ))
+                .from(damage)
+                .where(damage.user.id.eq(userEntity.getId())
+                        .and(damage.startDate.loe(now))
+                        .and(damage.endDate.goe(now)))
+                .orderBy(damage.endDate.desc())
+                .limit(1)
+                .fetchOne();
+
+
+        return new ResponseEntity<>(userDamage,HttpStatus.OK);
     }
 }

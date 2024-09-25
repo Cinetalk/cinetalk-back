@@ -121,6 +121,7 @@ public class FindService {
                     FindMovieDTO dto = new FindMovieDTO();
                     dto.setId(Long.valueOf((Integer) result.get("id")));
                     dto.setTitle((String) result.get("title"));
+                    dto.setOverview((String) result.get("overview"));
                     dto.setPoster_path((String) result.get("poster_path"));
                     return dto;
                 })
