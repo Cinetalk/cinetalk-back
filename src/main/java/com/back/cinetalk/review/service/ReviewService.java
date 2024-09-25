@@ -61,6 +61,7 @@ public class ReviewService {
 
         ReviewEntity reviewEntity = ReviewEntity.builder()
                 .movieId(movieId)
+                .movienm(reviewRequestDTO.getMovieName())
                 .user(user)
                 .star(reviewRequestDTO.getStar())
                 .content(reviewRequestDTO.getContent())

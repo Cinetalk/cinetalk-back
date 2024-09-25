@@ -10,6 +10,8 @@ import java.util.List;
 
 @Getter
 public class ReviewRequestDTO {
+    @NotNull
+    private String movieName;
 
     @NotNull
     @DecimalMin(value = "0.0", inclusive = true)
