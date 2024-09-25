@@ -273,6 +273,9 @@ public class MyPage_ActivityService {
                 .limit(1)
                 .fetchOne();
 
+        if(userDamage == null){
+            return new ResponseEntity<>(null,HttpStatus.OK);
+        }
 
         return new ResponseEntity<>(userDamage,HttpStatus.OK);
     }
