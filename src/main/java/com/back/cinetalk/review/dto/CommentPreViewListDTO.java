@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentPreViewListDTO {
 
-    List<CommentPreViewDTO> reReviewList;
+    List<CommentPreViewDTO> commentList;
     Integer listSize;
     Integer totalPage;
     Long totalElements;
@@ -28,7 +28,7 @@ public class CommentPreViewListDTO {
                 .totalPage(commentPreViewDTOList.getTotalPages())
                 .totalElements(commentPreViewDTOList.getTotalElements())
                 .listSize(commentPreViewDTOList.getNumberOfElements())
-                .reReviewList(commentPreViewDTOList.getContent())
+                .commentList(commentPreViewDTOList.getContent())
                 .build();
     }
 }

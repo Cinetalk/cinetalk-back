@@ -19,10 +19,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Random;
 
 @Component
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -81,10 +87,15 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             userRepository.updateNicknameByEmail(email,Newnickname);
 
+            byte[] profile = getRandomProfile();
+
+            userRepository.updateProfileByEmail(email,profile);
+
             response.sendRedirect("http://localhost:3000/redirect/without-nickname?authToken="+authToken);
         }
         //닉네임이 존재할 경우
         else{
+
             response.sendRedirect("http://localhost:3000/redirect?authToken="+authToken);
         }
     }
@@ -115,5 +126,35 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         RefreshEntity refreshEntity = RefreshEntity.ToRefreshEntity(refreshDTO);
 
         refreshRepository.save(refreshEntity);
+    }
+
+    public byte[] getRandomProfile() throws IOException {
+
+        String[] imageFiles = {
+                "profile_blue.png",
+                "profile_green.png",
+                "profile_orange.png",
+                "profile_red.png",
+                "profile_violet.png"
+        };
+
+        Random random = new Random();
+        int index = random.nextInt(imageFiles.length);
+        String selectedImage = imageFiles[index];
+
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("profile_images/" + selectedImage);
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            if (inputStream == null) {
+                throw new IOException("Image not found: " + selectedImage);
+            }
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            return outputStream.toByteArray();
+        }
     }
 }

@@ -7,8 +7,6 @@ import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,14 +21,11 @@ public class BookmarkService {
     @Transactional
     public StateRes bookmarkMovie(Long movieId, String email) {
         UserEntity user = userRepository.findByEmail(email);
-
         boolean check = bookmarkRepository.existsByUserAndAndMovieId(user, movieId);
 
-        if(check){
-
+        if (check) {
             bookmarkRepository.deleteByUserAndAndMovieId(user, movieId);
-        }else{
-
+        } else {
             BookmarkEntity bookmarkEntity = BookmarkEntity.builder()
                     .user(user)
                     .movieId(movieId)
@@ -42,13 +37,10 @@ public class BookmarkService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<?> bookmarkCheck(Long movieId, String email) {
-
+    public StateRes bookmarkCheck(Long movieId, String email) {
         UserEntity user = userRepository.findByEmail(email);
-
         boolean check = bookmarkRepository.existsByUserAndAndMovieId(user, movieId);
-
-        return new ResponseEntity<>(check, HttpStatus.OK);
+        return new StateRes(check);
     }
 }
 

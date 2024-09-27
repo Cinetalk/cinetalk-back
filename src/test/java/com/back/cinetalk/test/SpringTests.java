@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class SpringTests {
 
@@ -11,14 +12,11 @@ public class SpringTests {
     public void test() {
 
 
-        LocalDateTime time = LocalDateTime.now();
-        LocalDate today = LocalDate.now();
+        LocalDate date1 = LocalDate.of(2024, 9, 20);
+        LocalDate date2 = LocalDate.of(2024, 10, 25);
 
-        LocalDate day = today.minusDays(300);
+        long daysBetween = ChronoUnit.DAYS.between(date1, date2)+1;
 
-
-        System.out.println(time);
-        System.out.println(today);
-        System.out.println(day);
+        System.out.println(daysBetween);
     }
 }
