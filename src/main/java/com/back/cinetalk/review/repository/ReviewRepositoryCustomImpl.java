@@ -66,6 +66,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        insertCommentCount(results, queryFactory);
         insertGenreList(results, queryFactory);
 
         Long total = queryFactory
