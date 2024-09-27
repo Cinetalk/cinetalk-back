@@ -67,7 +67,7 @@ public class MyPage_ActivityController {
 
     @GetMapping("/DamageByUser")
     @Operation(summary = "유저의 제재 조회",description = "토큰과 같이 요청시 유저의 제재 현황 조회")
-    @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = LogByUserResponseDTO.class)))
+    @ApiResponse(responseCode = "200",description = "정보 발급 성공",content = @Content(schema = @Schema(implementation = DamageByUserResponseDTO.class)))
     @ApiResponse(responseCode = "404",description = "토큰이 존재하지 않음")
     @ApiResponse(responseCode = "401",description = "토큰이 유효하지 않음")
     public ResponseEntity<?> DamageByUser(HttpServletRequest request){return myPage_activityService.DamageByUser(request);}
