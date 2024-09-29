@@ -9,6 +9,7 @@ import com.back.cinetalk.review.dto.ReviewPreViewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.userBadge.entity.QUserBadgeEntity;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -37,8 +38,11 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     private final QBadgeEntity badgeEntity = QBadgeEntity.badgeEntity;
 
     @Override
-    public Page<ReviewPreViewDTO> findAllByMovieId(Long movieId, Pageable pageable) {
+    public Page<ReviewPreViewDTO> findAllByMovieId(Long movieId, Long userId, Pageable pageable, String sortType) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+
+        // 정렬 기준 설정
+        OrderSpecifier<?> orderSpecifier = getSortOrder(sortType);
 
         List<ReviewPreViewDTO> results = queryFactory
                 .select(new QReviewPreViewDTO(
@@ -53,7 +57,19 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         reviewDislikeEntity.countDistinct(),
                         JPAExpressions.select(reviewEntity.count())
                                 .from(reviewEntity)
-                                .where(reviewEntity.parentReview.eq(reviewEntity))
+                                .where(reviewEntity.parentReview.eq(reviewEntity)),
+                        // 사용자가 이 리뷰에 좋아요를 눌렀는지 여부 확인
+                        JPAExpressions.selectOne()
+                                .from(reviewLikeEntity)
+                                .where(reviewLikeEntity.review.eq(reviewEntity))
+                                .where(reviewLikeEntity.user.id.eq(userId))
+                                .exists(),  // 좋아요 여부 확인
+                        // 사용자가 이 리뷰에 싫어요를 눌렀는지 여부 확인
+                        JPAExpressions.selectOne()
+                                .from(reviewDislikeEntity)
+                                .where(reviewDislikeEntity.review.eq(reviewEntity))
+                                .where(reviewDislikeEntity.user.id.eq(userId))
+                                .exists()  // 싫어요 여부 확인
                 ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
@@ -62,10 +78,12 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .where(reviewEntity.movieId.eq(movieId))
                 .where(reviewEntity.parentReview.isNull())
                 .groupBy(reviewEntity.id)
+                .orderBy(orderSpecifier)  // 정렬 기준 추가
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        // 자식 리뷰(댓글) 개수 추가
         insertCommentCount(results, queryFactory);
         insertGenreList(results, queryFactory);
 
@@ -83,8 +101,9 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         return new PageImpl<>(results, pageable, total);
     }
 
+
     @Override
-    public Page<CommentPreViewDTO> findAllByParentReviewId(Long parentReviewId, Pageable pageable) {
+    public Page<CommentPreViewDTO> findAllByParentReviewId(Long parentReviewId, Long userId, Pageable pageable) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
         List<CommentPreViewDTO> results = queryFactory
@@ -96,7 +115,20 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         reviewEntity.content,
                         reviewEntity.createdAt,
                         reviewLikeEntity.countDistinct(),
-                        reviewDislikeEntity.countDistinct()))
+                        reviewDislikeEntity.countDistinct(),
+                        // 사용자가 이 리뷰에 좋아요를 눌렀는지 여부 확인
+                        JPAExpressions.selectOne()
+                                .from(reviewLikeEntity)
+                                .where(reviewLikeEntity.review.eq(reviewEntity))
+                                .where(reviewLikeEntity.user.id.eq(userId))
+                                .exists(),  // 좋아요 여부 확인
+                        // 사용자가 이 리뷰에 싫어요를 눌렀는지 여부 확인
+                        JPAExpressions.selectOne()
+                                .from(reviewDislikeEntity)
+                                .where(reviewDislikeEntity.review.eq(reviewEntity))
+                                .where(reviewDislikeEntity.user.id.eq(userId))
+                                .exists()  // 싫어요 여부 확인
+                ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
                 .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
@@ -121,7 +153,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     }
 
     @Override
-    public List<ReviewPreViewDTO> findBestReviews(Long movieId, int limit) {
+    public List<ReviewPreViewDTO> findBestReviews(Long movieId, Long userId, int limit) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
         List<ReviewPreViewDTO> bestReviewList = queryFactory
@@ -134,7 +166,22 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         reviewEntity.createdAt,
                         reviewEntity.spoiler,
                         reviewLikeEntity.countDistinct(),
-                        reviewDislikeEntity.countDistinct(), JPAExpressions.select(reviewEntity.count()).from(reviewEntity).where(reviewEntity.parentReview.eq(reviewEntity))))
+                        reviewDislikeEntity.countDistinct(),
+                        JPAExpressions.select(reviewEntity.count())
+                                .from(reviewEntity)
+                                .where(reviewEntity.parentReview.eq(reviewEntity)),
+                        JPAExpressions.selectOne()
+                                .from(reviewLikeEntity)
+                                .where(reviewLikeEntity.review.eq(reviewEntity))
+                                .where(reviewLikeEntity.user.id.eq(userId))
+                                .exists(),  // 좋아요 여부 확인
+                        // 사용자가 이 리뷰에 싫어요를 눌렀는지 여부 확인
+                        JPAExpressions.selectOne()
+                                .from(reviewDislikeEntity)
+                                .where(reviewDislikeEntity.review.eq(reviewEntity))
+                                .where(reviewDislikeEntity.user.id.eq(userId))
+                                .exists()  // 싫어요 여부 확인
+                ))
                 .from(reviewEntity)
                 .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
                 .leftJoin(reviewDislikeEntity).on(reviewDislikeEntity.review.eq(reviewEntity))
@@ -154,10 +201,12 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     }
 
     @Override
-    public Page<ReviewPreViewDTO> findGeneralReviewsExcludingBest(Long movieId, List<Long> bestReviewIds, Pageable pageable) {
+    public Page<ReviewPreViewDTO> findGeneralReviewsExcludingBest(Long movieId, Long userId, List<Long> bestReviewIds, Pageable pageable, String sortType) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
-        System.out.println( JPAExpressions.select(reviewEntity.count()).from(reviewEntity).where(reviewEntity.parentReview.eq(reviewEntity)));
+        // 정렬 기준 설정
+        OrderSpecifier<?> orderSpecifier = getSortOrder(sortType);
+
         List<ReviewPreViewDTO> generalReviewList = queryFactory
                 .select(new QReviewPreViewDTO(
                         reviewEntity.id,
@@ -171,7 +220,19 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         reviewDislikeEntity.countDistinct(),
                         JPAExpressions.select(reviewEntity.count())
                                 .from(reviewEntity)
-                                .where(reviewEntity.parentReview.id.eq(reviewEntity.id))))
+                                .where(reviewEntity.parentReview.eq(reviewEntity)),
+                        JPAExpressions.selectOne()
+                                .from(reviewLikeEntity)
+                                .where(reviewLikeEntity.review.eq(reviewEntity))
+                                .where(reviewLikeEntity.user.id.eq(userId))
+                                .exists(),  // 좋아요 여부 확인
+                        // 사용자가 이 리뷰에 싫어요를 눌렀는지 여부 확인
+                        JPAExpressions.selectOne()
+                                .from(reviewDislikeEntity)
+                                .where(reviewDislikeEntity.review.eq(reviewEntity))
+                                .where(reviewDislikeEntity.user.id.eq(userId))
+                                .exists()  // 싫어요 여부 확인
+                ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
                 .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
@@ -180,6 +241,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .where(reviewEntity.parentReview.isNull())
                 .where(reviewEntity.id.notIn(bestReviewIds))
                 .groupBy(reviewEntity.id)
+                .orderBy(orderSpecifier)  // 정렬 기준 추가
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -233,6 +295,15 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                             .and(userBadgeEntity.isUse.isTrue()))
                     .fetch();
             dto.setBadgeList(badgeList);
+        }
+    }
+
+    // 정렬 기준 설정 메서드
+    private OrderSpecifier<?> getSortOrder(String sortType) {
+        if ("star".equalsIgnoreCase(sortType)) {
+            return reviewEntity.star.desc();  // 별점순 내림차순 정렬
+        } else {
+            return reviewEntity.createdAt.desc();  // 최신순 정렬
         }
     }
 }

@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface ReviewRepositoryCustom {
 
-    Page<ReviewPreViewDTO> findAllByMovieId(Long movieId, Pageable pageable);
+    Page<ReviewPreViewDTO> findAllByMovieId(Long movieId, Long userId, Pageable pageable, String sortType);
 
-    Page<CommentPreViewDTO> findAllByParentReviewId(Long parentReviewId, Pageable pageable);
+    Page<CommentPreViewDTO> findAllByParentReviewId(Long parentReviewId, Long userId, Pageable pageable);
 
-    List<ReviewPreViewDTO> findBestReviews(Long movieId, int limit);
+    List<ReviewPreViewDTO> findBestReviews(Long movieId, Long userId, int limit);
 
-    Page<ReviewPreViewDTO> findGeneralReviewsExcludingBest(Long movieId, List<Long> bestReviewIds, Pageable pageable);
+    Page<ReviewPreViewDTO> findGeneralReviewsExcludingBest(Long movieId, Long userId, List<Long> bestReviewIds, Pageable pageable, String sortType);
 }

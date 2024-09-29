@@ -129,33 +129,36 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReviewPreViewDTO> getReviewList(Long movieId, Integer page) {
-        return reviewRepository.findAllByMovieId(movieId, PageRequest.of(page, 10));
+    public Page<ReviewPreViewDTO> getReviewList(Long movieId, String email, Integer page, String sort) {
+        UserEntity user = userRepository.findByEmail(email);
+        return reviewRepository.findAllByMovieId(movieId, user.getId(), PageRequest.of(page, 10), sort);
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewPreViewDTO> getBestReviews(Long movieId) {
+    public List<ReviewPreViewDTO> getBestReviews(Long movieId, String email) {
         int bestReviewLimit = 3;
-        return reviewRepository.findBestReviews(movieId, bestReviewLimit);
+        UserEntity user = userRepository.findByEmail(email);
+        return reviewRepository.findBestReviews(movieId, user.getId(), bestReviewLimit);
     }
 
     @Transactional(readOnly = true)
-    public Page<ReviewPreViewDTO> getGeneralReviewsExcludingBest(Long movieId, Integer page) {
+    public Page<ReviewPreViewDTO> getGeneralReviewsExcludingBest(Long movieId, String email, Integer page, String sort) {
         int bestReviewLimit = 3;
-
+        UserEntity user = userRepository.findByEmail(email);
         // Best 리뷰 가져오기
-        List<ReviewPreViewDTO> bestReviews = reviewRepository.findBestReviews(movieId, bestReviewLimit);
+        List<ReviewPreViewDTO> bestReviews = reviewRepository.findBestReviews(movieId, user.getId(), bestReviewLimit);
         List<Long> bestReviewIds = bestReviews.stream()
                 .map(ReviewPreViewDTO::getId)
                 .toList();
 
         // 일반 리뷰 가져오기 (Best 리뷰 제외)
-        return reviewRepository.findGeneralReviewsExcludingBest(movieId, bestReviewIds, PageRequest.of(page, 10));
+        return reviewRepository.findGeneralReviewsExcludingBest(movieId, user.getId(), bestReviewIds, PageRequest.of(page, 10), sort);
     }
 
     @Transactional(readOnly = true)
-    public Page<CommentPreViewDTO> getCommentList(Long parentReviewId, Integer page) {
-        return reviewRepository.findAllByParentReviewId(parentReviewId, PageRequest.of(page, 10));
+    public Page<CommentPreViewDTO> getCommentList(Long parentReviewId, String email, Integer page) {
+        UserEntity user = userRepository.findByEmail(email);
+        return reviewRepository.findAllByParentReviewId(parentReviewId, user.getId(), PageRequest.of(page, 10));
     }
 
     @Transactional
@@ -298,9 +301,16 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public ReviewEntity getMyReviewByMovie(Long movieId, String email) {
+    public ReviewEntity getMyReviewByMovieId(Long movieId, String email) {
         UserEntity user = userRepository.findByEmail(email);
-        return reviewRepository.findByUserIdAndMovieId(user.getId(), movieId)
+        return reviewRepository.findByUserIdAndMovieIdAndParentReviewIsNull(user.getId(), movieId)
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.REVIEW_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewEntity getMyStarByMovieId(Long movieId, String email) {
+        UserEntity user = userRepository.findByEmail(email);
+        return reviewRepository.findByUserIdAndMovieIdAndParentReviewIsNull(user.getId(), movieId)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.REVIEW_NOT_FOUND));
     }
 }
