@@ -23,4 +23,8 @@ public class CommentPreViewDTO {
     long likeCount;
 
     long dislikeCount;
+
+    boolean likeCheck;
+
+    boolean dislikeCheck;
 }

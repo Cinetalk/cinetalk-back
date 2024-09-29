@@ -41,35 +41,42 @@ public class ReviewController {
     }
 
     @GetMapping("/{movieId}")
-    @Operation(summary = "특정 영화의 리뷰 목록 조회 API", description = "특정 영화 전페 리뷰 목록을 조회하는 API 이며, 페이징을 포함합니다.")
+    @Operation(summary = "특정 영화의 리뷰 목록 조회 API", description = "특정 영화 전페 리뷰 목록을 조회하는 API 이며, 페이징을 포함합니다. 별점 순으로 정렬시, sort 파라미터에 star를 입력하면 됩니다.")
     public ReviewPreViewListDTO getReviewListByMovie(@PathVariable(name = "movieId") Long movieId,
-                                                     @RequestParam(name = "page") Integer page) {
+                                                     @JwtValidation String email,
+                                                     @RequestParam(name = "page") Integer page,
+                                                     @RequestParam(name = "sort", defaultValue = "createdAt") String sort) {
 
-        Page<ReviewPreViewDTO> reviewList = reviewService.getReviewList(movieId, page);
+        Page<ReviewPreViewDTO> reviewList = reviewService.getReviewList(movieId, email, page, sort);
         return ReviewPreViewListDTO.toReviewPreViewListDTO(reviewList);
     }
 
     @GetMapping("/{movieId}/best")
     @Operation(summary = "특정 영화의 Best 리뷰 목록 조회 API", description = "특정 영화의 Best 리뷰 목록을 조회하는 API 입니다.")
-    public List<ReviewPreViewDTO> getBestReviewsByMovie(@PathVariable(name = "movieId") Long movieId) {
-        return reviewService.getBestReviews(movieId);
+    public List<ReviewPreViewDTO> getBestReviewsByMovie(@PathVariable(name = "movieId") Long movieId,
+                                                        @JwtValidation String email) {
+
+        return reviewService.getBestReviews(movieId, email);
     }
 
     @GetMapping("/{movieId}/general")
-    @Operation(summary = "특정 영화의 일반 리뷰 목록 조회 API", description = "특정 영화의 일반 리뷰 목록(Best 리뷰 제외)을 조회하는 API 이며, 페이징을 포함합니다.")
+    @Operation(summary = "특정 영화의 일반 리뷰 목록 조회 API", description = "특정 영화의 일반 리뷰 목록(Best 리뷰 제외)을 조회하는 API 이며, 페이징을 포함합니다. 별점 순으로 정렬시, sort 파라미터에 star를 입력하면 됩니다.")
     public ReviewPreViewListDTO getGeneralReviewsByMovie(@PathVariable(name = "movieId") Long movieId,
-                                                         @RequestParam(name = "page") Integer page) {
+                                                         @JwtValidation String email,
+                                                         @RequestParam(name = "page") Integer page,
+                                                         @RequestParam(name = "sort", defaultValue = "createdAt") String sort) {
 
-        Page<ReviewPreViewDTO> reviewListExcludingBest = reviewService.getGeneralReviewsExcludingBest(movieId, page);
+        Page<ReviewPreViewDTO> reviewListExcludingBest = reviewService.getGeneralReviewsExcludingBest(movieId, email, page, sort);
         return ReviewPreViewListDTO.toReviewPreViewListDTO(reviewListExcludingBest);
     }
 
     @GetMapping("/{parentReviewId}/comments")
     @Operation(summary = "리뷰의 댓글 목록 조회 API", description = "특정 리뷰의 댓글 목록을 조회하는 API 이며, 페이징을 포함합니다.")
     public CommentPreViewListDTO getCommentListByParentReview(@PathVariable(name = "parentReviewId") Long parentReviewId,
+                                                              @JwtValidation String email,
                                                               @RequestParam(name = "page") Integer page) {
 
-        Page<CommentPreViewDTO> commentList = reviewService.getCommentList(parentReviewId, page);
+        Page<CommentPreViewDTO> commentList = reviewService.getCommentList(parentReviewId, email, page);
         return CommentPreViewListDTO.toReReviewPreViewListDTO(commentList);
     }
 
@@ -133,7 +140,15 @@ public class ReviewController {
     @Operation(summary = "내가 작성한 리뷰 조회 API", description = "특정 영화의 내가 작성한 리뷰를 조회하는 API 입니다.")
     public MyReviewResponseDTO getMyReviewByMovie(@RequestParam Long movieId, @JwtValidation String email) {
 
-        ReviewEntity myReviewByMovie = reviewService.getMyReviewByMovie(movieId, email);
+        ReviewEntity myReviewByMovie = reviewService.getMyReviewByMovieId(movieId, email);
         return MyReviewResponseDTO.toMyReviewResponseDTO(myReviewByMovie);
+    }
+
+    @GetMapping("/star")
+    @Operation(summary = "내가 작성한 벌점 조회 API", description = "특정 영화의 내가 작성한 별점을 조회하는 API 입니다.")
+    public StarResponseDTO getMyStarByMovie(@RequestParam Long movieId, @JwtValidation String email) {
+
+        ReviewEntity myReviewByMovie = reviewService.getMyStarByMovieId(movieId, email);
+        return StarResponseDTO.toStarResponseDTO(myReviewByMovie);
     }
 }
