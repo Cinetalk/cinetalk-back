@@ -29,7 +29,7 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , Qu
    @Query("SELECT COUNT(rg) FROM ReviewGenreEntity rg JOIN rg.review r WHERE r.user = :user AND rg.genre = :genre")
    long countByUserAndGenre(@Param("user") UserEntity user, @Param("genre") GenreEntity genre);
 
-   Optional<ReviewEntity> findByUserIdAndMovieId(Long userId, Long movieId);
+   Optional<ReviewEntity> findByUserIdAndMovieIdAndParentReviewIsNull(Long userId, Long movieId);
 
    Long countByParentReviewIsNullAndCreatedAtBetween(LocalDateTime fromDate, LocalDateTime toDate);
 }
