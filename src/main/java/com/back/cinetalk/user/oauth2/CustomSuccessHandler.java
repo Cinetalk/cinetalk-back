@@ -13,6 +13,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,6 +32,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 @Component
+@Slf4j
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JWTUtil jwtUtil;
@@ -80,6 +82,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addCookie(createCookie("refresh",refresh));
         response.setStatus(HttpStatus.OK.value());
 
+        String redirectUrl = (String) request.getSession().getAttribute("redirecturl");
+
         //닉네임이 존재하지 않을 경우
         if(nickname == null){
 
@@ -91,12 +95,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             userRepository.updateProfileByEmail(email,profile);
 
-            response.sendRedirect("http://localhost:3000/redirect/without-nickname?authToken="+authToken);
+            response.sendRedirect(redirectUrl+"/redirect/without-nickname?authToken="+authToken);
         }
         //닉네임이 존재할 경우
         else{
 
-            response.sendRedirect("http://localhost:3000/redirect?authToken="+authToken);
+            response.sendRedirect(redirectUrl+"/redirect?authToken="+authToken);
         }
     }
 
