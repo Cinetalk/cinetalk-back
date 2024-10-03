@@ -37,6 +37,7 @@ public class ADamageService {
 
         DamageEntity damage = DamageEntity.builder()
                 .category(requestDTO.getCategory())
+                .movienm(report.getReview().getMovienm())
                 .content(report.getReview().getContent())
                 .user(report.getReview().getUser())
                 .startDate(today)

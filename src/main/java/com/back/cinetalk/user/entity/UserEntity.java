@@ -74,7 +74,7 @@ public class UserEntity extends BaseEntity {
     private List<ReportEntity> reportEntityList = new ArrayList<>(); // 신고 리스트
 
     @OneToMany(mappedBy = "user")
-    private List<DamageEntity> damageEntityList = new ArrayList<>(); // 신고 리스트
+    private List<DamageEntity> damageEntityList = new ArrayList<>(); // 제재 리스트
 
     public static UserEntity ToUserEntity(UserDTO userDTO) {
         return UserEntity.builder()
