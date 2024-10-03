@@ -2,7 +2,6 @@ package com.back.cinetalk.user.MyPage.service;
 
 import com.back.cinetalk.bookmark.entity.QBookmarkEntity;
 import com.back.cinetalk.config.dto.StateRes;
-import com.back.cinetalk.damage.entity.DamageEntity;
 import com.back.cinetalk.damage.entity.QDamageEntity;
 import com.back.cinetalk.genre.entity.QGenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -259,6 +257,7 @@ public class MyPage_ActivityService {
 
         DamageByUserResponseDTO userDamage = queryFactory.select(Projections.constructor(
                 DamageByUserResponseDTO.class,
+                        damage.movienm,
                         damage.content.as("review_content"),
                         damage.category,
                         Expressions.stringTemplate("DATE_FORMAT({0}, '%y.%m.%d')",damage.startDate).as("startDate"),

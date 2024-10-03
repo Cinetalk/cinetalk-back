@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DamageByUserResponseDTO {
 
+    private String movienm;
     private String review_content;
     private String category;
     private String startDate;

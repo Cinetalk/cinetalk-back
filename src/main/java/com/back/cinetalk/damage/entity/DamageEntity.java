@@ -25,6 +25,9 @@ public class DamageEntity{
     //신고 사유 -- 신고 들어온것의 신고사유를 넣어주면 됨 front 가 해줄일
     private String category;
 
+    //영화 이름 -- 제재했던 댓글의 영화 이름 (이정도면 걍 review_id 등록하면 되지않움? -> CascadeType.ALL)
+    private String movienm;
+
     //댓글 내용 -- 제재를 가하게 되면 댓글은 삭제 되지만 댓글 내용은 보존해야 하기때문에
     private String content;
 
