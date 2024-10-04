@@ -71,7 +71,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         userDTO.setEmail(oAuth2Response.getEmail());
         //oauth 디폴트 password 생성
         userDTO.setPassword("oauthdefalt");
-        userDTO.setName(oAuth2Response.getName());
+        //이름 받아오기 금지
+        //userDTO.setName(oAuth2Response.getName());
         userDTO.setGender(oAuth2Response.getGender());
         userDTO.setBirthday(oAuth2Response.getBirthday());
         //프로필 받아오기 금지

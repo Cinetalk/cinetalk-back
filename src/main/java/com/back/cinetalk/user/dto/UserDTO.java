@@ -48,7 +48,7 @@ public class UserDTO {
         return UserDTO.builder()
                 .id(userEntity.getId())
                 .email(userEntity.getEmail())
-                .name(userEntity.getName())
+                //.name(userEntity.getName())
                 .nickname(userEntity.getNickname())
                 .gender(userEntity.getGender())
                 .birthday(userEntity.getBirthday())

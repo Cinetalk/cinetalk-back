@@ -16,7 +16,6 @@ public class NaverResponse implements OAuth2Response{
         this.attribute = (Map<String, Object>) attribute.get("response");
     }
 
-
     @Override
     public String getProvider() {
 
@@ -34,10 +33,12 @@ public class NaverResponse implements OAuth2Response{
         return attribute.get("email").toString();
     }
 
+    /*
     @Override
     public String getName() {
         return attribute.get("name").toString();
     }
+     */
 
     @Override
     public String getGender() {
@@ -54,6 +55,7 @@ public class NaverResponse implements OAuth2Response{
         return LocalDate.parse(birthString, formatter);
     }
 
+    /*
     @Override
     public byte[] getProfile() {
 
@@ -71,4 +73,6 @@ public class NaverResponse implements OAuth2Response{
             return null;
         }
     }
+
+     */
 }

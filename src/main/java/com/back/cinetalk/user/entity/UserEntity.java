@@ -36,7 +36,7 @@ public class UserEntity extends BaseEntity {
 
     private String password;
 
-    private String name;
+    //private String name;
 
     private String nickname;
 
@@ -81,7 +81,7 @@ public class UserEntity extends BaseEntity {
                 .id(userDTO.getId())
                 .email(userDTO.getEmail())
                 .password(userDTO.getPassword())
-                .name(userDTO.getName())
+                //.name(userDTO.getName())
                 .nickname(userDTO.getNickname())
                 .gender(userDTO.getGender())
                 .birthday(userDTO.getBirthday())
