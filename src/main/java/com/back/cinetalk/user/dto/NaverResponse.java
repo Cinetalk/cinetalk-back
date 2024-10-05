@@ -33,12 +33,14 @@ public class NaverResponse implements OAuth2Response{
         return attribute.get("email").toString();
     }
 
-    /*
+
     @Override
     public String getName() {
-        return attribute.get("name").toString();
+        //return attribute.get("name").toString();
+        //이름을 빈값이나 null 대신 이걸로 받기로함
+        return attribute.get("email").toString();
     }
-     */
+
 
     @Override
     public String getGender() {

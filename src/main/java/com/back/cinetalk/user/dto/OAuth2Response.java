@@ -11,7 +11,7 @@ public interface OAuth2Response {
     //이메일
     String getEmail();
     //사용자 실명 (설정한 이름)
-    //String getName();
+    String getName();
 
     //사용자 성별
     String getGender();
