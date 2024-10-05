@@ -49,7 +49,7 @@ public class MyPage_BookmarkService {
             BookmarkByUserResponseDTO responseDTO = BookmarkByUserResponseDTO.builder()
                     .id(bookmarkEntity.getId())
                     .movie_id(bookmarkEntity.getMovieId())
-                    .poster_path("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path"))
+                    .poster_path((String) oneByID.get("poster_path"))
                     .build();
 
             result.add(responseDTO);
