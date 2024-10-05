@@ -20,6 +20,8 @@ public class MyReviewResponseDTO {
 
     private String content;
 
+    boolean spoiler;
+
     private LocalDateTime createTime;
 
     public static MyReviewResponseDTO toMyReviewResponseDTO(ReviewEntity reviewEntity) {
@@ -27,6 +29,7 @@ public class MyReviewResponseDTO {
                 .reviewId(reviewEntity.getId())
                 .star(reviewEntity.getStar())
                 .content(reviewEntity.getContent())
+                .spoiler(reviewEntity.isSpoiler())
                 .createTime(reviewEntity.getCreatedAt())
                 .build();
     }

@@ -20,5 +20,5 @@ public interface OAuth2Response {
     LocalDate getBirthday();
 
     //사용자 프로필사진
-    byte[] getProfile();
+    //byte[] getProfile();
 }

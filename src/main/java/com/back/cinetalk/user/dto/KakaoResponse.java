@@ -33,11 +33,14 @@ public class KakaoResponse implements OAuth2Response{
         return attribute.get("email").toString();
     }
 
+
     @Override
     public String getName() {
 
-        return attribute.get("name").toString();
+        //return attribute.get("name").toString();
+        return attribute.get("email").toString();
     }
+
 
     @Override
     public String getGender() {
@@ -65,6 +68,7 @@ public class KakaoResponse implements OAuth2Response{
         return LocalDate.parse(birth, formatter);
     }
 
+    /*
     @Override
     public byte[] getProfile() {
 
@@ -84,4 +88,5 @@ public class KakaoResponse implements OAuth2Response{
             return null;
         }
     }
+    */
 }

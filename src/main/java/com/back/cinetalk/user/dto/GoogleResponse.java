@@ -44,11 +44,14 @@ public class GoogleResponse implements OAuth2Response{
         return attribute.get("email").toString();
     }
 
+
     @Override
     public String getName() {
 
-        return attribute.get("name").toString();
+        //return attribute.get("name").toString();
+        return attribute.get("email").toString();
     }
+
 
     @Override
     public String getGender() {
@@ -61,7 +64,7 @@ public class GoogleResponse implements OAuth2Response{
 
         return birthday;
     }
-
+    /*
     @Override
     public byte[] getProfile() {
 
@@ -79,6 +82,7 @@ public class GoogleResponse implements OAuth2Response{
             return null;
         }
     }
+    */
     private void fetchAdditionalUserInfo() {
         String url = "https://people.googleapis.com/v1/people/me?personFields=genders,birthdays";
         RestTemplate restTemplate = new RestTemplate();
