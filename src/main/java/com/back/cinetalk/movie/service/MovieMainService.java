@@ -132,7 +132,7 @@ public class MovieMainService {
                 map.put("likeCount", result.get(1, Long.class));
                 map.put("rereviewCount", result.get(2, Long.class));
                 map.put("StarAvg", result.get(3, Double.class));
-                map.put("movieposter", "https://image.tmdb.org/t/p/original" + (String) oneByID.get("poster_path"));
+                map.put("movieposter",(String) oneByID.get("poster_path"));
 
                 resultlist.add(map);
             }
@@ -361,7 +361,7 @@ public class MovieMainService {
                     .review_id(reviewEntity.getId())
                     .movie_id(reviewEntity.getMovieId())
                     .movienm((String) oneByID.get("title"))
-                    .poster_id("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path"))
+                    .poster_id((String) oneByID.get("poster_path"))
                     .star(reviewEntity.getStar())
                     .content(reviewEntity.getContent())
                     .RateCount(rateCount)
@@ -436,7 +436,7 @@ public class MovieMainService {
 
             String movienm = oneByID.get("title").toString();
             String overview = oneByID.get("overview").toString();
-            String poster_path = "https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString();
+            String poster_path = oneByID.get("poster_path").toString();
             String releaseDate = oneByID.get("release_date").toString().substring(0, 4);
 
             HoxyDTO result = HoxyDTO.builder()
@@ -500,8 +500,8 @@ public class MovieMainService {
             BannerDTO result = BannerDTO.builder()
                     .movieId(movieId)
                     .movienm(oneByID.get("title").toString())
-                    .poster_path("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString())
-                    .backdrop_path("https://image.tmdb.org/t/p/original"+oneByID.get("backdrop_path").toString())
+                    .poster_path(oneByID.get("poster_path").toString())
+                    .backdrop_path(oneByID.get("backdrop_path").toString())
                     .genres((List<Map<String, Object>>) oneByID.get("genres"))
                     .rate(rate)
                     .keyword(topKeyword)
@@ -584,7 +584,7 @@ public class MovieMainService {
             TopTenDTO result = TopTenDTO.builder()
                     .movieId(movieId)
                     .movienm(oneByID.get("title").toString())
-                    .poster_path("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path").toString())
+                    .poster_path(oneByID.get("poster_path").toString())
                     .release_date(oneByID.get("release_date").toString()) //문자열 잘라야됨
                     .genres((List<Map<String, Object>>) oneByID.get("genres"))
                     .TMDBRate(Double.valueOf(oneByID.get("vote_average").toString()))
