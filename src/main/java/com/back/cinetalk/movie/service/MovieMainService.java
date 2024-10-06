@@ -165,18 +165,13 @@ public class MovieMainService {
         //리뷰 직렬화
         for (String content : reviewList) {
             Review.append(content
-                    .replaceAll("\\.","")
                     .replaceAll("\\n", "")
-                    .replaceAll("~","")
-                    .replaceAll("\\)","")
-                    .replaceAll("\\(","")
-                    .replaceAll(",","")
-                    .replaceAll("ㅋ","")
-                    .replaceAll("ㅎ","")
-                    +".");
+                    .replaceAll("\\t", "")
+                    .replaceAll("\\r", "")
+                    .replaceAll("[ㄱ-ㅎㅏ-ㅣ!@#$%^&*()_+=-\\[\\]{};':\"\\\\|,.<>?/~`]", ""));
         }
 
-        Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
+        Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
 
         // 형태소 분석 및 단어 추출 - 알고리즘 최적화
         Map<String, Integer> wordFrequency = new HashMap<>();
@@ -200,6 +195,7 @@ public class MovieMainService {
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         if(sortedList.size()<5){
+            log.info(String.valueOf(tokenList.size()));
             log.info("Mention_Keyword_Count : "+sortedList.size());
 
             throw new RestApiException(CommonErrorCode.MENTIONKEYWORD_LESS);
