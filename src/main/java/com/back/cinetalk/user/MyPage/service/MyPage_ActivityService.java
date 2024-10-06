@@ -236,7 +236,7 @@ public class MyPage_ActivityService {
                     .id(tuple.get(1,Long.class))
                     .movieId(tuple.get(2,Long.class))
                     .movienm((String) oneByID.get("title"))
-                    .poster_path("https://image.tmdb.org/t/p/original"+oneByID.get("poster_path"))
+                    .poster_path((String) oneByID.get("poster_path"))
                     .star(star)
                     .content(tuple.get(4,String.class))
                     .createdAt(tuple.get(5,LocalDateTime.class))
