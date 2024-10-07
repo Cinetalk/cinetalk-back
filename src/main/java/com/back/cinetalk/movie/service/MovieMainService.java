@@ -33,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.back.cinetalk.review.entity.QReviewEntity.*;
 import static com.back.cinetalk.user.entity.QUserEntity.*;
@@ -142,6 +144,7 @@ public class MovieMainService {
     }
 
     //TODO 자주 언급 되는 키워드
+    @Async
     public ResponseEntity<?> MentionKeyword() {
 
         // 오늘 날짜 설정
@@ -149,9 +152,10 @@ public class MovieMainService {
 
         // 오늘 자 리뷰 가져오기
         List<String> reviewList = queryFactory
-                .select(review.content)
+                .select(Expressions.stringTemplate(
+                        "REGEXP_REPLACE(REPLACE(REPLACE(REPLACE({0}, '\\n', ''), '\\t', ''), '\\r', ''), '[ㄱ-ㅎㅏ-ㅣ]', '')",
+                        review.content))
                 .from(review)
-                // review.createdAt의 날짜 부분만 비교하기 위해 LocalDate로 변환 후 비교
                 .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX))
                         .and(review.parentReview.isNull()))
                 .fetch();
@@ -161,17 +165,11 @@ public class MovieMainService {
             return new ResponseEntity<>("",HttpStatus.OK);
         }
 
-        StringBuilder Review = new StringBuilder();
-        //리뷰 직렬화
-        for (String content : reviewList) {
-            Review.append(content
-                    .replaceAll("\\n", "")
-                    .replaceAll("\\t", "")
-                    .replaceAll("\\r", "")
-                    .replaceAll("[ㄱ-ㅎㅏ-ㅣ!@#$%^&*()_+=-\\[\\]{};':\"\\\\|,.<>?/~`]", ""));
-        }
+        String Review = String.join("", reviewList);
 
-        Komoran komoran = new Komoran(DEFAULT_MODEL.FULL);
+        //String s = Review.toString().replaceAll("[\\n\\t\\r]|[ㄱ-ㅎㅏ-ㅣ]", "");
+
+        Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
 
         // 형태소 분석 및 단어 추출 - 알고리즘 최적화
         Map<String, Integer> wordFrequency = new HashMap<>();
