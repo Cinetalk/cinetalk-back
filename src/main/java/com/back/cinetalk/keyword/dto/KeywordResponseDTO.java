@@ -13,12 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class KeywordResponseDTO {
 
+    private Long keywordId;
+
     private String keyword;
 
     private int count;
 
     public static KeywordResponseDTO toKeywordResponseDTO(KeywordEntity keywordEntity) {
         return KeywordResponseDTO.builder()
+                .keywordId(keywordEntity.getId())
                 .keyword(keywordEntity.getKeyword())
                 .count(keywordEntity.getCount())
                 .build();
