@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @Getter
@@ -24,6 +26,10 @@ public class MyReviewResponseDTO {
 
     private LocalDateTime createTime;
 
+    String nickName;
+
+    List<String> badgeList;
+
     public static MyReviewResponseDTO toMyReviewResponseDTO(ReviewEntity reviewEntity) {
         return MyReviewResponseDTO.builder()
                 .reviewId(reviewEntity.getId())
@@ -31,6 +37,11 @@ public class MyReviewResponseDTO {
                 .content(reviewEntity.getContent())
                 .spoiler(reviewEntity.isSpoiler())
                 .createTime(reviewEntity.getCreatedAt())
+                .nickName(reviewEntity.getUser().getNickname())
+                .badgeList(reviewEntity.getUser().getUserBadgeEntityList()
+                        .stream()
+                        .map(badge -> badge.getBadge().getName())
+                        .collect(Collectors.toList()))
                 .build();
     }
 }
