@@ -41,8 +41,8 @@ spring:
             client-name: kakao
             client-id: dddf0b88ada935e84093e84df995be33
             client-secret: a8KAE9PqewRLeTwvXhMCliyFaxPTbMuX
-            #redirect-uri: https://cinetalk.kro.kr/login/oauth2/code/kakao
-            redirect-uri: http://localhost:80/login/oauth2/code/kakao
+            redirect-uri: https://cinetalk.kro.kr/login/oauth2/code/kakao
+            #redirect-uri: http://localhost:80/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
             #scope: account_email,profile_nickname,profile_image,name,gender,birthday,birthyear
