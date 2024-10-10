@@ -45,6 +45,7 @@ public class KakaoResponse implements OAuth2Response{
     @Override
     public String getGender() {
 
+        /*
         String gender = attribute.get("gender").toString();
 
         if(gender.equals("male")){
@@ -52,20 +53,23 @@ public class KakaoResponse implements OAuth2Response{
         }else{
             return "F";
         }
+         */
+        return "E";
     }
 
     @Override
     public LocalDate getBirthday() {
 
-        String birthyear = attribute.get("birthyear").toString();
+        //String birthyear = attribute.get("birthyear").toString();
 
-        String birthday = attribute.get("birthday").toString();
+        //String birthday = attribute.get("birthday").toString();
 
-        String birth = birthyear+"-"+birthday.substring(0,2)+"-"+birthday.substring(2);
+        //String birth = birthyear+"-"+birthday.substring(0,2)+"-"+birthday.substring(2);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        return LocalDate.parse(birth, formatter);
+        //return LocalDate.parse(birth, formatter);
+        return LocalDate.parse("2000-01-01", formatter);
     }
 
     /*

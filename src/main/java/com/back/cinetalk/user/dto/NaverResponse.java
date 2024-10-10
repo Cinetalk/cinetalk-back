@@ -44,17 +44,20 @@ public class NaverResponse implements OAuth2Response{
 
     @Override
     public String getGender() {
-        return attribute.get("gender").toString();
+
+        //return attribute.get("gender").toString();
+        return "E";
     }
 
     @Override
     public LocalDate getBirthday() {
 
-        String birthString = attribute.get("birthyear").toString() + "-" + attribute.get("birthday").toString();
+        //String birthString = attribute.get("birthyear").toString() + "-" + attribute.get("birthday").toString();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        return LocalDate.parse(birthString, formatter);
+        //return LocalDate.parse(birthString, formatter);
+        return LocalDate.parse("2000-01-01", formatter);
     }
 
     /*
