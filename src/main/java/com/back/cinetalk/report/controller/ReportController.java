@@ -16,12 +16,21 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @PostMapping("/{reviewId}")
+    @PostMapping("/reviews/{reviewId}")
     @Operation(summary = "리뷰 신고 API", description = "리뷰를 신고하는 API 입니다.")
-    public StateRes saveReport(@PathVariable(name = "reviewId") Long reviewId,
-                               @RequestBody @Valid ReportRequestDTO reportRequestDTO,
-                               @JwtValidation String email) {
+    public StateRes saveReviewReport(@PathVariable(name = "reviewId") Long reviewId,
+                                     @RequestBody @Valid ReportRequestDTO reportRequestDTO,
+                                     @JwtValidation String email) {
 
-        return reportService.saveReport(reviewId, reportRequestDTO, email);
+        return reportService.saveReviewReport(reviewId, reportRequestDTO, email);
+    }
+
+    @PostMapping("keywords/{keywordId}")
+    @Operation(summary = "키워드 신고 API", description = "리뷰를 신고하는 API 입니다.")
+    public StateRes saveKeywordReport(@PathVariable Long keywordId,
+                                      @RequestBody @Valid ReportRequestDTO reportRequestDTO,
+                                      @JwtValidation String email) {
+
+        return reportService.saveKeywordReport(keywordId, reportRequestDTO, email);
     }
 }
