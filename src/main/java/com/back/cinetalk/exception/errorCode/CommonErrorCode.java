@@ -36,6 +36,7 @@ public enum CommonErrorCode implements ErrorCode {
 
     // 키워드 관련 에러
     KEYWORD_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 작성한 키워드입니다."),
+    KEYWORD_ALREADY_COUNT(HttpStatus.BAD_REQUEST, "해당 키워드를 이미 클릭하셨습니다."),
     KEYWORD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 키워드를 찾을 수 없습니다"),
     KEYWORD_NOT_ALLOWED(HttpStatus.FORBIDDEN, "키워드를 수정할 권한이 없습니다"),
 

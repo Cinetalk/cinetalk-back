@@ -1,7 +1,6 @@
 package com.back.cinetalk.keyword.dto;
 
 import com.back.cinetalk.keyword.entity.KeywordEntity;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

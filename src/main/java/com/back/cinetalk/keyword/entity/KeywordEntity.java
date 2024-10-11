@@ -9,6 +9,8 @@ import lombok.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,7 +34,14 @@ public class KeywordEntity extends BaseEntity {
 
     private int count;
 
+    @OneToMany(mappedBy = "keyword")
+    private List<UserKeywordClickEntity> userKeywordClickEntityList = new ArrayList<>(); // 제재 리스트
+
     public void update(KeywordRequestDTO keywordRequestDTO) {
         this.keyword = keywordRequestDTO.getKeyword();
+    }
+
+    public void updateCount() {
+        this.count++;
     }
 }
