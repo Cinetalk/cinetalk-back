@@ -1,6 +1,7 @@
 package com.back.cinetalk.report.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
+import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -35,6 +36,10 @@ public class ReportEntity extends BaseEntity {
     @JoinColumn(name = "review_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private ReviewEntity review;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "keyword_id")
+    private KeywordEntity keyword;
 
     public void UpdateStatus(Boolean status){
         this.status=status;
