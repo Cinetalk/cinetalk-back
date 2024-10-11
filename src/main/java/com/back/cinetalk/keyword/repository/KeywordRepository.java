@@ -15,12 +15,12 @@ import java.util.Optional;
 @Repository
 public interface KeywordRepository extends JpaRepository<KeywordEntity, Long>, KeywordRepositoryCustom {
 
-    @Query("SELECT DISTINCT k.keyword FROM KeywordEntity k " +
+    @Query("SELECT k FROM KeywordEntity k " +
             "WHERE k.movieId = :movieId " +
-            "GROUP BY k.keyword " +
-            "ORDER BY MAX(k.updatedAt) DESC " +
+            "AND k.updatedAt = (SELECT MAX(k2.updatedAt) FROM KeywordEntity k2 WHERE k2.keyword = k.keyword) " +
+            "ORDER BY k.updatedAt DESC " +
             "LIMIT 4")
-    List<String> findDistinctKeywordsByMovieIdOrderByCreatedAtDesc(@Param("movieId") Long movieId);
+    List<KeywordEntity> findDistinctKeywordsByMovieIdOrderByUpdatedAtDesc(@Param("movieId") Long movieId);
 
     boolean existsByUserIdAndMovieId(Long userId, Long movieId);
 
