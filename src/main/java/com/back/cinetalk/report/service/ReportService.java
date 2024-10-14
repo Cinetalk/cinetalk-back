@@ -52,7 +52,7 @@ public class ReportService {
         KeywordEntity keyword = keywordRepository.findById(keywordId)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.KEYWORD_NOT_FOUND));
 
-        if (reportRepository.existsByUserAndKeyword(user, keyword)) {
+        if (reportRepository.existsByUserAndMovieId(user, keyword.getMovieId())) {
             throw new RestApiException(CommonErrorCode.KEYWORD_REPORT_ALREADY_IN_WRITE);
         }
 

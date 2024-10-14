@@ -13,5 +13,5 @@ public interface ReportRepository extends JpaRepository<ReportEntity, Long> {
 
     boolean existsByUserAndReview (UserEntity user, ReviewEntity review);
 
-    boolean existsByUserAndKeyword (UserEntity user, KeywordEntity keyword);
+    boolean existsByUserAndMovieId (UserEntity user, Long movieId);
 }
