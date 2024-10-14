@@ -204,34 +204,9 @@ public class ReviewService {
 
         verifyUserAuthorization(user, reviewEntity);
 
-        // 리뷰와 연관된 장르들 가져오기
-        List<ReviewGenreEntity> reviewGenreEntities = reviewGenreRepository.findByReview(reviewEntity);
+        // 리뷰 삭제
         reviewRepository.delete(reviewEntity);
-
-        // 각 장르에 대해 뱃지 회수 확인
-        reviewGenreEntities.forEach(reviewGenreEntity -> checkAndRevokeGenreBadge(user, reviewGenreEntity.getGenre()));
-
         return new StateRes(true);
-    }
-
-    @Transactional
-    public void checkAndRevokeGenreBadge(UserEntity user, GenreEntity genre) {
-        // 특정 장르에 대한 리뷰 수 계산
-        long genreReviewCount = reviewRepository.countByUserAndGenre(user, genre);
-
-        // 리뷰 수가 10개 미만인 경우 뱃지 회수
-        if (genreReviewCount < 10) {
-            BadgeEntity badge = badgeRepository.findByGenre(genre)
-                    .orElseThrow(() -> new RestApiException(CommonErrorCode.BADGE_NOT_FOUND));
-
-            if (badge != null) {
-                // 해당 장르 뱃지를 발급받았는지 확인
-                Optional<UserBadgeEntity> existingBadge = userBadgeRepository.findByUserAndBadge(user, badge);
-                existingBadge.ifPresent(userBadgeRepository::delete);
-
-                log.info(genre.getName() + "장르의 뱃지가 제거되었습니다!");
-            }
-        }
     }
 
     private void verifyUserAuthorization(UserEntity user, ReviewEntity reviewEntity) {

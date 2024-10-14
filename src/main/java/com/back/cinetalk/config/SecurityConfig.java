@@ -130,6 +130,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin","/areports/**","/amain/**","/adamage/**","/afeedback/**").hasRole("ADMIN")
                         .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/login", "/join","/reissue","/AuthBy","/movie/**","/find/**", "keywords/**","/reviews/**","/my/NicknameCheck").permitAll()
+                        .requestMatchers("/reports/keywords/**").permitAll()
                         .anyRequest().authenticated());
 
 

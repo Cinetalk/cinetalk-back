@@ -3,7 +3,7 @@ package com.back.cinetalk.report.dto;
 import lombok.Getter;
 
 @Getter
-public class ReportRequestDTO {
+public class ReviewReportRequestDTO {
 
     private String category;
 

@@ -152,9 +152,7 @@ public class MovieMainService {
 
         // 오늘 자 리뷰 가져오기
         List<String> reviewList = queryFactory
-                .select(Expressions.stringTemplate(
-                        "REGEXP_REPLACE(REPLACE(REPLACE(REPLACE({0}, '\\n', ''), '\\t', ''), '\\r', ''), '[ㄱ-ㅎㅏ-ㅣ]', '')",
-                        review.content))
+                .select(review.content)
                 .from(review)
                 .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX))
                         .and(review.parentReview.isNull()))
@@ -167,14 +165,14 @@ public class MovieMainService {
 
         String Review = String.join("", reviewList);
 
-        //String s = Review.toString().replaceAll("[\\n\\t\\r]|[ㄱ-ㅎㅏ-ㅣ]", "");
+        String s = Review.replaceAll("[ㄱ-ㅣ]|\\s|\\n|\\r", "");
 
         Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
 
         // 형태소 분석 및 단어 추출 - 알고리즘 최적화
         Map<String, Integer> wordFrequency = new HashMap<>();
 
-        List<Token> tokenList = komoran.analyze(String.valueOf(Review)).getTokenList();
+        List<Token> tokenList = komoran.analyze(s).getTokenList();
 
         for (Token token : tokenList) {
             String pos = token.getPos();
@@ -221,6 +219,8 @@ public class MovieMainService {
                 String nickname = entity.getUser().getNickname();
 
                 map.put("nickname",nickname);
+
+                map.put("profile",entity.getUser().getProfile());
 
                 result.add(map);
             }

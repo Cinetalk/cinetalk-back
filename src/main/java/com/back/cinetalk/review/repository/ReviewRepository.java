@@ -16,6 +16,8 @@ import java.util.Optional;
 @Repository
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> , QuerydslPredicateExecutor<ReviewEntity>, ReviewRepositoryCustom {
 
+   List<ReviewEntity> findByMovieId(Long movieId);
+
    boolean existsByUserIdAndMovieId(Long userId, Long movieId);
 
    List<ReviewEntity> findTop10ByContentContainingAndParentReviewIsNullOrderByCreatedAtAsc(String Content);

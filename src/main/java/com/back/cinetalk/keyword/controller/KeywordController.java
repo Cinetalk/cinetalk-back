@@ -34,7 +34,7 @@ public class KeywordController {
     @GetMapping("/{movieId}/myKeyword")
     @Operation(summary = "특정 영화에 내가 작성한 키워드 조회 API", description = "특정 영화의 내가 작성한 키워드를 조회하는 API 입니다.")
     public KeywordResponseDTO getMyKeywordByMovie(@PathVariable(name = "movieId") Long movieId,
-                                            @JwtValidation String email) {
+                                                  @JwtValidation String email) {
 
         KeywordEntity keywordEntity = keywordService.getMyKeywordByMovie(movieId, email);
         return KeywordResponseDTO.toKeywordResponseDTO(keywordEntity);
@@ -51,7 +51,7 @@ public class KeywordController {
     @Operation(summary = "특정 영화의 최신 언급된 키워드 조회 API", description = "가장 최신에 언급된 키워드 4개를 조회하는 API 입니다.")
     public List<LatestKeywordResponseDTO> getLatestMentionedKeywordListByMovie(@PathVariable(name = "movieId") Long movieId) {
 
-        List<String> keywordEntityList = keywordService.getLatestMentionedKeywordListByMovie(movieId);
+        List<KeywordEntity> keywordEntityList = keywordService.getLatestMentionedKeywordListByMovie(movieId);
         return LatestKeywordResponseDTO.fromEntityList(keywordEntityList);
     }
 
@@ -62,6 +62,15 @@ public class KeywordController {
                                             @JwtValidation String emai) {
 
         KeywordEntity keywordEntity = keywordService.updateKeyword(keywordId, keywordRequestDTO, emai);
+        return KeywordResponseDTO.toKeywordResponseDTO(keywordEntity);
+    }
+
+    @PatchMapping("/count/{keywordId}")
+    @Operation(summary = "특정 영화의 키워드 클릭 API", description = "특정 영화의 키워드를 클릭하는 API 입니다. 클릭할 경우, 카운트가 증가됩니다.")
+    public KeywordResponseDTO updateKeywordCount(@PathVariable(name = "keywordId") Long keywordId,
+                                            @JwtValidation String emai) {
+
+        KeywordEntity keywordEntity = keywordService.updateKeywordCount(keywordId, emai);
         return KeywordResponseDTO.toKeywordResponseDTO(keywordEntity);
     }
 }

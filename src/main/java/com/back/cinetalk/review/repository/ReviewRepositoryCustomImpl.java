@@ -69,7 +69,8 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                                 .from(reviewDislikeEntity)
                                 .where(reviewDislikeEntity.review.eq(reviewEntity))
                                 .where(reviewDislikeEntity.user.id.eq(userId))
-                                .exists()  // 싫어요 여부 확인
+                                .exists(),  // 싫어요 여부 확인
+                        reviewEntity.user.id.eq(userId)
                 ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
@@ -180,7 +181,8 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                                 .from(reviewDislikeEntity)
                                 .where(reviewDislikeEntity.review.eq(reviewEntity))
                                 .where(reviewDislikeEntity.user.id.eq(userId))
-                                .exists()  // 싫어요 여부 확인
+                                .exists(),  // 싫어요 여부 확인
+                        reviewEntity.user.id.eq(userId)
                 ))
                 .from(reviewEntity)
                 .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
@@ -231,7 +233,8 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                                 .from(reviewDislikeEntity)
                                 .where(reviewDislikeEntity.review.eq(reviewEntity))
                                 .where(reviewDislikeEntity.user.id.eq(userId))
-                                .exists()  // 싫어요 여부 확인
+                                .exists(),  // 싫어요 여부 확인
+                        reviewEntity.user.id.eq(userId)
                 ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
@@ -301,7 +304,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     // 정렬 기준 설정 메서드
     private OrderSpecifier<?> getSortOrder(String sortType) {
         if ("star".equalsIgnoreCase(sortType)) {
-            return reviewEntity.star.desc();  // 별점순 내림차순 정렬
+            return reviewEntity.reviewLikeEntityList.size().desc();  // 별점순 내림차순 정렬
         } else {
             return reviewEntity.createdAt.desc();  // 최신순 정렬
         }

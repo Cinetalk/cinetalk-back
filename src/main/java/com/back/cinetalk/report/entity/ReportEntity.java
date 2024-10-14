@@ -1,6 +1,7 @@
 package com.back.cinetalk.report.entity;
 
 import com.back.cinetalk.config.entity.BaseEntity;
+import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -19,6 +20,8 @@ public class ReportEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private Long movieId;
 
     private String category;
 

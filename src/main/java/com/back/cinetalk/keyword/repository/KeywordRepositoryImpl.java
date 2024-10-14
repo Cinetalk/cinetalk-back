@@ -9,10 +9,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class KeywordRepositoryImpl implements KeywordRepositoryCustom {
@@ -28,6 +30,7 @@ public class KeywordRepositoryImpl implements KeywordRepositoryCustom {
 
         return queryFactory
                 .select(Projections.fields(KeywordResponseDTO.class,
+                        keywordEntity.id.as("keywordId"),
                         keywordEntity.keyword,
                         keywordEntity.count.sum().as("count")))
                 .from(keywordEntity)

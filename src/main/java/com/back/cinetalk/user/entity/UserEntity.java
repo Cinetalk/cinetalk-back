@@ -4,6 +4,7 @@ import com.back.cinetalk.bookmark.entity.BookmarkEntity;
 import com.back.cinetalk.config.entity.BaseEntity;
 import com.back.cinetalk.damage.entity.DamageEntity;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
+import com.back.cinetalk.keyword.entity.UserKeywordClickEntity;
 import com.back.cinetalk.rate.dislike.entity.ReviewDislikeEntity;
 import com.back.cinetalk.rate.like.entity.ReviewLikeEntity;
 import com.back.cinetalk.report.entity.ReportEntity;
@@ -75,6 +76,9 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<DamageEntity> damageEntityList = new ArrayList<>(); // 제재 리스트
+
+    @OneToMany(mappedBy = "user")
+    private List<UserKeywordClickEntity> userKeywordClickEntityList = new ArrayList<>(); // 제재 리스트
 
     public static UserEntity ToUserEntity(UserDTO userDTO) {
         return UserEntity.builder()

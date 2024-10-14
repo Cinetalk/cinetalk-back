@@ -61,7 +61,7 @@ public class ADamageService {
 
         ReviewEntity review = report.getReview();
 
-        review.updateReviewContent("<신고된 리뷰 입니다.>");
+        review.updateReviewContent("해당 톡은 커뮤니티 가이드라인에 따라 숨겨졌습니다.");
 
         reviewRepository.save(review);
 
