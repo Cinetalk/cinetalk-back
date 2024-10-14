@@ -78,9 +78,7 @@ public class FindService {
         List<Map<String, Object>> results = (List<Map<String, Object>>) list.get("results");
 
 
-
-        /*
-        List<Integer> movieIdList = resultApi.stream()
+        List<Integer> movieIdList = results.stream()
                 .map(result -> (Integer) result.get("id"))
                 .toList();
 
@@ -114,9 +112,9 @@ public class FindService {
                 throw new RestApiException(CommonErrorCode.FiND_NOT_FOUND);
             }
         });
-        */
 
-        List<FindMovieDTO> returnList = results.stream()
+
+        /*List<FindMovieDTO> returnList = results.stream()
                 .map(result -> {
                     FindMovieDTO dto = new FindMovieDTO();
                     dto.setId(Long.valueOf((Integer) result.get("id")));
@@ -125,7 +123,7 @@ public class FindService {
                     dto.setPoster_path((String) result.get("poster_path"));
                     return dto;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
 
         return returnList;
     }
