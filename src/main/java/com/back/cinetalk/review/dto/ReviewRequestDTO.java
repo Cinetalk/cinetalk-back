@@ -18,7 +18,6 @@ public class ReviewRequestDTO {
     @DecimalMax(value = "5.0", inclusive = true)
     private Double star;
 
-    @NotBlank
     private String content;
 
     @NotNull
