@@ -48,7 +48,7 @@ public enum CommonErrorCode implements ErrorCode {
 
     // 신고 관련 에러
     REVIEW_REPORT_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 신고한 리뷰입니다."),
-    KEYWORD_REPORT_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 신고한 리뷰입니다."),
+    KEYWORD_REPORT_ALREADY_IN_WRITE(HttpStatus.BAD_REQUEST, "이미 신고한 키워드입니다."),
     REPORT_NOT_FOUND(HttpStatus.BAD_REQUEST,"해당 신고를 찾을 수 없습니다."),
 
 
