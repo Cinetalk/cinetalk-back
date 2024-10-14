@@ -21,6 +21,8 @@ public class ReportEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long movieId;
+
     private String category;
 
     private String content;
@@ -36,10 +38,6 @@ public class ReportEntity extends BaseEntity {
     @JoinColumn(name = "review_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private ReviewEntity review;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "keyword_id")
-    private KeywordEntity keyword;
 
     public void UpdateStatus(Boolean status){
         this.status=status;

@@ -47,21 +47,21 @@ public class ReportService {
     }
 
     @Transactional
-    public StateRes saveKeywordReport(Long reviewId, KeywordReportRequestDTO keywordReportRequestDTO, String email) {
+    public StateRes saveKeywordReport(Long keywordId, KeywordReportRequestDTO keywordReportRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
-        KeywordEntity keyword = keywordRepository.findById(reviewId)
+        KeywordEntity keyword = keywordRepository.findById(keywordId)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.KEYWORD_NOT_FOUND));
 
         if (reportRepository.existsByUserAndKeyword(user, keyword)) {
             throw new RestApiException(CommonErrorCode.KEYWORD_REPORT_ALREADY_IN_WRITE);
         }
 
-        reportRepository.save(ReportEntity.builder()
-                .content(keywordReportRequestDTO.getContent())
-                .user(user)
-                .keyword(keyword)
-                .build()
-        );
+        reportRepository.save(
+                ReportEntity.builder()
+                        .movieId(keyword.getMovieId())
+                        .content(keywordReportRequestDTO.getContent())
+                        .user(user)
+                        .build());
 
         return new StateRes(true);
     }
