@@ -220,6 +220,8 @@ public class MovieMainService {
 
                 map.put("nickname",nickname);
 
+                map.put("profile",entity.getUser().getProfile());
+
                 result.add(map);
             }
 
