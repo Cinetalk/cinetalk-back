@@ -26,12 +26,12 @@ public class ReportController {
         return reportService.saveReviewReport(reviewId, reviewReportRequestDTO, email);
     }
 
-    @PostMapping("/keywords/{keywordId}")
+    @PostMapping("/keywords/{movieId}")
     @Operation(summary = "키워드 신고 API", description = "리뷰를 신고하는 API 입니다.")
-    public StateRes saveKeywordReport(@PathVariable Long keywordId,
+    public StateRes saveKeywordReport(@PathVariable Long movieId,
                                       @RequestBody @Valid KeywordReportRequestDTO keywordReportRequestDTO,
                                       @JwtValidation String email) {
 
-        return reportService.saveKeywordReport(keywordId, keywordReportRequestDTO, email);
+        return reportService.saveKeywordReport(movieId, keywordReportRequestDTO, email);
     }
 }
