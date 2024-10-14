@@ -301,7 +301,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     // 정렬 기준 설정 메서드
     private OrderSpecifier<?> getSortOrder(String sortType) {
         if ("star".equalsIgnoreCase(sortType)) {
-            return reviewEntity.star.desc();  // 별점순 내림차순 정렬
+            return reviewEntity.reviewLikeEntityList.size().desc();  // 별점순 내림차순 정렬
         } else {
             return reviewEntity.createdAt.desc();  // 최신순 정렬
         }
