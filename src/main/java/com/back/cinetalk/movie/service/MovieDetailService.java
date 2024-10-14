@@ -1,6 +1,8 @@
 package com.back.cinetalk.movie.service;
 
 import com.back.cinetalk.movie.dto.*;
+import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -19,11 +21,12 @@ import java.util.stream.Collectors;
 public class MovieDetailService {
 
     private final CallAPI callAPI;
+    private final ReviewRepository reviewRepository;
 
     // 영화 상세 정보
-    public MovieDetailDTO getMovieDetail(String movie_id) throws IOException {
+    public MovieDetailDTO getMovieDetail(String movieId) throws IOException {
 
-        String url1 = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=images,credits,release_dates&language=ko";
+        String url1 = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=images,credits,release_dates&language=ko";
         Map<String, Object> stringObjectMap1 = callAPI.callAPI(url1);
 
         List<GenreDTO> genreList = extractGenres((List<Map<String, Object>>) stringObjectMap1.get("genres"));
@@ -32,21 +35,34 @@ public class MovieDetailService {
         String contentRating = extractContentRating(stringObjectMap1);
 
 
-        String url2 = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=images";
+        String url2 = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=images";
         Map<String, Object> stringObjectMap2 = callAPI.callAPI(url2);
         List<ImageDTO> imageList = extractImages((List<Map<String, Object>>) ((Map<String, Object>) stringObjectMap2.get("images")).get("backdrops"));
 
         String language = "ko";
-        String url3 = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=videos&language=" + language;
+        String url3 = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=videos&language=" + language;
         Map<String, Object> stringObjectMap3 = callAPI.callAPI(url3);
         List<String> videoList = extractVideoKeys((Map<String, Object>) stringObjectMap3.get("videos"));
 
         if (videoList.isEmpty()) {
             language = "en";
-            url3 = "https://api.themoviedb.org/3/movie/" + movie_id + "?append_to_response=videos&language=" + language;
+            url3 = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=videos&language=" + language;
             stringObjectMap3 = callAPI.callAPI(url3);
             videoList = extractVideoKeys((Map<String, Object>) stringObjectMap3.get("videos"));
         }
+
+        List<ReviewEntity> reviewEntityList = reviewRepository.findByMovieId(Long.valueOf(movieId));
+        double totalReviewScore = 0;
+        int reviewCount = reviewEntityList.size();
+
+        for (ReviewEntity review : reviewEntityList) {
+            Double reviewScore = review.getStar();
+            if (reviewScore != null) {
+                totalReviewScore += reviewScore;
+            }
+        }
+
+        double averageReviewScore = reviewCount > 0 ? Math.round(totalReviewScore / reviewCount * 10) / 10.0 : 0.0;
 
         return MovieDetailDTO.builder()
                 .posterImg("https://image.tmdb.org/t/p/original" + stringObjectMap1.get("poster_path"))
@@ -59,7 +75,8 @@ public class MovieDetailService {
                 .releaseDate((String) stringObjectMap1.get("release_date"))
                 .contentRating(contentRating)
                 .status((String) stringObjectMap1.get("status"))
-                .score(Math.round((Double) stringObjectMap1.get("vote_average") * 10) / 10.0)
+                .tmdbScore(Math.round((Double) stringObjectMap1.get("vote_average") * 10) / 10.0)
+                .cinetalkScore(averageReviewScore)
                 .runningTime((Integer) stringObjectMap1.get("runtime"))
                 .imageDTOList(imageList)
                 .videoList(videoList)

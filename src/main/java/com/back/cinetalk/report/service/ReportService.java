@@ -5,7 +5,8 @@ import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.keyword.entity.KeywordEntity;
 import com.back.cinetalk.keyword.repository.KeywordRepository;
-import com.back.cinetalk.report.dto.ReportRequestDTO;
+import com.back.cinetalk.report.dto.KeywordReportRequestDTO;
+import com.back.cinetalk.report.dto.ReviewReportRequestDTO;
 import com.back.cinetalk.report.entity.ReportEntity;
 import com.back.cinetalk.report.repository.ReportRepository;
 import com.back.cinetalk.review.entity.ReviewEntity;
@@ -25,7 +26,7 @@ public class ReportService {
     private final UserRepository userRepository;
 
     @Transactional
-    public StateRes saveReviewReport(Long reviewId, ReportRequestDTO reportRequestDTO, String email) {
+    public StateRes saveReviewReport(Long reviewId, ReviewReportRequestDTO reviewReportRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
         ReviewEntity review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.REVIEW_NOT_FOUND));
@@ -34,19 +35,19 @@ public class ReportService {
             throw new RestApiException(CommonErrorCode.REVIEW_REPORT_ALREADY_IN_WRITE);
         }
 
-        reportRepository.save(
-                ReportEntity.builder()
-                        .category(reportRequestDTO.getCategory())
-                        .content(reportRequestDTO.getContent())
-                        .user(user)
-                        .review(review)
-                        .build());
+        reportRepository.save(ReportEntity.builder()
+                .category(reviewReportRequestDTO.getCategory())
+                .content(reviewReportRequestDTO.getContent())
+                .user(user)
+                .review(review)
+                .build()
+        );
 
         return new StateRes(true);
     }
 
     @Transactional
-    public StateRes saveKeywordReport(Long keywordId, ReportRequestDTO reportRequestDTO, String email) {
+    public StateRes saveKeywordReport(Long keywordId, KeywordReportRequestDTO keywordReportRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
         KeywordEntity keyword = keywordRepository.findById(keywordId)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.KEYWORD_NOT_FOUND));
@@ -58,7 +59,7 @@ public class ReportService {
         reportRepository.save(
                 ReportEntity.builder()
                         .movieId(keyword.getMovieId())
-                        .content(reportRequestDTO.getContent())
+                        .content(keywordReportRequestDTO.getContent())
                         .user(user)
                         .build());
 

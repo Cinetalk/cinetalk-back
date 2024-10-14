@@ -34,9 +34,11 @@ public class MovieDetailDTO {
 
     private String contentRating;   // 연령 등급
 
-    private double score;           // 평점 (tmdb)
+    private double tmdbScore;       // 평점 (tmdb)
 
-    private int runningTime;        // 러닝타임
+    private double cinetalkScore;   // 평점 (cinetalk)
+
+    private int runningTime;
 
     private List<ImageDTO> imageDTOList;
 
