@@ -46,9 +46,9 @@ public class ReportService {
     }
 
     @Transactional
-    public StateRes saveKeywordReport(Long reviewId, ReportRequestDTO reportRequestDTO, String email) {
+    public StateRes saveKeywordReport(Long keywordId, ReportRequestDTO reportRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
-        KeywordEntity keyword = keywordRepository.findById(reviewId)
+        KeywordEntity keyword = keywordRepository.findById(keywordId)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.KEYWORD_NOT_FOUND));
 
         if (reportRepository.existsByUserAndKeyword(user, keyword)) {
@@ -57,10 +57,9 @@ public class ReportService {
 
         reportRepository.save(
                 ReportEntity.builder()
-                        .category(reportRequestDTO.getCategory())
+                        .movieId(keyword.getMovieId())
                         .content(reportRequestDTO.getContent())
                         .user(user)
-                        .keyword(keyword)
                         .build());
 
         return new StateRes(true);

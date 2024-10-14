@@ -35,7 +35,7 @@ public class KeywordEntity extends BaseEntity {
     private int count;
 
     @OneToMany(mappedBy = "keyword")
-    private List<UserKeywordClickEntity> userKeywordClickEntityList = new ArrayList<>(); // 제재 리스트
+    private List<UserKeywordClickEntity> userKeywordClickEntityList = new ArrayList<>();
 
     public void update(KeywordRequestDTO keywordRequestDTO) {
         this.keyword = keywordRequestDTO.getKeyword();
