@@ -48,10 +48,14 @@ public class ReportService {
 
     @Transactional
     public StateRes saveKeywordReport(Long movieId, KeywordReportRequestDTO keywordReportRequestDTO, String email) {
-        UserEntity user = userRepository.findByEmail(email);
-
-        if (reportRepository.existsByUserAndMovieId(user, movieId)) {
-            throw new RestApiException(CommonErrorCode.KEYWORD_REPORT_ALREADY_IN_WRITE);
+        UserEntity user;
+        if (email == null) {
+            user = null;
+        } else {
+            user = userRepository.findByEmail(email);
+            if (reportRepository.existsByUserAndMovieId(user, movieId)) {
+                throw new RestApiException(CommonErrorCode.KEYWORD_REPORT_ALREADY_IN_WRITE);
+            }
         }
 
         reportRepository.save(
