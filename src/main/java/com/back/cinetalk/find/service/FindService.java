@@ -10,6 +10,7 @@ import com.back.cinetalk.find.entity.FindEntity;
 import com.back.cinetalk.find.entity.QFindEntity;
 import com.back.cinetalk.find.repository.FindRepository;
 import com.back.cinetalk.movie.service.CallAPI;
+import com.back.cinetalk.movie.service.MovieDetailService;
 import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
@@ -38,6 +39,7 @@ public class FindService {
     private final CallAPI callAPI;
     private final JPAQueryFactory queryFactory;
     private final AdultContentFinder adultContentFinder;
+    private final MovieDetailService movieDetailService;
 
 
     //TODO 검색어 저장
@@ -89,20 +91,21 @@ public class FindService {
 
         movieIdList.forEach(movieId -> {
             try {
-                String detailUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=keywords&language=ko";
+                String detailUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=keywords,release_dates&language=ko";
 
                 Map<String, Object> movie = callAPI.callAPI(detailUrl);
-
+                String contentRating = movieDetailService.extractContentRating(movie);
                 Map<String, Object> keywordsMap = (Map<String, Object>) movie.get("keywords");
                 List<Map<String, Object>> keywords = (List<Map<String, Object>>) keywordsMap.get("keywords");
 
                 boolean containsKeywordId = keywords.stream()
                         .anyMatch(keyword -> 155477 == (Integer) keyword.get("id"));
 
-                if (!containsKeywordId) {
+                if (!containsKeywordId && contentRating != "") {
                     FindMovieDTO findMovieDTO = FindMovieDTO.builder()
                             .id((long) movieId)
                             .title((String) movie.get("title"))
+                            .overview((String) movie.get("overview"))
                             .poster_path((String) movie.get("poster_path"))
                             .build();
 
@@ -134,9 +137,10 @@ public class FindService {
         QReviewEntity review = QReviewEntity.reviewEntity;
 
         BooleanExpression predicate = review.content.like("%" + query + "%");
+        BooleanExpression not_predicate = review.content.notLike("%해당 톡은 커뮤니티 가이드라인에 따라 숨겨졌습니다.%");
 
         List<ReviewEntity> result = queryFactory.selectFrom(review)
-                .where(predicate)
+                .where(predicate.and(not_predicate))
                 .orderBy(review.createdAt.asc())
                 .fetch();
 

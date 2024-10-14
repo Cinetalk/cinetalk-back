@@ -142,7 +142,7 @@ public class MovieDetailService {
                 .build();
     }
 
-    private String extractContentRating(Map<String, Object> stringObjectMap1) {
+    public String extractContentRating(Map<String, Object> stringObjectMap1) {
         // release_dates 키의 값 확인
         Map<String, Object> releaseDatesMap = (Map<String, Object>) stringObjectMap1.get("release_dates");
 
