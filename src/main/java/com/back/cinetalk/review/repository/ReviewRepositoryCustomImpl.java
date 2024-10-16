@@ -11,6 +11,7 @@ import com.back.cinetalk.user.entity.QUserEntity;
 import com.back.cinetalk.userBadge.entity.QUserBadgeEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -58,19 +59,20 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         JPAExpressions.select(reviewEntity.count())
                                 .from(reviewEntity)
                                 .where(reviewEntity.parentReview.eq(reviewEntity)),
-                        // 사용자가 이 리뷰에 좋아요를 눌렀는지 여부 확인
-                        JPAExpressions.selectOne()
+                        // userId가 null이 아닌 경우에만 좋아요 여부 확인
+                        userId != null ? JPAExpressions.selectOne()
                                 .from(reviewLikeEntity)
                                 .where(reviewLikeEntity.review.eq(reviewEntity))
                                 .where(reviewLikeEntity.user.id.eq(userId))
-                                .exists(),  // 좋아요 여부 확인
-                        // 사용자가 이 리뷰에 싫어요를 눌렀는지 여부 확인
-                        JPAExpressions.selectOne()
+                                .exists() : Expressions.constant(false),  // null이면 false 반환
+                        // userId가 null이 아닌 경우에만 싫어요 여부 확인
+                        userId != null ? JPAExpressions.selectOne()
                                 .from(reviewDislikeEntity)
                                 .where(reviewDislikeEntity.review.eq(reviewEntity))
                                 .where(reviewDislikeEntity.user.id.eq(userId))
-                                .exists(),  // 싫어요 여부 확인
-                        reviewEntity.user.id.eq(userId)
+                                .exists() : Expressions.constant(false),  // null이면 false 반환
+                        // userId가 null이 아닌 경우에만 본인 댓글 여부 확인
+                        userId != null ? reviewEntity.user.id.eq(userId) : Expressions.constant(false)  // null이면 false 반환
                 ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
@@ -102,7 +104,6 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         return new PageImpl<>(results, pageable, total);
     }
 
-
     @Override
     public Page<CommentPreViewDTO> findAllByParentReviewId(Long parentReviewId, Long userId, Pageable pageable) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
@@ -117,18 +118,20 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         reviewEntity.createdAt,
                         reviewLikeEntity.countDistinct(),
                         reviewDislikeEntity.countDistinct(),
-                        // 사용자가 이 리뷰에 좋아요를 눌렀는지 여부 확인
-                        JPAExpressions.selectOne()
+                        // userId가 null이 아닌 경우에만 좋아요 여부 확인
+                        userId != null ? JPAExpressions.selectOne()
                                 .from(reviewLikeEntity)
                                 .where(reviewLikeEntity.review.eq(reviewEntity))
                                 .where(reviewLikeEntity.user.id.eq(userId))
-                                .exists(),  // 좋아요 여부 확인
-                        // 사용자가 이 리뷰에 싫어요를 눌렀는지 여부 확인
-                        JPAExpressions.selectOne()
+                                .exists() : Expressions.constant(false),  // null이면 false 반환
+                        // userId가 null이 아닌 경우에만 싫어요 여부 확인
+                        userId != null ? JPAExpressions.selectOne()
                                 .from(reviewDislikeEntity)
                                 .where(reviewDislikeEntity.review.eq(reviewEntity))
                                 .where(reviewDislikeEntity.user.id.eq(userId))
-                                .exists()  // 싫어요 여부 확인
+                                .exists() : Expressions.constant(false),  // null이면 false 반환
+                        // userId가 null이 아닌 경우에만 본인 댓글 여부 확인
+                        userId != null ? reviewEntity.user.id.eq(userId) : Expressions.constant(false)  // null이면 false 반환
                 ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
@@ -171,18 +174,20 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         JPAExpressions.select(reviewEntity.count())
                                 .from(reviewEntity)
                                 .where(reviewEntity.parentReview.eq(reviewEntity)),
-                        JPAExpressions.selectOne()
+                        // userId가 null이 아닌 경우에만 좋아요 여부 확인
+                        userId != null ? JPAExpressions.selectOne()
                                 .from(reviewLikeEntity)
                                 .where(reviewLikeEntity.review.eq(reviewEntity))
                                 .where(reviewLikeEntity.user.id.eq(userId))
-                                .exists(),  // 좋아요 여부 확인
-                        // 사용자가 이 리뷰에 싫어요를 눌렀는지 여부 확인
-                        JPAExpressions.selectOne()
+                                .exists() : Expressions.constant(false),  // null이면 false 반환
+                        // userId가 null이 아닌 경우에만 싫어요 여부 확인
+                        userId != null ? JPAExpressions.selectOne()
                                 .from(reviewDislikeEntity)
                                 .where(reviewDislikeEntity.review.eq(reviewEntity))
                                 .where(reviewDislikeEntity.user.id.eq(userId))
-                                .exists(),  // 싫어요 여부 확인
-                        reviewEntity.user.id.eq(userId)
+                                .exists() : Expressions.constant(false),  // null이면 false 반환
+                        // userId가 null이 아닌 경우에만 본인 댓글 여부 확인
+                        userId != null ? reviewEntity.user.id.eq(userId) : Expressions.constant(false)  // null이면 false 반환
                 ))
                 .from(reviewEntity)
                 .leftJoin(reviewLikeEntity).on(reviewLikeEntity.review.eq(reviewEntity))
@@ -223,18 +228,20 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                         JPAExpressions.select(reviewEntity.count())
                                 .from(reviewEntity)
                                 .where(reviewEntity.parentReview.eq(reviewEntity)),
-                        JPAExpressions.selectOne()
+                        // userId가 null이 아닌 경우에만 좋아요 여부 확인
+                        userId != null ? JPAExpressions.selectOne()
                                 .from(reviewLikeEntity)
                                 .where(reviewLikeEntity.review.eq(reviewEntity))
                                 .where(reviewLikeEntity.user.id.eq(userId))
-                                .exists(),  // 좋아요 여부 확인
-                        // 사용자가 이 리뷰에 싫어요를 눌렀는지 여부 확인
-                        JPAExpressions.selectOne()
+                                .exists() : Expressions.constant(false),  // null이면 false 반환
+                        // userId가 null이 아닌 경우에만 싫어요 여부 확인
+                        userId != null ? JPAExpressions.selectOne()
                                 .from(reviewDislikeEntity)
                                 .where(reviewDislikeEntity.review.eq(reviewEntity))
                                 .where(reviewDislikeEntity.user.id.eq(userId))
-                                .exists(),  // 싫어요 여부 확인
-                        reviewEntity.user.id.eq(userId)
+                                .exists() : Expressions.constant(false),  // null이면 false 반환
+                        // userId가 null이 아닌 경우에만 본인 댓글 여부 확인
+                        userId != null ? reviewEntity.user.id.eq(userId) : Expressions.constant(false)  // null이면 false 반환
                 ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))

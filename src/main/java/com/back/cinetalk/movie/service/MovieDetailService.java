@@ -5,10 +5,7 @@ import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +21,7 @@ public class MovieDetailService {
     private final ReviewRepository reviewRepository;
 
     // 영화 상세 정보
-    public MovieDetailDTO getMovieDetail(String movieId) throws IOException {
+    public MovieDetailDTO getMovieDetail(Long movieId) throws IOException {
 
         String url1 = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=images,credits,release_dates&language=ko";
         Map<String, Object> stringObjectMap1 = callAPI.callAPI(url1);
@@ -51,7 +48,7 @@ public class MovieDetailService {
             videoList = extractVideoKeys((Map<String, Object>) stringObjectMap3.get("videos"));
         }
 
-        List<ReviewEntity> reviewEntityList = reviewRepository.findByMovieId(Long.valueOf(movieId));
+        List<ReviewEntity> reviewEntityList = reviewRepository.findByMovieId(movieId);
         double totalReviewScore = 0;
         int reviewCount = reviewEntityList.size();
 
