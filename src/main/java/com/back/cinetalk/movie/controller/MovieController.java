@@ -33,10 +33,10 @@ public class MovieController {
     private final MainColorExtract mainColorExtract;
     private final UserByAccess userByAccess;
 
-    @GetMapping("/{movie_id}")
+    @GetMapping("/{movieId}")
     @Operation(summary = "영화 상세정보 ",description = "영화 상세정보 api")
-    public MovieDetailDTO getMovieDetails(@PathVariable(name = "movie_id") String movie_id) throws IOException {
-        return movieDetailService.getMovieDetail(movie_id);
+    public MovieDetailDTO getMovieDetails(@PathVariable Long movieId) throws IOException {
+        return movieDetailService.getMovieDetail(movieId);
     }
 
     @GetMapping("/list")

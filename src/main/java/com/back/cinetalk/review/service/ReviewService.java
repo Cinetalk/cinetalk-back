@@ -130,35 +130,44 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public Page<ReviewPreViewDTO> getReviewList(Long movieId, String email, Integer page, String sort) {
-        UserEntity user = userRepository.findByEmail(email);
-        return reviewRepository.findAllByMovieId(movieId, user.getId(), PageRequest.of(page, 10), sort);
+        Long userId = getUserIdFromEmail(email);
+        return reviewRepository.findAllByMovieId(movieId, userId, PageRequest.of(page, 10), sort);
     }
 
     @Transactional(readOnly = true)
     public List<ReviewPreViewDTO> getBestReviews(Long movieId, String email) {
+        Long userId = getUserIdFromEmail(email);
         int bestReviewLimit = 3;
-        UserEntity user = userRepository.findByEmail(email);
-        return reviewRepository.findBestReviews(movieId, user.getId(), bestReviewLimit);
+        return reviewRepository.findBestReviews(movieId, userId, bestReviewLimit);
     }
 
     @Transactional(readOnly = true)
     public Page<ReviewPreViewDTO> getGeneralReviewsExcludingBest(Long movieId, String email, Integer page, String sort) {
+        Long userId = getUserIdFromEmail(email);
         int bestReviewLimit = 3;
-        UserEntity user = userRepository.findByEmail(email);
+
         // Best 리뷰 가져오기
-        List<ReviewPreViewDTO> bestReviews = reviewRepository.findBestReviews(movieId, user.getId(), bestReviewLimit);
+        List<ReviewPreViewDTO> bestReviews = reviewRepository.findBestReviews(movieId, userId, bestReviewLimit);
         List<Long> bestReviewIds = bestReviews.stream()
                 .map(ReviewPreViewDTO::getId)
                 .toList();
 
         // 일반 리뷰 가져오기 (Best 리뷰 제외)
-        return reviewRepository.findGeneralReviewsExcludingBest(movieId, user.getId(), bestReviewIds, PageRequest.of(page, 10), sort);
+        return reviewRepository.findGeneralReviewsExcludingBest(movieId, userId, bestReviewIds, PageRequest.of(page, 10), sort);
     }
 
     @Transactional(readOnly = true)
     public Page<CommentPreViewDTO> getCommentList(Long parentReviewId, String email, Integer page) {
+        Long userId = getUserIdFromEmail(email);
+        return reviewRepository.findAllByParentReviewId(parentReviewId, userId, PageRequest.of(page, 10));
+    }
+
+    private Long getUserIdFromEmail(String email) {
+        if (email == null) {
+            return null;
+        }
         UserEntity user = userRepository.findByEmail(email);
-        return reviewRepository.findAllByParentReviewId(parentReviewId, user.getId(), PageRequest.of(page, 10));
+        return user != null ? user.getId() : null;
     }
 
     @Transactional

@@ -27,4 +27,6 @@ public class CommentPreViewDTO {
     boolean likeCheck;
 
     boolean dislikeCheck;
+
+    boolean isMine;
 }

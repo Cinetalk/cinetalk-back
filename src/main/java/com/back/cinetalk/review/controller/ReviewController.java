@@ -5,6 +5,7 @@ import com.back.cinetalk.review.dto.*;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.service.ReviewService;
 import com.back.cinetalk.user.jwt.JwtValidation;
+import com.back.cinetalk.user.jwt.OptionalJwtValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class ReviewController {
     @GetMapping("/{movieId}")
     @Operation(summary = "특정 영화의 리뷰 목록 조회 API", description = "특정 영화 전페 리뷰 목록을 조회하는 API 이며, 페이징을 포함합니다. 별점 순으로 정렬시, sort 파라미터에 star를 입력하면 됩니다.")
     public ReviewPreViewListDTO getReviewListByMovie(@PathVariable(name = "movieId") Long movieId,
-                                                     @JwtValidation String email,
+                                                     @OptionalJwtValidation String email,
                                                      @RequestParam(name = "page") Integer page,
                                                      @RequestParam(name = "sort", defaultValue = "createdAt") String sort) {
 
@@ -54,7 +55,7 @@ public class ReviewController {
     @GetMapping("/{movieId}/best")
     @Operation(summary = "특정 영화의 Best 리뷰 목록 조회 API", description = "특정 영화의 Best 리뷰 목록을 조회하는 API 입니다.")
     public List<ReviewPreViewDTO> getBestReviewsByMovie(@PathVariable(name = "movieId") Long movieId,
-                                                        @JwtValidation String email) {
+                                                        @OptionalJwtValidation String email) {
 
         return reviewService.getBestReviews(movieId, email);
     }
@@ -62,7 +63,7 @@ public class ReviewController {
     @GetMapping("/{movieId}/general")
     @Operation(summary = "특정 영화의 일반 리뷰 목록 조회 API", description = "특정 영화의 일반 리뷰 목록(Best 리뷰 제외)을 조회하는 API 이며, 페이징을 포함합니다. 별점 순으로 정렬시, sort 파라미터에 star를 입력하면 됩니다.")
     public ReviewPreViewListDTO getGeneralReviewsByMovie(@PathVariable(name = "movieId") Long movieId,
-                                                         @JwtValidation String email,
+                                                         @OptionalJwtValidation String email,
                                                          @RequestParam(name = "page") Integer page,
                                                          @RequestParam(name = "sort", defaultValue = "createdAt") String sort) {
 
@@ -73,7 +74,7 @@ public class ReviewController {
     @GetMapping("/{parentReviewId}/comments")
     @Operation(summary = "리뷰의 댓글 목록 조회 API", description = "특정 리뷰의 댓글 목록을 조회하는 API 이며, 페이징을 포함합니다.")
     public CommentPreViewListDTO getCommentListByParentReview(@PathVariable(name = "parentReviewId") Long parentReviewId,
-                                                              @JwtValidation String email,
+                                                              @OptionalJwtValidation String email,
                                                               @RequestParam(name = "page") Integer page) {
 
         Page<CommentPreViewDTO> commentList = reviewService.getCommentList(parentReviewId, email, page);
