@@ -14,7 +14,7 @@ public class CommentPreViewDTO {
 
     String nickName;
 
-    byte[] profileImg;
+    byte[] profileImage;
 
     String content;
 
