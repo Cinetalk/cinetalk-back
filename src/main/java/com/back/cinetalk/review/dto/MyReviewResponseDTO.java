@@ -24,6 +24,12 @@ public class MyReviewResponseDTO {
 
     boolean spoiler;
 
+    long likeCount;
+
+    long dislikeCount;
+
+    long commentCount;
+
     private LocalDateTime createTime;
 
     String nickName;
@@ -36,6 +42,9 @@ public class MyReviewResponseDTO {
                 .star(reviewEntity.getStar())
                 .content(reviewEntity.getContent())
                 .spoiler(reviewEntity.isSpoiler())
+                .likeCount(reviewEntity.getReviewLikeEntityList().size())
+                .dislikeCount(reviewEntity.getReviewDislikeEntityList().size())
+                .commentCount(reviewEntity.getChildrenComment().size())
                 .createTime(reviewEntity.getCreatedAt())
                 .nickName(reviewEntity.getUser().getNickname())
                 .badgeList(reviewEntity.getUser().getUserBadgeEntityList()

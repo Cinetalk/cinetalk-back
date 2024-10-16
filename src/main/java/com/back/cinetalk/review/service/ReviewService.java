@@ -48,7 +48,7 @@ public class ReviewService {
     public ReviewEntity saveReview(Long movieId, ReviewRequestDTO reviewRequestDTO, String email) {
         UserEntity user = userRepository.findByEmail(email);
 
-        if (reviewRepository.existsByUserIdAndMovieId(user.getId(), movieId)) {
+        if (reviewRepository.existsByUserIdAndMovieIdAndParentReviewIsNull(user.getId(), movieId)) {
             throw new RestApiException(CommonErrorCode.REVIEW_ALREADY_IN_WRITE);
         }
 
