@@ -50,12 +50,13 @@ public class MovieDetailService {
 
         List<ReviewEntity> reviewEntityList = reviewRepository.findByMovieId(movieId);
         double totalReviewScore = 0;
-        int reviewCount = reviewEntityList.size();
+        int reviewCount = 0;
 
         for (ReviewEntity review : reviewEntityList) {
             Double reviewScore = review.getStar();
             if (reviewScore != null) {
                 totalReviewScore += reviewScore;
+                reviewCount++;
             }
         }
 
