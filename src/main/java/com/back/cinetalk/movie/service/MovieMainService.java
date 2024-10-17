@@ -204,8 +204,6 @@ public class MovieMainService {
 
             String keyword = entry.getKey();
 
-            int count = entry.getValue();
-
             List<ReviewEntity> list = reviewRepository.findTop10ByContentContainingAndParentReviewIsNullOrderByCreatedAtAsc(keyword);
 
             List<Map<String,Object>> result = new ArrayList<>();
@@ -229,7 +227,6 @@ public class MovieMainService {
             Map<String, Object> resultMap = new HashMap<>();
 
             resultMap.put("keyword", keyword);
-            resultMap.put("count", count);
             resultMap.put("reviewList", result);
             resultList.add(resultMap);
         }
