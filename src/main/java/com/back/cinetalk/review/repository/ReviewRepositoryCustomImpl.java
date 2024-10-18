@@ -80,6 +80,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .leftJoin(reviewDislikeEntity).on(reviewDislikeEntity.review.eq(reviewEntity))
                 .where(reviewEntity.movieId.eq(movieId))
                 .where(reviewEntity.parentReview.isNull())
+                .where(reviewEntity.content.isNotEmpty())
                 .groupBy(reviewEntity.id)
                 .orderBy(orderSpecifier)  // 정렬 기준 추가
                 .offset(pageable.getOffset())
@@ -95,6 +96,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .from(reviewEntity)
                 .where(reviewEntity.movieId.eq(movieId))
                 .where(reviewEntity.parentReview.isNull())
+                .where(reviewEntity.content.isNotEmpty())
                 .fetchOne();
 
         if (total == null) {
@@ -194,6 +196,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .leftJoin(reviewDislikeEntity).on(reviewDislikeEntity.review.eq(reviewEntity))
                 .where(reviewEntity.movieId.eq(movieId))
                 .where(reviewEntity.parentReview.isNull())
+                .where(reviewEntity.content.isNotEmpty())
                 .groupBy(reviewEntity.id)
                 .having(reviewLikeEntity.countDistinct().goe(10))
                 .having(reviewLikeEntity.countDistinct().divide(reviewDislikeEntity.countDistinct().add(1)).goe(0.5))
@@ -250,6 +253,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .where(reviewEntity.movieId.eq(movieId))
                 .where(reviewEntity.parentReview.isNull())
                 .where(reviewEntity.id.notIn(bestReviewIds))
+                .where(reviewEntity.content.isNotEmpty())
                 .groupBy(reviewEntity.id)
                 .orderBy(orderSpecifier)  // 정렬 기준 추가
                 .offset(pageable.getOffset())
@@ -266,6 +270,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .where(reviewEntity.movieId.eq(movieId))
                 .where(reviewEntity.parentReview.isNull())
                 .where(reviewEntity.id.notIn(bestReviewIds))
+                .where(reviewEntity.content.isNotEmpty())
                 .fetchOne();
 
         if (total == null) {

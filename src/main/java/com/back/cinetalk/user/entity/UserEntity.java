@@ -37,8 +37,6 @@ public class UserEntity extends BaseEntity {
 
     private String password;
 
-    //private String name;
-
     private String nickname;
 
     private String gender;
@@ -54,16 +52,16 @@ public class UserEntity extends BaseEntity {
     private String role;
 
     @OneToMany(mappedBy = "user")
-    private List<ReviewEntity> reviewEntityList = new ArrayList<ReviewEntity>();
+    private List<ReviewEntity> reviewEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<KeywordEntity> keywordEntityList = new ArrayList<KeywordEntity>();
+    private List<KeywordEntity> keywordEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<BookmarkEntity> bookmarkEntityList = new ArrayList<BookmarkEntity>();
+    private List<BookmarkEntity> bookmarkEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<UserBadgeEntity> userBadgeEntityList = new ArrayList<UserBadgeEntity>();
+    private List<UserBadgeEntity> userBadgeEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<ReviewLikeEntity> reviewLikeEntityList = new ArrayList<>(); // 좋아요 리스트

@@ -1,6 +1,7 @@
 package com.back.cinetalk.review.dto;
 
 import com.back.cinetalk.review.entity.ReviewEntity;
+import com.back.cinetalk.userBadge.entity.UserBadgeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,6 +50,7 @@ public class MyReviewResponseDTO {
                 .nickName(reviewEntity.getUser().getNickname())
                 .badgeList(reviewEntity.getUser().getUserBadgeEntityList()
                         .stream()
+                        .filter(UserBadgeEntity::isUse)
                         .map(badge -> badge.getBadge().getName())
                         .collect(Collectors.toList()))
                 .build();
