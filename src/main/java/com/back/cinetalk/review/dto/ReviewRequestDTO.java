@@ -3,6 +3,7 @@ package com.back.cinetalk.review.dto;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class ReviewRequestDTO {
     @DecimalMax(value = "5.0", inclusive = true)
     private Double star;
 
+    @Size(max = 2000)
     private String content;
 
     @NotNull
