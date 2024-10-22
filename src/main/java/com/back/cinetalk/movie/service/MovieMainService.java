@@ -1,5 +1,6 @@
 package com.back.cinetalk.movie.service;
 
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.genre.entity.GenreEntity;
@@ -145,7 +146,6 @@ public class MovieMainService {
     }
 
     //TODO 자주 언급 되는 키워드
-    @Async
     public ResponseEntity<?> MentionKeyword() {
 
         // 오늘 날짜 설정
@@ -161,7 +161,7 @@ public class MovieMainService {
 
         if(reviewList.isEmpty()){
 
-            return new ResponseEntity<>("",HttpStatus.OK);
+            return new ResponseEntity<>(false,HttpStatus.OK);
         }
 
         String Review = String.join("", reviewList);
@@ -330,7 +330,8 @@ public class MovieMainService {
         List<ReviewEntity> reviewList = queryFactory.select(review)
                 .from(review)
                 .where(review.parentReview.isNull()
-                        .and(review.user.id.eq(userId)))
+                        .and(review.user.id.eq(userId))
+                        .and(review.content.notIn("")))
                 .orderBy(review.createdAt.desc())
                 .limit(10)
                 .fetch();
