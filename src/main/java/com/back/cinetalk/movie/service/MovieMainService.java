@@ -329,7 +329,8 @@ public class MovieMainService {
         List<ReviewEntity> reviewList = queryFactory.select(review)
                 .from(review)
                 .where(review.parentReview.isNull()
-                        .and(review.user.id.eq(userId)))
+                        .and(review.user.id.eq(userId))
+                        .and(review.content.notIn("")))
                 .orderBy(review.createdAt.desc())
                 .limit(10)
                 .fetch();
