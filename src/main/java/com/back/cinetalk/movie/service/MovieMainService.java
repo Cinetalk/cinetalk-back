@@ -1,5 +1,6 @@
 package com.back.cinetalk.movie.service;
 
+import com.back.cinetalk.config.dto.StateRes;
 import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.genre.entity.GenreEntity;
@@ -160,7 +161,7 @@ public class MovieMainService {
 
         if(reviewList.isEmpty()){
 
-            return new ResponseEntity<>("",HttpStatus.OK);
+            return new ResponseEntity<>(false,HttpStatus.OK);
         }
 
         String Review = String.join("", reviewList);
