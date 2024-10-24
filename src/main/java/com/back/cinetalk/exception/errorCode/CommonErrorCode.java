@@ -20,6 +20,7 @@ public enum CommonErrorCode implements ErrorCode {
     REFRESH_TOKEN_ISEXPIRED(HttpStatus.BAD_REQUEST,"refresh토큰이 만료되었습니다."),
     REFRESH_TOKEN_UNDIFINED(HttpStatus.BAD_REQUEST,"refresh토큰이 유효하지 않습니다."),
     REFRESH_TOKEN_NOT_SAVED(HttpStatus.BAD_REQUEST,"저장된 토큰이 존재하지 않습니다."),
+    COOKIES_NOT_SENT(HttpStatus.BAD_REQUEST,"쿠키가 존재하지 않습니다."),
 
 
     //유저 관련 에러
