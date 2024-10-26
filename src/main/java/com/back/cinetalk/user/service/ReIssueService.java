@@ -49,6 +49,10 @@ public class ReIssueService {
 
         log.info(Arrays.toString(cookies));
 
+        if(cookies == null) {
+            throw new RestApiException(CommonErrorCode.COOKIES_NOT_SENT);
+        }
+
         for (Cookie cookie : cookies){
             log.info(cookie.getName());
             if (cookie.getName().equals("refresh")){
