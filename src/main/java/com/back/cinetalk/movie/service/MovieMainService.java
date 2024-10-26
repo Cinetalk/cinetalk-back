@@ -161,7 +161,9 @@ public class MovieMainService {
 
         if(reviewList.isEmpty()){
 
-            return new ResponseEntity<>(false,HttpStatus.OK);
+            StateRes stateRes = new StateRes(false);
+
+            return new ResponseEntity<>(stateRes,HttpStatus.OK);
         }
 
         String Review = String.join("", reviewList);
