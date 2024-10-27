@@ -156,7 +156,8 @@ public class MovieMainService {
                 .select(review.content)
                 .from(review)
                 .where(review.createdAt.between(currentDate.atStartOfDay(), currentDate.atTime(LocalTime.MAX))
-                        .and(review.parentReview.isNull()))
+                        .and(review.parentReview.isNull())
+                        .and(review.content.notIn("")))
                 .fetch();
 
         if(reviewList.isEmpty()){
