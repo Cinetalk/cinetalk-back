@@ -394,7 +394,7 @@ public class MovieMainService {
                     .from(review)
                     .where(review.parentReview.isNull())
                     .groupBy(review.movieId)
-                    .orderBy(review.count().desc())
+                    .orderBy(review.count().desc(), review.movienm.asc())
                     .limit(10)
                     .fetch();
 
@@ -415,9 +415,16 @@ public class MovieMainService {
 
                 movieList = queryFactory.select(review.movieId)
                         .from(review)
-                        .where(review.parentReview.isNull())
+                        .where(review.parentReview.isNull()
+                                .and(review.movieId.notIn(
+                                        JPAExpressions
+                                                .select(review.movieId)
+                                                .from(review)
+                                                .where(review.user.id.eq(userEntity.getId())
+                                                        .and(review.parentReview.isNull()))
+                                )))
                         .groupBy(review.movieId)
-                        .orderBy(review.count().desc())
+                        .orderBy(review.count().desc(), review.movienm.asc())
                         .limit(10)
                         .fetch();
             }else{
