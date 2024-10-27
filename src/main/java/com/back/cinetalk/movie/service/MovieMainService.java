@@ -160,21 +160,32 @@ public class MovieMainService {
                         .and(review.content.notIn("")))
                 .fetch();
 
+        /*
         if(reviewList.isEmpty()){
 
             StateRes stateRes = new StateRes(false);
 
             return new ResponseEntity<>(stateRes,HttpStatus.OK);
         }
+        */
 
         String Review = String.join("", reviewList);
 
         String s = Review.replaceAll("[ㄱ-ㅣ]|\\s|\\n|\\r", "");
 
+        if(s.isEmpty()){
+
+            StateRes stateRes = new StateRes(false);
+
+            return new ResponseEntity<>(stateRes,HttpStatus.OK);
+        }
+
         Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
 
         // 형태소 분석 및 단어 추출 - 알고리즘 최적화
         Map<String, Integer> wordFrequency = new HashMap<>();
+
+
 
         List<Token> tokenList = komoran.analyze(s).getTokenList();
 
@@ -383,7 +394,7 @@ public class MovieMainService {
                     .from(review)
                     .where(review.parentReview.isNull())
                     .groupBy(review.movieId)
-                    .orderBy(review.count().desc())
+                    .orderBy(review.count().desc(), review.movienm.asc())
                     .limit(10)
                     .fetch();
 
@@ -404,9 +415,16 @@ public class MovieMainService {
 
                 movieList = queryFactory.select(review.movieId)
                         .from(review)
-                        .where(review.parentReview.isNull())
+                        .where(review.parentReview.isNull()
+                                .and(review.movieId.notIn(
+                                        JPAExpressions
+                                                .select(review.movieId)
+                                                .from(review)
+                                                .where(review.user.id.eq(userEntity.getId())
+                                                        .and(review.parentReview.isNull()))
+                                )))
                         .groupBy(review.movieId)
-                        .orderBy(review.count().desc())
+                        .orderBy(review.count().desc(), review.movienm.asc())
                         .limit(10)
                         .fetch();
             }else{
