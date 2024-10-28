@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 @Configuration
 @OpenAPIDefinition(servers = {
-        @Server(url = "https://cinetalk.kro.kr", description = "https"),
+        @Server(url = "https://server.cinetalk.site", description = "https"),
         @Server(url = "http://localhost:80", description = "local")
 })
 public class SwaggerConfig {
@@ -36,7 +36,6 @@ public class SwaggerConfig {
         return new Info()
 
                 .title("Cinetalk-Server API 명세서")
-                .description("")
-                .version("1.0.0");
+                .description("");
     }
 }
