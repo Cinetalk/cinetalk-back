@@ -162,15 +162,6 @@ public class MovieMainService {
                         .and(review.content.notIn("")))
                 .fetch();
 
-        /*
-        if(reviewList.isEmpty()){
-
-            StateRes stateRes = new StateRes(false);
-
-            return new ResponseEntity<>(stateRes,HttpStatus.OK);
-        }
-        */
-
         String Review = String.join("", reviewList);
 
         String s = Review.replaceAll("[ㄱ-ㅣ]|\\s|\\n|\\r", "");
@@ -205,8 +196,6 @@ public class MovieMainService {
         List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
-        List<Map<String, Object>> resultList = new ArrayList<>();
-
         if(sortedList.size()<5){
             log.info(String.valueOf(tokenList.size()));
             log.info("Mention_Keyword_Count : "+sortedList.size());
@@ -214,37 +203,37 @@ public class MovieMainService {
             throw new RestApiException(CommonErrorCode.MENTIONKEYWORD_LESS);
         }
 
+        List<MentionDTO> resultList = new ArrayList<>();
+
         for (int i = 0; i<5; i++) {
 
             Map.Entry<String, Integer> entry = sortedList.get(i);
 
             String keyword = entry.getKey();
 
-            List<ReviewEntity> list = reviewRepository.findTop10ByContentContainingAndParentReviewIsNullOrderByCreatedAtAsc(keyword);
+            List<MentionReviewDTO> reviewlist =
+                    queryFactory.select(Projections.constructor(MentionReviewDTO.class,
+                            review.id,
+                            review.movieId,
+                            review.movienm,
+                            review.star,
+                            review.content,
+                            Expressions.numberTemplate(Integer.class, "YEAR({0})", review.createdAt),
+                            review.user.profile,
+                            review.user.nickname)).from(review)
+                    .where(review.content.like("%"+keyword+"%")
+                            .and(review.parentReview.isNull())
+                            .and(review.spoiler.eq(false)))
+                            .orderBy(review.createdAt.asc())
+                            .limit(10)
+                            .fetch();
 
-            List<Map<String,Object>> result = new ArrayList<>();
+            MentionDTO mentionDTO = MentionDTO.builder()
+                    .keyword(keyword)
+                    .reviewList(reviewlist)
+                    .build();
 
-            for (ReviewEntity entity:list){
-
-                Map<String,Object> map = new HashMap<>();
-
-                ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(entity);
-                map.put("review",reviewDTO);
-
-                String nickname = entity.getUser().getNickname();
-
-                map.put("nickname",nickname);
-
-                map.put("profile",entity.getUser().getProfile());
-
-                result.add(map);
-            }
-
-            Map<String, Object> resultMap = new HashMap<>();
-
-            resultMap.put("keyword", keyword);
-            resultMap.put("reviewList", result);
-            resultList.add(resultMap);
+            resultList.add(mentionDTO);
         }
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
