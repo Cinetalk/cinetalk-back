@@ -63,7 +63,6 @@ public class MovieMainService {
     public final JWTUtil jwtUtil;
     private final JPAQueryFactory queryFactory;
     private final ReviewRepository reviewRepository;
-    private final UserByAccess userByAccess;
     private final UserRepository userRepository;
     private final ReviewLikeRepository reviewLikeRepository;
 
@@ -166,6 +165,8 @@ public class MovieMainService {
 
         String s = Review.replaceAll("[ㄱ-ㅣ]|\\s|\\n|\\r", "");
 
+        System.out.println(s);
+
         if(s.isEmpty()){
 
             StateRes stateRes = new StateRes(false);
@@ -178,15 +179,18 @@ public class MovieMainService {
         // 형태소 분석 및 단어 추출 - 알고리즘 최적화
         Map<String, Integer> wordFrequency = new HashMap<>();
 
-
-
         List<Token> tokenList = komoran.analyze(s).getTokenList();
 
         for (Token token : tokenList) {
             String pos = token.getPos();
             String morph = token.getMorph();
 
+
+
             if (pos.contains("NN") && morph.length() > 1) {
+                System.out.println(pos);
+                System.out.println(morph);
+
                 // 단어가 이미 존재하면 빈도수를 증가시키고, 없으면 새로운 키로 추가
                 wordFrequency.put(morph, wordFrequency.getOrDefault(morph, 0) + 1);
             }
@@ -195,6 +199,8 @@ public class MovieMainService {
         // 빈도순으로 정렬
         List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+        System.out.println(sortedList);
 
         if(sortedList.size()<5){
             log.info(String.valueOf(tokenList.size()));
