@@ -111,7 +111,9 @@ public class MovieMainService {
                             reReviewCountSubquery.as("reReviewCount"),
                             avgStarSubquery.as("avgStar"))
                     .from(review)
-                    .where(review.movieId.eq(movieid).and(review.parentReview.isNull()))
+                    .where(review.movieId.eq(movieid)
+                            .and(review.parentReview.isNull())
+                            .and(review.content.notIn("")))
                     .orderBy(likeCountSubquery.desc())
                     .limit(1)
                     .fetchFirst();
@@ -160,21 +162,23 @@ public class MovieMainService {
                         .and(review.content.notIn("")))
                 .fetch();
 
-        if(reviewList.isEmpty()){
+        String Review = String.join("", reviewList);
+
+        String s = Review.replaceAll("[ㄱ-ㅣ]|\\s|\\n|\\r", "");
+
+        if(s.isEmpty()){
 
             StateRes stateRes = new StateRes(false);
 
             return new ResponseEntity<>(stateRes,HttpStatus.OK);
         }
 
-        String Review = String.join("", reviewList);
-
-        String s = Review.replaceAll("[ㄱ-ㅣ]|\\s|\\n|\\r", "");
-
         Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
 
         // 형태소 분석 및 단어 추출 - 알고리즘 최적화
         Map<String, Integer> wordFrequency = new HashMap<>();
+
+
 
         List<Token> tokenList = komoran.analyze(s).getTokenList();
 
@@ -192,8 +196,6 @@ public class MovieMainService {
         List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
-        List<Map<String, Object>> resultList = new ArrayList<>();
-
         if(sortedList.size()<5){
             log.info(String.valueOf(tokenList.size()));
             log.info("Mention_Keyword_Count : "+sortedList.size());
@@ -201,37 +203,37 @@ public class MovieMainService {
             throw new RestApiException(CommonErrorCode.MENTIONKEYWORD_LESS);
         }
 
+        List<MentionDTO> resultList = new ArrayList<>();
+
         for (int i = 0; i<5; i++) {
 
             Map.Entry<String, Integer> entry = sortedList.get(i);
 
             String keyword = entry.getKey();
 
-            List<ReviewEntity> list = reviewRepository.findTop10ByContentContainingAndParentReviewIsNullOrderByCreatedAtAsc(keyword);
+            List<MentionReviewDTO> reviewlist =
+                    queryFactory.select(Projections.constructor(MentionReviewDTO.class,
+                            review.id,
+                            review.movieId,
+                            review.movienm,
+                            review.star,
+                            review.content,
+                            Expressions.numberTemplate(Integer.class, "YEAR({0})", review.createdAt),
+                            review.user.profile,
+                            review.user.nickname)).from(review)
+                    .where(review.content.like("%"+keyword+"%")
+                            .and(review.parentReview.isNull())
+                            .and(review.spoiler.eq(false)))
+                            .orderBy(review.createdAt.asc())
+                            .limit(10)
+                            .fetch();
 
-            List<Map<String,Object>> result = new ArrayList<>();
+            MentionDTO mentionDTO = MentionDTO.builder()
+                    .keyword(keyword)
+                    .reviewList(reviewlist)
+                    .build();
 
-            for (ReviewEntity entity:list){
-
-                Map<String,Object> map = new HashMap<>();
-
-                ReviewDTO reviewDTO = ReviewDTO.toReviewDTO(entity);
-                map.put("review",reviewDTO);
-
-                String nickname = entity.getUser().getNickname();
-
-                map.put("nickname",nickname);
-
-                map.put("profile",entity.getUser().getProfile());
-
-                result.add(map);
-            }
-
-            Map<String, Object> resultMap = new HashMap<>();
-
-            resultMap.put("keyword", keyword);
-            resultMap.put("reviewList", result);
-            resultList.add(resultMap);
+            resultList.add(mentionDTO);
         }
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
@@ -383,7 +385,7 @@ public class MovieMainService {
                     .from(review)
                     .where(review.parentReview.isNull())
                     .groupBy(review.movieId)
-                    .orderBy(review.count().desc())
+                    .orderBy(review.count().desc(), review.movienm.asc())
                     .limit(10)
                     .fetch();
 
@@ -404,9 +406,16 @@ public class MovieMainService {
 
                 movieList = queryFactory.select(review.movieId)
                         .from(review)
-                        .where(review.parentReview.isNull())
+                        .where(review.parentReview.isNull()
+                                .and(review.movieId.notIn(
+                                        JPAExpressions
+                                                .select(review.movieId)
+                                                .from(review)
+                                                .where(review.user.id.eq(userEntity.getId())
+                                                        .and(review.parentReview.isNull()))
+                                )))
                         .groupBy(review.movieId)
-                        .orderBy(review.count().desc())
+                        .orderBy(review.count().desc(), review.movienm.asc())
                         .limit(10)
                         .fetch();
             }else{
@@ -527,8 +536,8 @@ public class MovieMainService {
             movieIdList = queryFactory.select(review.movieId)
                     .from(review)
                     .where(review.parentReview.isNull()
-                    .and(review.spoiler.eq(false))
-                    .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN))))
+                        .and(review.spoiler.eq(false))
+                        .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN))))
                     .groupBy(review.movieId)
                     .orderBy(review.count().desc())
                     .limit(10)
@@ -541,7 +550,7 @@ public class MovieMainService {
                     .where(reviewGenre.genre.id.eq(genreId)
                             .and(reviewGenre.review.spoiler.eq(false))
                             .and(reviewGenre.review.parentReview.isNull()
-                                    .and(reviewGenre.review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN)))))
+                            .and(reviewGenre.review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN)))))
                     .groupBy(reviewGenre.review.movieId)
                     .orderBy(reviewGenre.review.count().desc())
                     .limit(10)
@@ -579,7 +588,8 @@ public class MovieMainService {
                     .from(review)
                     .where(review.parentReview.isNull()
                             .and(review.spoiler.eq(false))
-                            .and(review.movieId.eq(movieId)))
+                            .and(review.movieId.eq(movieId))
+                            .and(review.content.notIn("")))
                     .orderBy(likeCountSubquery.desc())
                     .limit(3)
                     .fetch();

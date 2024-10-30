@@ -1,6 +1,7 @@
 package com.back.cinetalk.movie.controller;
 
 import com.back.cinetalk.movie.dto.BannerDTO;
+import com.back.cinetalk.movie.dto.MentionDTO;
 import com.back.cinetalk.movie.dto.MovieDetailDTO;
 import com.back.cinetalk.movie.dto.UserEqDTO;
 import com.back.cinetalk.movie.service.MainColorExtract;
@@ -58,6 +59,8 @@ public class MovieController {
 
     @GetMapping("/MentionKeword")
     @Operation(summary = "자주 언급되는 키워드",description = "오늘 자 모든 리뷰의 자주 언급된 키워드 상위 5개가 들어간 리뷰 10개씩을 출력")
+    @ApiResponse(responseCode = "200",description = "출력완료",
+            content = @Content(schema = @Schema(implementation = MentionDTO.class)))
     public ResponseEntity<?> MentionKeyword(){
 
         long startTime = System.currentTimeMillis();
@@ -73,6 +76,8 @@ public class MovieController {
 
     @GetMapping("/TotalReviewCount")
     @Operation(summary = "톡이 쌓였어요",description = "등록된 모든 리뷰의 개수 출력")
+    @ApiResponse(responseCode = "200",description = "출력완료",
+            content = @Content(schema = @Schema(implementation = Integer.class)))
     public ResponseEntity<?> TotalReviewCount(){
 
         return new ResponseEntity<>(movieMainService.TotalReviewCount(),HttpStatus.OK);
