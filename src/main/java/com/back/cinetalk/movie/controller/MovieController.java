@@ -40,15 +40,6 @@ public class MovieController {
         return movieDetailService.getMovieDetail(movieId);
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "주간 최신 영화 리스트",description = "최신 영화 리스트")
-    @ApiResponse(responseCode = "200",description = "출력완료",
-            content = @Content(schema = @Schema(implementation = ResponseBody.class
-            )))
-    public List<Map<String, Object>> list() throws IOException {
-
-        return movieMainService.nowPlayingList();
-    }
 
     @GetMapping("/HidingPiece")
     @Operation(summary = "숨겨진 명작",description = "리뷰가 5~20개 인 영화중 평점이 4점 이상인 랜덤한 영화 10개 표출")

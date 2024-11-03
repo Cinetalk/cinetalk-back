@@ -65,5 +65,5 @@ spring:
 
   data:
     redis:
-      host: 3.38.49.22
-      port: 6379
+      host: svc.sel4.cloudtype.app
+      port: 32450

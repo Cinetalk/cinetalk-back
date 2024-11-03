@@ -22,6 +22,7 @@ public class RedisConfig {
         return new LettuceConnectionFactory(host, port);
     }
 
+    /*
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
@@ -40,4 +41,5 @@ public class RedisConfig {
 
         return redisTemplate;
     }
+    */
 }
