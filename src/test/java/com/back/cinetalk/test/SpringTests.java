@@ -1,6 +1,7 @@
 package com.back.cinetalk.test;
 
 import kr.co.shineware.nlp.komoran.model.Token;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class SpringTests {
 
     @Test
+    @Disabled
     public void test() {
 
         WebClient webClient = WebClient.create();

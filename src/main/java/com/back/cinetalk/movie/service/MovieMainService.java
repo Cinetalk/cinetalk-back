@@ -6,16 +6,12 @@ import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.dto.*;
-import com.back.cinetalk.movie.entity.MovieEntity;
-import com.back.cinetalk.movie.repository.MovieRepository;
 import com.back.cinetalk.rate.like.entity.QReviewLikeEntity;
 import com.back.cinetalk.rate.like.repository.ReviewLikeRepository;
-import com.back.cinetalk.review.dto.ReviewDTO;
 import com.back.cinetalk.review.entity.QReviewEntity;
 import com.back.cinetalk.review.entity.ReviewEntity;
 import com.back.cinetalk.review.repository.ReviewRepository;
 import com.back.cinetalk.reviewGenre.entity.QReviewGenreEntity;
-import com.back.cinetalk.user.MyPage.component.UserByAccess;
 import com.back.cinetalk.user.MyPage.dto.activity.ReviewByUserResponseDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.jwt.JWTUtil;
@@ -35,30 +31,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.back.cinetalk.review.entity.QReviewEntity.*;
-import static com.back.cinetalk.user.entity.QUserEntity.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MovieMainService {
 
-    private final getNewMovie getNewMovie;
-    private final MovieRepository movieRepository;
     private final CallAPI callAPI;
     public final JWTUtil jwtUtil;
     private final JPAQueryFactory queryFactory;
@@ -624,6 +613,7 @@ public class MovieMainService {
 
         return reviewRepository.count();
     }
+/*
 
     //TODO 최신 영화 받아오기
     public List<Map<String, Object>> nowPlayingList() throws IOException {
@@ -679,6 +669,7 @@ public class MovieMainService {
         }
         return result;
     }
+*/
 
     //TODO 영화 이름 으로 영화 정보 받기
     public Map<String, Object> getOneByName(String query) throws IOException {
