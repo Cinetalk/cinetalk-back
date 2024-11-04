@@ -276,6 +276,7 @@ public class MovieMainService {
                     .from(review)
                     .leftJoin(userBadge).on(review.user.eq(userBadge.user))
                     .where(review.parentReview.isNull()
+                            .and(userBadge.isUse.eq(true))
                             .and(userBadge.badge.id.in(BadgeIds))
                             .and(userBadge.user.ne(byEmail)))
                     .groupBy(review.user)
@@ -283,8 +284,6 @@ public class MovieMainService {
                     .limit(10)
                     .fetch();
 
-            System.out.println(userList);
-            System.out.println(BadgeIds);
         }
 
         List<UserEqDTO> resultList = new ArrayList<>();
