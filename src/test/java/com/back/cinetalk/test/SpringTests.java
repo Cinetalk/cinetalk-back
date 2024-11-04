@@ -19,7 +19,6 @@ import java.util.Map;
 public class SpringTests {
 
     @Test
-    @Disabled
     public void test() {
 
         WebClient webClient = WebClient.create();

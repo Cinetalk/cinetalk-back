@@ -1,5 +1,6 @@
+# Dockerfile
 FROM openjdk:21-jdk
 ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} ./app.jar
-ENV TZ=Asia/Seoul
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+COPY ${JAR_FILE} ./docker_test.jar
+EXPOSE 80
+ENTRYPOINT ["java", "-jar", "/docker_test.jar"]

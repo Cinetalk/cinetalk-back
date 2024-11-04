@@ -177,9 +177,6 @@ public class MovieMainService {
 
 
             if (pos.contains("NN") && morph.length() > 1) {
-                System.out.println(pos);
-                System.out.println(morph);
-
                 // 단어가 이미 존재하면 빈도수를 증가시키고, 없으면 새로운 키로 추가
                 wordFrequency.put(morph, wordFrequency.getOrDefault(morph, 0) + 1);
             }
@@ -241,17 +238,20 @@ public class MovieMainService {
 
         List<Long> BadgeIds = new ArrayList<>();
 
+        UserEntity byEmail = new UserEntity();
+
         if(access != null){
 
             String email = jwtUtil.getEmail(access);
 
-            UserEntity byEmail = userRepository.findByEmail(email);
+            byEmail = userRepository.findByEmail(email);
 
             // 유저가 갖고 있는 뱃지 목록 조회
             BadgeIds = queryFactory
                     .select(userBadge.badge.id)
                     .from(userBadge)
-                    .where(userBadge.user.eq(byEmail))
+                    .where(userBadge.user.eq(byEmail)
+                    .and(userBadge.isUse.eq(true)))
                     .fetch();
         }
 
@@ -276,11 +276,15 @@ public class MovieMainService {
                     .from(review)
                     .leftJoin(userBadge).on(review.user.eq(userBadge.user))
                     .where(review.parentReview.isNull()
-                            .and(userBadge.id.in(BadgeIds)))
+                            .and(userBadge.badge.id.in(BadgeIds))
+                            .and(userBadge.user.ne(byEmail)))
                     .groupBy(review.user)
                     .orderBy(review.count().desc())
                     .limit(10)
                     .fetch();
+
+            System.out.println(userList);
+            System.out.println(BadgeIds);
         }
 
         List<UserEqDTO> resultList = new ArrayList<>();
@@ -303,7 +307,8 @@ public class MovieMainService {
             List<UserEqBadgeDTO> badges = queryFactory.select(Projections.constructor(UserEqBadgeDTO.class,
                             userBadge.badge.id.as("badge_id"),userBadge.badge.name.as("badge_name")))
                     .from(userBadge)
-                    .where(userBadge.user.id.eq(userEntity.getUserId()))
+                    .where(userBadge.user.id.eq(userEntity.getUserId())
+                            .and(userBadge.isUse.eq(true)))
                     .fetch();
 
             List<ReviewByUserResponseDTO> reviews = ReviewByUser(userEntity.getUserId());
