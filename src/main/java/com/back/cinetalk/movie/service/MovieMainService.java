@@ -259,15 +259,28 @@ public class MovieMainService {
 
         if(BadgeIds.isEmpty()){
 
+            if(access != null){
+                userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
+                                review.user.id,review.user.nickname,review.user.profile))
+                        .from(review)
+                        .where(review.parentReview.isNull()
+                            .and(review.user.ne(byEmail)))
+                        .groupBy(review.user.id)
+                        .orderBy(review.count().desc())
+                        .limit(10)
+                        .fetch();
+            }else{
+                userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
+                                review.user.id,review.user.nickname,review.user.profile))
+                        .from(review)
+                        .where(review.parentReview.isNull())
+                        .groupBy(review.user.id)
+                        .orderBy(review.count().desc())
+                        .limit(10)
+                        .fetch();
+            }
             // 리뷰를 많이 작성한 유저 조회
-            userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
-                            review.user.id,review.user.nickname,review.user.profile))
-                    .from(review)
-                    .where(review.parentReview.isNull())
-                    .groupBy(review.user.id)
-                    .orderBy(review.count().desc())
-                    .limit(10)
-                    .fetch();
+
 
         }else{
 
@@ -325,6 +338,7 @@ public class MovieMainService {
 
             resultList.add(result);
         }
+        resultList.sort(Comparator.comparingInt((UserEqDTO o) -> o.getBadges().size()).reversed());
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
