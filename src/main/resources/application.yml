@@ -67,3 +67,4 @@ spring:
     redis:
       host: 3.38.49.22
       port: 6379
+      password: qwer1234!
