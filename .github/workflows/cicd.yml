@@ -45,6 +45,7 @@ jobs:
           host: ${{ secrets.HOST}}
           username: ec2-user
           key: ${{ secrets.PRIVATE_KEY}}
+          port: 22
           script: |
             docker pull kto5294/cinetalk:latest
             docker stop $(docker ps -a -q) || true
