@@ -42,7 +42,7 @@ public class MovieController {
 
 
     @GetMapping("/HidingPiece")
-    @Operation(summary = "숨겨진 명작",description = "리뷰가 5~20개 인 영화중 평점이 4점 이상인 랜덤한 영화 10개 표출")
+    @Operation(summary = "숨겨진 명작테스트",description = "리뷰가 5~20개 인 영화중 평점이 4점 이상인 랜덤한 영화 10개 표출")
     public ResponseEntity<?> HidingPiece() throws IOException {
         
         return movieMainService.HidingPiece();
