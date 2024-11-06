@@ -42,7 +42,7 @@ public class MovieController {
 
 
     @GetMapping("/HidingPiece")
-    @Operation(summary = "숨겨진 명작테스트",description = "리뷰가 5~20개 인 영화중 평점이 4점 이상인 랜덤한 영화 10개 표출")
+    @Operation(summary = "숨겨진 명작",description = "리뷰가 5~20개 인 영화중 평점이 4점 이상인 랜덤한 영화 10개 표출")
     public ResponseEntity<?> HidingPiece() throws IOException {
         
         return movieMainService.HidingPiece();
@@ -98,7 +98,7 @@ public class MovieController {
     }
 
     @GetMapping("/MainBanner")
-    @Operation(summary = "메인 페이지 배너",description = "최근 일주일 동안 리뷰가 가장 많이 달린 영화 TOP 3")
+    @Operation(summary = "메인 페이지 배너",description = "최근 일주일 동안 리뷰가 가장 많이 달린 영화 TOP 3 및 댓글 표시")
     @ApiResponse(responseCode = "200",description = "출력완료",
             content = @Content(schema = @Schema(implementation = BannerDTO.class)))
     public ResponseEntity<?> MainBanner() throws IOException {
