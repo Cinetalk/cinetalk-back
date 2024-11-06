@@ -154,8 +154,6 @@ public class MovieMainService {
 
         String s = Review.replaceAll("[ㄱ-ㅣ]|\\s|\\n|\\r", "");
 
-        System.out.println(s);
-
         if(s.isEmpty()){
 
             StateRes stateRes = new StateRes(false);
@@ -186,7 +184,6 @@ public class MovieMainService {
         List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
-        System.out.println(sortedList);
 
         if(sortedList.size()<5){
             log.info(String.valueOf(tokenList.size()));
