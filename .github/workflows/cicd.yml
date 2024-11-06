@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - main
-# ㅇㅇ
+
 jobs:
   run-java-gradle:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST}}
-          username: ec2-user
+          username: ubuntu
           key: ${{ secrets.PRIVATE_KEY}}
           port: 22
           script: |
