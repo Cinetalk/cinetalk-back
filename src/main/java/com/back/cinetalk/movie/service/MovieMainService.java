@@ -150,46 +150,38 @@ public class MovieMainService {
                         .and(review.content.notIn("")))
                 .fetch();
 
-        String Review = String.join("", reviewList);
+        List<Map.Entry<String, Integer>> sortedList = getKeywordList(reviewList);
 
-        String s = Review.replaceAll("[ㄱ-ㅣ]|\\s|\\n|\\r", "");
+        if(sortedList == null){
+            reviewList = queryFactory
+                    .select(review.content)
+                    .from(review)
+                    .where(review.createdAt.between(currentDate.minusWeeks(2).atStartOfDay(), currentDate.atTime(LocalTime.MAX))
+                            .and(review.parentReview.isNull())
+                            .and(review.content.notIn("")))
+                    .fetch();
 
-        if(s.isEmpty()){
+            sortedList = getKeywordList(reviewList);
 
-            StateRes stateRes = new StateRes(false);
+            if(sortedList == null){
 
-            return new ResponseEntity<>(stateRes,HttpStatus.OK);
-        }
+                reviewList = queryFactory
+                        .select(review.content)
+                        .from(review)
+                        .where(review.createdAt.between(currentDate.minusMonths(1).atStartOfDay(), currentDate.atTime(LocalTime.MAX))
+                                .and(review.parentReview.isNull())
+                                .and(review.content.notIn("")))
+                        .fetch();
 
-        Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
+                sortedList = getKeywordList(reviewList);
 
-        // 형태소 분석 및 단어 추출 - 알고리즘 최적화
-        Map<String, Integer> wordFrequency = new HashMap<>();
+                if(sortedList == null){
 
-        List<Token> tokenList = komoran.analyze(s).getTokenList();
+                    StateRes stateRes = new StateRes(false);
 
-        for (Token token : tokenList) {
-            String pos = token.getPos();
-            String morph = token.getMorph();
-
-
-
-            if (pos.contains("NN") && morph.length() > 1) {
-                // 단어가 이미 존재하면 빈도수를 증가시키고, 없으면 새로운 키로 추가
-                wordFrequency.put(morph, wordFrequency.getOrDefault(morph, 0) + 1);
+                    return new ResponseEntity<>(stateRes, HttpStatus.OK);
+                }
             }
-        }
-
-        // 빈도순으로 정렬
-        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
-        sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
-
-
-        if(sortedList.size()<5){
-            log.info(String.valueOf(tokenList.size()));
-            log.info("Mention_Keyword_Count : "+sortedList.size());
-
-            throw new RestApiException(CommonErrorCode.MENTIONKEYWORD_LESS);
         }
 
         List<MentionDTO> resultList = new ArrayList<>();
@@ -226,6 +218,51 @@ public class MovieMainService {
         }
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
+
+    public List<Map.Entry<String, Integer>> getKeywordList(List<String> reviewList){
+
+        String Review = String.join("", reviewList);
+
+        String s = Review.replaceAll("[ㄱ-ㅣ\\s\\n\\r]", "");
+
+        if(s.isEmpty()){
+            return null;
+        }
+
+        if(s.length() > 2000){
+            s = s.substring(0,2000);
+        }
+
+        Komoran komoran = new Komoran(DEFAULT_MODEL.LIGHT);
+
+        // 형태소 분석 및 단어 추출 - 알고리즘 최적화
+        Map<String, Integer> wordFrequency = new HashMap<>();
+
+        List<Token> tokenList = komoran.analyze(s).getTokenList();
+
+        for (Token token : tokenList) {
+            String pos = token.getPos();
+            String morph = token.getMorph();
+
+            if (pos.contains("NN") && morph.length() > 1) {
+                // 단어가 이미 존재하면 빈도수를 증가시키고, 없으면 새로운 키로 추가
+                wordFrequency.put(morph, wordFrequency.getOrDefault(morph, 0) + 1);
+            }
+        }
+
+        // 빈도순으로 정렬
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
+        sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+        if(sortedList.size()<5){
+            log.info(String.valueOf(tokenList.size()));
+            log.info("Mention_Keyword_Count : "+sortedList.size());
+
+            return null;
+        }
+
+        return sortedList;
     }
 
     //TODO 나와 취향이 비슷한 사람들
