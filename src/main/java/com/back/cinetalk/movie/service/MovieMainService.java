@@ -331,6 +331,17 @@ public class MovieMainService {
                     .limit(10)
                     .fetch();
 
+            if(userList == null){
+                userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
+                                review.user.id,review.user.nickname,review.user.profile))
+                        .from(review)
+                        .where(review.parentReview.isNull()
+                                .and(review.user.ne(byEmail)))
+                        .groupBy(review.user.id)
+                        .orderBy(review.count().desc())
+                        .limit(10)
+                        .fetch();
+            }
         }
 
         List<UserEqDTO> resultList = new ArrayList<>();
