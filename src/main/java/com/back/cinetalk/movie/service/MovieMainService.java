@@ -331,7 +331,7 @@ public class MovieMainService {
                     .limit(10)
                     .fetch();
 
-            if(userList == null){
+            if(userList.isEmpty()){
                 userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
                                 review.user.id,review.user.nickname,review.user.profile))
                         .from(review)
