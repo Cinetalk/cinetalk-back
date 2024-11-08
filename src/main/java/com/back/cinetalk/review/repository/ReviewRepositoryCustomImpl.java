@@ -134,7 +134,8 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                                 .where(reviewDislikeEntity.user.id.eq(userId))
                                 .exists() : Expressions.constant(false),  // null이면 false 반환
                         // userId가 null이 아닌 경우에만 본인 댓글 여부 확인
-                        userId != null ? reviewEntity.user.id.eq(userId) : Expressions.constant(false)  // null이면 false 반환
+                        userId != null ? reviewEntity.user.id.eq(userId) : Expressions.constant(false),  // null이면 false 반환
+                        reviewEntity.isEdited
                 ))
                 .from(reviewEntity)
                 .leftJoin(userEntity).on(reviewEntity.user.eq(userEntity))
