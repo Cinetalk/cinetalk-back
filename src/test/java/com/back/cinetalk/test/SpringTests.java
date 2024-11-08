@@ -1,6 +1,7 @@
 package com.back.cinetalk.test;
 
-import kr.co.shineware.nlp.komoran.model.Token;
+import com.twitter.penguin.korean.TwitterKoreanProcessor;
+import com.twitter.penguin.korean.tokenizer.KoreanTokenizer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -8,9 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +17,8 @@ import java.util.Map;
 public class SpringTests {
 
     @Test
-    public void test() {
+    @Disabled
+    public void KeywordTest1() {
 
         WebClient webClient = WebClient.create();
 
@@ -72,5 +71,20 @@ public class SpringTests {
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
         System.out.println(sortedList);
+    }
+
+    @Test
+    public void KeywordTest2(){
+
+        String text = "안녕하세요. 저는 자바로 형태소 분석을 하고 있습니다.";
+
+
+        // 트위터 한국어 프로세서를 이용한 형태소 분석
+        List<KoreanTokenizer.KoreanToken> tokens = (List<KoreanTokenizer.KoreanToken>) TwitterKoreanProcessor.tokenize(text);
+
+        // 분석된 형태소 출력
+        for (KoreanTokenizer.KoreanToken token : tokens) {
+            System.out.println("토큰: " + token.text() + " / 품사: " + token.pos());
+        }
     }
 }
