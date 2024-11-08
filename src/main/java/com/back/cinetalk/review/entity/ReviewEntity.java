@@ -43,6 +43,8 @@ public class ReviewEntity extends BaseEntity {
 
     private boolean spoiler;
 
+    private boolean isEdited;
+
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private ReviewEntity parentReview; //부모 리뷰
@@ -66,13 +68,15 @@ public class ReviewEntity extends BaseEntity {
         this.star = reviewRequestDTO.getStar();
         this.content = reviewRequestDTO.getContent();
         this.spoiler = reviewRequestDTO.isSpoiler();
-    }
-
-    public void updateReviewContent(String content) {
-        this.content = content;
+        this.isEdited = true;
     }
 
     public void updateComment(CommentRequestDTO commentRequestDTO) {
         this.content = commentRequestDTO.getContent();
+        this.isEdited = true;
+    }
+
+    public void updateReviewContent(String content) {
+        this.content = content;
     }
 }

@@ -41,8 +41,10 @@ public class ReviewPreViewDTO {
 
     boolean isMine;
 
+    boolean isEdited;
+
     @QueryProjection
-    public ReviewPreViewDTO(Long id, String nickName, byte[] profileImage, Double star, String content, LocalDateTime createdAt, boolean spoiler, long likeCount, long dislikeCount, long commentCount, boolean likeCheck, boolean dislikeCheck, boolean isMine) {
+    public ReviewPreViewDTO(Long id, String nickName, byte[] profileImage, Double star, String content, LocalDateTime createdAt, boolean spoiler, long likeCount, long dislikeCount, long commentCount, boolean likeCheck, boolean dislikeCheck, boolean isMine, boolean isEdited) {
         this.id = id;
         this.nickName = nickName;
         this.profileImage = profileImage;
@@ -56,5 +58,6 @@ public class ReviewPreViewDTO {
         this.likeCheck = likeCheck;
         this.dislikeCheck = dislikeCheck;
         this.isMine = isMine;
+        this.isEdited = isEdited;
     }
 }

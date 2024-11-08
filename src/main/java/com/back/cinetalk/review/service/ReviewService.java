@@ -67,6 +67,7 @@ public class ReviewService {
                 .content(reviewRequestDTO.getContent())
                 .spoiler(reviewRequestDTO.isSpoiler())
                 .parentReview(null)
+                .isEdited(false)
                 .build();
 
         ReviewEntity savedReview = reviewRepository.save(reviewEntity);
@@ -123,6 +124,7 @@ public class ReviewService {
                 .movieId(parentReview.getMovieId())
                 .content(commentRequestDTO.getContent())
                 .parentReview(parentReview)
+                .isEdited(false)
                 .build();
 
         return reviewRepository.save(comment);
