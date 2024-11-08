@@ -72,6 +72,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    testImplementation 'org.scala-lang:scala-library:2.12.10'
+    testImplementation 'com.twitter.penguin:korean-text:4.4.4'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
