@@ -76,14 +76,14 @@ public class SpringTests {
     @Test
     public void KeywordTest2(){
 
-        String text = "안녕하세요. 저는 자바로 형태소 분석을 하고 있습니다.";
+        String word = "안녕하세요저는자바로형태소분석을하고있습니다";
 
         WebClient webClient = WebClient.create();
 
         Map<String, Object> request = new HashMap<>();
         Map<String, String> argument = new HashMap<>();
         argument.put("analysis_code","ner");
-        argument.put("text", text);
+        argument.put("text", word);
         request.put("argument", argument);
 
         Map<String, Object> block = webClient.post()
@@ -96,7 +96,27 @@ public class SpringTests {
 
         Map<String, Object> returnObject = (Map<String, Object>) block.get("return_object");
         List<Map<String,Object>> sentence = (List<Map<String, Object>>) returnObject.get("sentence");
+        List<Map<String,Object>> morp = (List<Map<String, Object>>) sentence.get(0).get("morp");
 
-        System.out.println(sentence);
+        Map<String, Integer> wordFrequency = new HashMap<>();
+        for (Map<String, Object> morpheme : morp) {
+
+            String content = (String) morpheme.get("lemma");
+            String tag = (String) morpheme.get("type");
+
+
+            if(tag.contains("NN")){
+                System.out.println(content);
+                System.out.println(tag);
+                System.out.println("------------------------------");
+                wordFrequency.put(content, wordFrequency.getOrDefault(content, 0) + 1);
+            }
+        }
+
+        // 빈도순으로 정렬
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
+        sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+        System.out.println(sortedList);
     }
 }
