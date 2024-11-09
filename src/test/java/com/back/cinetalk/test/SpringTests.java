@@ -78,13 +78,25 @@ public class SpringTests {
 
         String text = "안녕하세요. 저는 자바로 형태소 분석을 하고 있습니다.";
 
+        WebClient webClient = WebClient.create();
 
-        // 트위터 한국어 프로세서를 이용한 형태소 분석
-        List<KoreanTokenizer.KoreanToken> tokens = (List<KoreanTokenizer.KoreanToken>) TwitterKoreanProcessor.tokenize(text);
+        Map<String, Object> request = new HashMap<>();
+        Map<String, String> argument = new HashMap<>();
+        argument.put("analysis_code","ner");
+        argument.put("text", text);
+        request.put("argument", argument);
 
-        // 분석된 형태소 출력
-        for (KoreanTokenizer.KoreanToken token : tokens) {
-            System.out.println("토큰: " + token.text() + " / 품사: " + token.pos());
-        }
+        Map<String, Object> block = webClient.post()
+                .uri("http://aiopen.etri.re.kr:8000/WiseNLU")
+                .header("Authorization","0504fcbc-2336-4d37-9f85-0d52b96d8073")
+                .bodyValue(request)  // 요청 본문 설정
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+
+        Map<String, Object> returnObject = (Map<String, Object>) block.get("return_object");
+        List<Map<String,Object>> sentence = (List<Map<String, Object>>) returnObject.get("sentence");
+
+        System.out.println(sentence);
     }
 }
