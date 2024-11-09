@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -150,7 +151,7 @@ public class MovieMainService {
                         .and(review.content.notIn("")))
                 .fetch();
 
-        List<Map.Entry<String, Integer>> sortedList = getKeywordList(reviewList);
+        List<Map.Entry<String, Integer>> sortedList = getKeywordListByAPI(reviewList);
 
         if(sortedList == null){
             reviewList = queryFactory
@@ -256,7 +257,70 @@ public class MovieMainService {
         sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
         if(sortedList.size()<5){
-            log.info(String.valueOf(tokenList.size()));
+            log.info("Mention_Keyword_Count : "+sortedList.size());
+
+            return null;
+        }
+
+        return sortedList;
+    }
+
+    public List<Map.Entry<String, Integer>> getKeywordListByAPI(List<String> reviewList){
+
+        String Review = String.join("", reviewList);
+
+        String s = Review.replaceAll("[ㄱ-ㅣ\\s\\n\\r.]", "");
+
+        if(s.isEmpty()){
+            return null;
+        }
+
+        if(s.length() > 2000){
+            s = s.substring(0,2000);
+        }
+
+
+        WebClient webClient = WebClient.create();
+
+        Map<String, Object> request = new HashMap<>();
+        Map<String, String> argument = new HashMap<>();
+        argument.put("analysis_code","ner");
+        argument.put("text", s);
+        request.put("argument", argument);
+
+        Map<String, Object> block = webClient.post()
+                .uri("http://aiopen.etri.re.kr:8000/WiseNLU")
+                .header("Authorization","0504fcbc-2336-4d37-9f85-0d52b96d8073")
+                .bodyValue(request)  // 요청 본문 설정
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+
+        Map<String, Object> returnObject = (Map<String, Object>) block.get("return_object");
+        List<Map<String,Object>> sentence = (List<Map<String, Object>>) returnObject.get("sentence");
+        List<Map<String,Object>> morp = (List<Map<String, Object>>) sentence.get(0).get("morp");
+
+        Map<String, Integer> wordFrequency = new HashMap<>();
+        for (Map<String, Object> morpheme : morp) {
+
+            String content = (String) morpheme.get("lemma");
+            String tag = (String) morpheme.get("type");
+
+
+            if(tag.contains("NN")){
+                System.out.println(content);
+                System.out.println(tag);
+                System.out.println("------------------------------");
+                wordFrequency.put(content, wordFrequency.getOrDefault(content, 0) + 1);
+            }
+        }
+
+        // 빈도순으로 정렬
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(wordFrequency.entrySet());
+        sortedList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+        if(sortedList.size()<5){
+            log.info(String.valueOf(sortedList.size()));
             log.info("Mention_Keyword_Count : "+sortedList.size());
 
             return null;
