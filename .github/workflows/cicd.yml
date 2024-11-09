@@ -50,5 +50,7 @@ jobs:
             docker pull kto5294/cinetalk:latest
             docker stop $(docker ps -a -q) || true
             docker rm $(docker ps -a -q) || true
-            docker run --oom-kill-disable=true --restart unless-stopped -d -p 80:80 kto5294/cinetalk:latest
+            docker run --memory="512m" --memory-swap="1g" --oom-kill-disable=true --restart unless-stopped -d -p 80:80 kto5294/cinetalk:latest
             docker image prune -a -f
+            docker volume prune -f
+            docker system prune -f
