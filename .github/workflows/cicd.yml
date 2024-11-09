@@ -37,7 +37,7 @@ jobs:
 
       - name: Docker push
         run: |
-          docker push kto5294/cinetalk:latest 
+          docker push kto5294/cinetalk:latest
 
       - name: Deploy
         uses: appleboy/ssh-action@master
