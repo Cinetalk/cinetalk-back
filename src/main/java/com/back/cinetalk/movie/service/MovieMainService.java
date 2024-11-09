@@ -453,14 +453,13 @@ public class MovieMainService {
 
             UserEntity userEntity = userRepository.findByEmail(email);
 
-            GenreEntity genreEntity = queryFactory.select(reviewGenre.genre).from(reviewGenre)
+            List<GenreEntity> genreList = queryFactory.select(reviewGenre.genre).from(reviewGenre)
                     .where(reviewGenre.review.user.eq(userEntity).and(reviewGenre.review.parentReview.isNull()))
                     .groupBy(reviewGenre.genre)
                     .orderBy(reviewGenre.count().desc())
-                    .limit(1)
-                    .fetchOne();
+                    .fetch();
 
-            if(genreEntity == null){
+            if(genreList.isEmpty()){
 
                 movieList = queryFactory.select(review.movieId)
                         .from(review)
@@ -478,22 +477,49 @@ public class MovieMainService {
                         .fetch();
             }else{
 
-                movieList = queryFactory
-                        .select(review.movieId)
-                        .from(review)
-                        .leftJoin(reviewGenre).on(review.id.eq(reviewGenre.review.id))
-                        .where(reviewGenre.genre.id.eq(genreEntity.getId())
-                                .and(review.movieId.notIn(
-                                        JPAExpressions
-                                                .select(review.movieId)
-                                                .from(review)
-                                                .where(review.user.id.eq(userEntity.getId())
-                                                        .and(review.parentReview.isNull()))
-                                )))
-                        .groupBy(review.movieId)
-                        .orderBy(review.count().desc(), review.movienm.asc())
-                        .limit(10)
-                        .fetch();
+                for (int i = 0; i <genreList.size(); i++) {
+
+                    GenreEntity genreEntity = genreList.get(i);
+
+                    movieList = queryFactory
+                            .select(review.movieId)
+                            .from(review)
+                            .leftJoin(reviewGenre).on(review.id.eq(reviewGenre.review.id))
+                            .where(reviewGenre.genre.id.eq(genreEntity.getId())
+                                    .and(review.movieId.notIn(
+                                            JPAExpressions
+                                                    .select(review.movieId)
+                                                    .from(review)
+                                                    .where(review.user.id.eq(userEntity.getId())
+                                                            .and(review.parentReview.isNull()))
+                                    )))
+                            .groupBy(review.movieId)
+                            .orderBy(review.count().desc(), review.movienm.asc())
+                            .limit(10)
+                            .fetch();
+
+                    if(movieList.size() > 5){
+                        break;
+                    }
+                }
+
+                if (movieList.size() < 6){
+
+                    movieList = queryFactory.select(review.movieId)
+                            .from(review)
+                            .where(review.parentReview.isNull()
+                                    .and(review.movieId.notIn(
+                                            JPAExpressions
+                                                    .select(review.movieId)
+                                                    .from(review)
+                                                    .where(review.user.id.eq(userEntity.getId())
+                                                            .and(review.parentReview.isNull()))
+                                    )))
+                            .groupBy(review.movieId)
+                            .orderBy(review.count().desc(), review.movienm.asc())
+                            .limit(10)
+                            .fetch();
+                }
             }
         }
 
