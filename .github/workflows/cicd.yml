@@ -42,15 +42,18 @@ jobs:
       - name: Deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST}}
+          host: ${{ secrets.HOST }}
           username: ubuntu
-          key: ${{ secrets.PRIVATE_KEY}}
+          key: ${{ secrets.PRIVATE_KEY }}
           port: 22
           script: |
             docker pull kto5294/cinetalk:latest
             docker stop $(docker ps -a -q) || true
             docker rm $(docker ps -a -q) || true
-            docker run --memory="1g" --memory-swap="3g" --oom-kill-disable=true --restart unless-stopped -d -p 80:80 kto5294/cinetalk:latest
+            docker run --memory="1g" --memory-swap="3g" --oom-kill-disable=true \
+              --restart unless-stopped -d -p 80:80 --health-cmd="curl --fail http://localhost/movie/MentionKeword || exit 1" \
+              --health-interval=30s --health-retries=3 --health-timeout=10s \
+              kto5294/cinetalk:latest
             docker image prune -a -f
             docker volume prune -f
             docker system prune -f
