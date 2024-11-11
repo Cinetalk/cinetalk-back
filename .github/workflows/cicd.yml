@@ -51,9 +51,18 @@ jobs:
             docker stop $(docker ps -a -q) || true
             docker rm $(docker ps -a -q) || true
             docker run --memory="1g" --memory-swap="3g" --oom-kill-disable=true \
-              --restart unless-stopped -d -p 80:80 --health-cmd="curl --fail http://localhost/movie/MentionKeword || exit 1" \
-              --health-interval=30s --health-retries=3 --health-timeout=10s \
-              kto5294/cinetalk:latest
+            --restart unless-stopped -d -p 80:80 --health-cmd="curl --fail http://localhost/movie/MentionKeword || exit 1" \
+            --health-interval=30s --health-retries=3 --health-timeout=10s \
+            kto5294/cinetalk:latest
             docker image prune -a -f
             docker volume prune -f
             docker system prune -f
+            while true; do
+            unhealthy_containers=$(docker ps --filter "health=unhealthy" --quiet)
+            if [ -n "$unhealthy_containers" ]; then
+            echo "컨테이너가 unhealthy 상태입니다. 재시작합니다..."
+            docker restart $unhealthy_containers
+            docker logs $unhealthy_containers
+            fi
+            sleep 30
+            done
