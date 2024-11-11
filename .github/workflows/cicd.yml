@@ -2,7 +2,7 @@ name: cinetalk-pipeline
 on:
   #push:
     #branches:
-      #- main
+      #- main#
 
   pull_request:
     branches:
