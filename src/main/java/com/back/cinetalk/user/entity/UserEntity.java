@@ -44,7 +44,7 @@ public class UserEntity extends BaseEntity {
     private LocalDate birthday;
 
     @Lob
-    @Column(columnDefinition = "LONGBLOB")
+    @Column(columnDefinition = "BLOB")
     private byte[] profile;
 
     private String provider;

@@ -20,6 +20,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -146,19 +151,30 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         int index = random.nextInt(imageFiles.length);
         String selectedImage = imageFiles[index];
 
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("profile_images/" + selectedImage);
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-
+        // 이미지 파일 로딩
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("profile_images/" + selectedImage)) {
             if (inputStream == null) {
                 throw new IOException("Image not found: " + selectedImage);
             }
 
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-            return outputStream.toByteArray();
+            // 이미지를 BufferedImage로 읽기
+            BufferedImage image = ImageIO.read(inputStream);
+
+            // 바이트 배열로 변환 (JPEG 형식으로 압축)
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            // JPEGWriter와 압축 품질 설정
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
+            JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+            jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            jpegParams.setCompressionQuality(0.7f);  // 품질을 설정 (0.0f ~ 1.0f)
+
+            writer.setOutput(ImageIO.createImageOutputStream(byteArrayOutputStream));
+            writer.write(null, new javax.imageio.IIOImage(image, null, null), jpegParams);
+            writer.dispose();
+
+            // 압축된 이미지 바이트 배열 리턴
+            return byteArrayOutputStream.toByteArray();
         }
     }
 }

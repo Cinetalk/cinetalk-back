@@ -19,7 +19,7 @@ public class TopTenReviewDTO {
 
     private Long likeCount;
 
-    //private byte[] profile;
+    private byte[] profile;
 
 
 }
