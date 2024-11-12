@@ -19,6 +19,6 @@ public class MentionReviewDTO {
     private double star;
     private String content;
     private int createdAt;
-    //private byte[] profile;
+    private byte[] profile;
     private String nickname;
 }

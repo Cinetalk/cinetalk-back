@@ -201,7 +201,7 @@ public class MovieMainService {
                             review.star,
                             review.content,
                             Expressions.numberTemplate(Integer.class, "YEAR({0})", review.createdAt),
-                            /*review.user.profile,*/
+                            review.user.profile,
                             review.user.nickname)).from(review)
                     .where(review.content.like("%"+keyword+"%")
                             .and(review.parentReview.isNull())
@@ -731,8 +731,8 @@ public class MovieMainService {
                             review.id.as("reviewId"),
                             review.star,
                             review.content,
-                            likeCountSubquery.as("likeCount")
-                            /*review.user.profile*/))
+                            likeCountSubquery.as("likeCount"),
+                            review.user.profile))
                     .from(review)
                     .where(review.parentReview.isNull()
                             .and(review.spoiler.eq(false))
