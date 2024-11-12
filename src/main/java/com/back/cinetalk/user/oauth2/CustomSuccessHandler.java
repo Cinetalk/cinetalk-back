@@ -20,10 +20,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -160,6 +162,18 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 이미지를 BufferedImage로 읽기
             BufferedImage image = ImageIO.read(inputStream);
 
+            // 이미지 해상도 축소 (예: 100x100으로 축소)
+            int targetWidth = 100;  // 타겟 너비
+            int targetHeight = 100; // 타겟 높이
+
+            Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+
+            // 새로운 크기에서 BufferedImage로 변환
+            BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = resizedImage.createGraphics();
+            g.drawImage(scaledImage, 0, 0, null);
+            g.dispose();  // 자원 해제
+
             // 바이트 배열로 변환 (JPEG 형식으로 압축)
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -167,10 +181,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
             JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
             jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            jpegParams.setCompressionQuality(0.7f);  // 품질을 설정 (0.0f ~ 1.0f)
+            jpegParams.setCompressionQuality(0.2f);  // 품질을 0.2로 낮추어 더 강하게 압축
 
             writer.setOutput(ImageIO.createImageOutputStream(byteArrayOutputStream));
-            writer.write(null, new javax.imageio.IIOImage(image, null, null), jpegParams);
+            writer.write(null, new IIOImage(resizedImage, null, null), jpegParams);
             writer.dispose();
 
             // 압축된 이미지 바이트 배열 리턴
