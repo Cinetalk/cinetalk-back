@@ -1,8 +1,6 @@
 package com.back.cinetalk.movie.service;
 
 import com.back.cinetalk.config.dto.StateRes;
-import com.back.cinetalk.exception.errorCode.CommonErrorCode;
-import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.genre.entity.GenreEntity;
 import com.back.cinetalk.keyword.entity.QKeywordEntity;
 import com.back.cinetalk.movie.dto.*;
@@ -70,11 +68,160 @@ public class MovieMainService {
         return callAPI.callAPI(url);
     }
 
+
+    //TODO 메인페이지 배너
+    public ResponseEntity<?> mainBanner() throws IOException {
+
+        List<Long> MovieIdList = queryFactory.select(review.movieId).from(review)
+                .where(review.parentReview.isNull()
+                        .and(review.createdAt.after(LocalDateTime.now().minusDays(7).with(LocalTime.MIN))))
+                .groupBy(review.movieId)
+                .orderBy(review.count().desc())
+                .orderBy(review.movieId.asc())
+                .limit(3)
+                .fetch();
+
+        List<BannerDTO> resultList = new ArrayList<BannerDTO>();
+
+        for(Long movieId: MovieIdList){
+
+            Map<String, Object> oneByID = getOneByID(movieId);
+
+            Double rate = queryFactory.select(review.star.avg())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.movieId.eq(movieId)))
+                    .fetchOne();
+
+            rate = Math.round(rate * 10.0) / 10.0;
+
+            String topKeyword = queryFactory.select(keyword.keyword)
+                    .from(keyword)
+                    .where(keyword.movieId.eq(movieId))
+                    .groupBy(keyword.keyword)
+                    .orderBy(keyword.count.desc())
+                    .limit(1)
+                    .fetchOne();
+
+            List<BannerReviewDTO> ReviewList = queryFactory.select(Projections.constructor(BannerReviewDTO.class, review.star, review.content, review.createdAt))
+                    .from(review)
+                    .where(review.movieId.eq(movieId)
+                            .and(review.parentReview.isNull()
+                                    .and(review.spoiler.eq(false))
+                                    .and(review.content.notIn(""))))
+                    .orderBy(review.createdAt.desc())
+                    .limit(5)
+                    .fetch();
+
+            BannerDTO result = BannerDTO.builder()
+                    .movieId(movieId)
+                    .movienm(oneByID.get("title").toString())
+                    .poster_path(oneByID.get("poster_path").toString())
+                    .backdrop_path(oneByID.get("backdrop_path").toString())
+                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
+                    .rate(rate)
+                    .keyword(topKeyword)
+                    .ReviewList(ReviewList)
+                    .build();
+
+            resultList.add(result);
+        }
+
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
+
+    //TODO 영화톡 TOP10
+    public ResponseEntity<?> TopTenTalk(Long genreId) throws IOException {
+
+        List<Long> movieIdList = new ArrayList<>();
+
+        if (genreId == 0){
+
+            movieIdList = queryFactory.select(review.movieId)
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.spoiler.eq(false))
+                            .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN))))
+                    .groupBy(review.movieId)
+                    .orderBy(review.count().desc())
+                    .limit(10)
+                    .fetch();
+
+        }else{
+
+            movieIdList = queryFactory.select(reviewGenre.review.movieId)
+                    .from(reviewGenre)
+                    .where(reviewGenre.genre.id.eq(genreId)
+                            .and(reviewGenre.review.spoiler.eq(false))
+                            .and(reviewGenre.review.parentReview.isNull()
+                                    .and(reviewGenre.review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN)))))
+                    .groupBy(reviewGenre.review.movieId)
+                    .orderBy(reviewGenre.review.count().desc())
+                    .limit(10)
+                    .fetch();
+        }
+
+        List<TopTenDTO> resultList = new ArrayList<>();
+
+        for(Long movieId: movieIdList){
+
+            Map<String, Object> oneByID = getOneByID(movieId);
+
+            Double rate = queryFactory.select(review.star.avg())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.movieId.eq(movieId)))
+                    .fetchOne();
+
+            Long reviewCount = queryFactory.select(review.count())
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.movieId.eq(movieId)))
+                    .fetchOne();
+
+            NumberTemplate<Long> likeCountSubquery = Expressions.numberTemplate(Long.class,
+                    "(select count(*) from ReviewLikeEntity where review.id = {0})", review.id);
+
+            List<TopTenReviewDTO> reviewList = queryFactory.select(Projections.constructor(
+                            TopTenReviewDTO.class,
+                            review.id.as("reviewId"),
+                            review.star,
+                            review.content,
+                            likeCountSubquery.as("likeCount"),
+                            review.user.profile))
+                    .from(review)
+                    .where(review.parentReview.isNull()
+                            .and(review.spoiler.eq(false))
+                            .and(review.movieId.eq(movieId))
+                            .and(review.content.notIn("")))
+                    .orderBy(likeCountSubquery.desc())
+                    .limit(3)
+                    .fetch();
+
+            TopTenDTO result = TopTenDTO.builder()
+                    .movieId(movieId)
+                    .movienm(oneByID.get("title").toString())
+                    .poster_path(oneByID.get("poster_path").toString())
+                    .release_date(oneByID.get("release_date").toString()) //문자열 잘라야됨
+                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
+                    .TMDBRate(Double.valueOf(oneByID.get("vote_average").toString()))
+                    .rate(rate)
+                    .reviewCount(reviewCount)
+                    .reviewList(reviewList)
+                    .build();
+
+            resultList.add(result);
+        }
+
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
+    }
+
     //TODO 숨겨진 명작
     public ResponseEntity<?> HidingPiece() throws IOException {
 
         List<Long> fetch = queryFactory.select(review.movieId)
                 .from(review)
+                .where(review.parentReview.isNull())
                 .groupBy(review.movieId)
                 .having(review.count().between(5, 20).and(review.star.avg().goe(4)))
                 .orderBy(Expressions.numberTemplate(Double.class, "function('RAND')").asc())
@@ -612,154 +759,6 @@ public class MovieMainService {
 
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
-
-    //TODO 메인페이지 배너
-    public ResponseEntity<?> mainBanner() throws IOException {
-
-        List<Long> MovieIdList = queryFactory.select(review.movieId).from(review)
-                .where(review.parentReview.isNull()
-                        .and(review.createdAt.after(LocalDateTime.now().minusDays(7).with(LocalTime.MIN))))
-                .groupBy(review.movieId)
-                .orderBy(review.count().desc())
-                .orderBy(review.movieId.asc())
-                .limit(3)
-                .fetch();
-
-        List<BannerDTO> resultList = new ArrayList<BannerDTO>();
-
-        for(Long movieId: MovieIdList){
-
-            Map<String, Object> oneByID = getOneByID(movieId);
-
-            Double rate = queryFactory.select(review.star.avg())
-                    .from(review)
-                    .where(review.parentReview.isNull()
-                            .and(review.movieId.eq(movieId)))
-                    .fetchOne();
-
-            rate = Math.round(rate * 10.0) / 10.0;
-
-            String topKeyword = queryFactory.select(keyword.keyword)
-                    .from(keyword)
-                    .where(keyword.movieId.eq(movieId))
-                    .groupBy(keyword.keyword)
-                    .orderBy(keyword.count.desc())
-                    .limit(1)
-                    .fetchOne();
-
-            List<BannerReviewDTO> ReviewList = queryFactory.select(Projections.constructor(BannerReviewDTO.class, review.star, review.content, review.createdAt))
-                    .from(review)
-                    .where(review.movieId.eq(movieId)
-                            .and(review.parentReview.isNull()
-                                    .and(review.spoiler.eq(false))
-                                    .and(review.content.notIn(""))))
-                    .orderBy(review.createdAt.desc())
-                    .limit(5)
-                    .fetch();
-
-            BannerDTO result = BannerDTO.builder()
-                    .movieId(movieId)
-                    .movienm(oneByID.get("title").toString())
-                    .poster_path(oneByID.get("poster_path").toString())
-                    .backdrop_path(oneByID.get("backdrop_path").toString())
-                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
-                    .rate(rate)
-                    .keyword(topKeyword)
-                    .ReviewList(ReviewList)
-                    .build();
-
-            resultList.add(result);
-        }
-
-        return new ResponseEntity<>(resultList, HttpStatus.OK);
-    }
-
-    //TODO 영화톡 TOP10
-    public ResponseEntity<?> TopTenTalk(Long genreId) throws IOException {
-
-        List<Long> movieIdList = new ArrayList<>();
-
-        if (genreId == 0){
-
-            movieIdList = queryFactory.select(review.movieId)
-                    .from(review)
-                    .where(review.parentReview.isNull()
-                        .and(review.spoiler.eq(false))
-                        .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN))))
-                    .groupBy(review.movieId)
-                    .orderBy(review.count().desc())
-                    .limit(10)
-                    .fetch();
-
-        }else{
-
-            movieIdList = queryFactory.select(reviewGenre.review.movieId)
-                    .from(reviewGenre)
-                    .where(reviewGenre.genre.id.eq(genreId)
-                            .and(reviewGenre.review.spoiler.eq(false))
-                            .and(reviewGenre.review.parentReview.isNull()
-                            .and(reviewGenre.review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN)))))
-                    .groupBy(reviewGenre.review.movieId)
-                    .orderBy(reviewGenre.review.count().desc())
-                    .limit(10)
-                    .fetch();
-        }
-
-        List<TopTenDTO> resultList = new ArrayList<>();
-
-        for(Long movieId: movieIdList){
-
-            Map<String, Object> oneByID = getOneByID(movieId);
-
-            Double rate = queryFactory.select(review.star.avg())
-                    .from(review)
-                    .where(review.parentReview.isNull()
-                            .and(review.movieId.eq(movieId)))
-                    .fetchOne();
-
-            Long reviewCount = queryFactory.select(review.count())
-                    .from(review)
-                    .where(review.parentReview.isNull()
-                            .and(review.movieId.eq(movieId)))
-                    .fetchOne();
-
-            NumberTemplate<Long> likeCountSubquery = Expressions.numberTemplate(Long.class,
-                    "(select count(*) from ReviewLikeEntity where review.id = {0})", review.id);
-
-            List<TopTenReviewDTO> reviewList = queryFactory.select(Projections.constructor(
-                            TopTenReviewDTO.class,
-                            review.id.as("reviewId"),
-                            review.star,
-                            review.content,
-                            likeCountSubquery.as("likeCount"),
-                            review.user.profile))
-                    .from(review)
-                    .where(review.parentReview.isNull()
-                            .and(review.spoiler.eq(false))
-                            .and(review.movieId.eq(movieId))
-                            .and(review.content.notIn("")))
-                    .orderBy(likeCountSubquery.desc())
-                    .limit(3)
-                    .fetch();
-
-            TopTenDTO result = TopTenDTO.builder()
-                    .movieId(movieId)
-                    .movienm(oneByID.get("title").toString())
-                    .poster_path(oneByID.get("poster_path").toString())
-                    .release_date(oneByID.get("release_date").toString()) //문자열 잘라야됨
-                    .genres((List<Map<String, Object>>) oneByID.get("genres"))
-                    .TMDBRate(Double.valueOf(oneByID.get("vote_average").toString()))
-                    .rate(rate)
-                    .reviewCount(reviewCount)
-                    .reviewList(reviewList)
-                    .build();
-
-            resultList.add(result);
-        }
-
-        return new ResponseEntity<>(resultList, HttpStatus.OK);
-    }
-
 
     //TODO 전체 리뷰 갯수
     public long TotalReviewCount(){

@@ -20,7 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -139,22 +143,38 @@ public class MyPage_InfoService {
 
         byte[] imageBytes;
         try {
-            if (maxFileSize < fileSize) {
-                // 이미지 크기가 최대 크기를 초과하면 크기를 줄임
-                BufferedImage originalImage = null;
+            if (maxFileSize > fileSize) {
 
-                originalImage = ImageIO.read(file.getInputStream());
+                BufferedImage image = ImageIO.read(file.getInputStream());
 
-                // 이미지 리사이징
-                Image resultingImage = originalImage.getScaledInstance(600, 800, Image.SCALE_DEFAULT);
-                BufferedImage outputImage = new BufferedImage(600, 800, BufferedImage.TYPE_INT_RGB);
-                outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+                // 이미지 해상도 축소 (예: 100x100으로 축소)
+                int targetWidth = 100;  // 타겟 너비
+                int targetHeight = 100; // 타겟 높이
 
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(outputImage, "jpg", baos);
-                imageBytes = baos.toByteArray();
+                Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+
+                // 새로운 크기에서 BufferedImage로 변환
+                BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = resizedImage.createGraphics();
+                g.drawImage(scaledImage, 0, 0, null);
+                g.dispose();  // 자원 해제
+
+                // 바이트 배열로 변환 (JPEG 형식으로 압축)
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+                // JPEGWriter와 압축 품질 설정
+                ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
+                JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+                jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                jpegParams.setCompressionQuality(0.1f);  // 품질을 0.2로 낮추어 더 강하게 압축
+
+                writer.setOutput(ImageIO.createImageOutputStream(byteArrayOutputStream));
+                writer.write(null, new IIOImage(resizedImage, null, null), jpegParams);
+                writer.dispose();
+
+                imageBytes = byteArrayOutputStream.toByteArray();
             } else {
-                imageBytes = file.getBytes();
+                throw new RestApiException(CommonErrorCode.USER_IMAGE_MAX);
             }
         } catch (IOException e) {
             throw new RestApiException(CommonErrorCode.USER_IMAGE_ERROR);
