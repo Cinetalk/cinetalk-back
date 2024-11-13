@@ -148,8 +148,8 @@ public class MyPage_InfoService {
                 BufferedImage image = ImageIO.read(file.getInputStream());
 
                 // 이미지 해상도 축소 (예: 100x100으로 축소)
-                int targetWidth = 10;  // 타겟 너비
-                int targetHeight = 10; // 타겟 높이
+                int targetWidth = 100;  // 타겟 너비
+                int targetHeight = 100; // 타겟 높이
 
                 Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
 
@@ -165,8 +165,11 @@ public class MyPage_InfoService {
                 // JPEGWriter와 압축 품질 설정
                 ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
                 JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+
                 jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                jpegParams.setCompressionQuality(1.0f);  // 품질을 0.2로 낮추어 더 강하게 압축
+                jpegParams.setCompressionQuality(0.1f);  // 품질을 0.2로 낮추어 더 강하게 압축
+                jpegParams.setOptimizeHuffmanTables(true);  // 허프만 테이블 최적화
+                jpegParams.setProgressiveMode(JPEGImageWriteParam.MODE_DEFAULT);  // 프로그레시브 압축
 
                 writer.setOutput(ImageIO.createImageOutputStream(byteArrayOutputStream));
                 writer.write(null, new IIOImage(resizedImage, null, null), jpegParams);
