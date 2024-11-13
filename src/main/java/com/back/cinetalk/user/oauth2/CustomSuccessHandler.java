@@ -181,7 +181,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
             JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
             jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            jpegParams.setCompressionQuality(0.2f);  // 품질을 0.2로 낮추어 더 강하게 압축
+            jpegParams.setCompressionQuality(0.3f);  // 품질을 0.2로 낮추어 더 강하게 압축
 
             writer.setOutput(ImageIO.createImageOutputStream(byteArrayOutputStream));
             writer.write(null, new IIOImage(resizedImage, null, null), jpegParams);
