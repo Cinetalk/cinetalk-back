@@ -148,8 +148,8 @@ public class MyPage_InfoService {
                 BufferedImage image = ImageIO.read(file.getInputStream());
 
                 // 이미지 해상도 축소 (예: 100x100으로 축소)
-                int targetWidth = 100;  // 타겟 너비
-                int targetHeight = 100; // 타겟 높이
+                int targetWidth = 10;  // 타겟 너비
+                int targetHeight = 10; // 타겟 높이
 
                 Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
 
