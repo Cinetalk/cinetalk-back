@@ -57,12 +57,16 @@ jobs:
             docker image prune -a -f
             docker volume prune -f
             docker system prune -f
-            while true; do
-            unhealthy_containers=$(docker ps --filter "health=unhealthy" --quiet)
-            if [ -n "$unhealthy_containers" ]; then
-            echo "컨테이너가 unhealthy 상태입니다. 재시작합니다..."
-            docker restart $unhealthy_containers
-            docker logs $unhealthy_containers
-            fi
-            sleep 30
-            done
+
+#도커 오류시 자동 restart but 깃헙 액션 success 불가
+#      - name: Docker Restart
+#        run: |
+#            while true; do
+#            unhealthy_containers=$(docker ps --filter "health=unhealthy" --quiet)
+#            if [ -n "$unhealthy_containers" ]; then
+#            echo "컨테이너가 unhealthy 상태입니다. 재시작합니다..."
+#            docker restart $unhealthy_containers
+#            docker logs $unhealthy_containers
+#            fi
+#            sleep 30
+#            done
