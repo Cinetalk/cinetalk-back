@@ -40,7 +40,7 @@ public class UserDTO {
     public static UserDTO ToUserDTO(UserEntity userEntity){
 
         String profileBase64 = null;
-        byte[] profileBytes = userEntity.getProfile();
+        byte[] profileBytes = userEntity.getProfile_hd();
         if (profileBytes != null) {
             profileBase64 = Base64.getEncoder().encodeToString(profileBytes);
         }

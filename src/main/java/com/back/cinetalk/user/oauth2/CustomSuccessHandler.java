@@ -1,5 +1,6 @@
 package com.back.cinetalk.user.oauth2;
 
+import com.back.cinetalk.user.dto.ProfileDTO;
 import com.back.cinetalk.user.repository.RefreshRepository;
 import com.back.cinetalk.user.dto.CustomOAuth2User;
 import com.back.cinetalk.user.dto.RefreshDTO;
@@ -9,6 +10,7 @@ import com.back.cinetalk.user.repository.UserRepository;
 import com.back.cinetalk.user.service.AuthTokenCreate;
 import com.back.cinetalk.user.service.ClientIpAddress;
 import com.back.cinetalk.user.service.NicknameGenerator;
+import com.back.cinetalk.user.service.ProfileCompress;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,14 +50,16 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final NicknameGenerator nicknameGenerator;
     private final AuthTokenCreate authTokenCreate;
     private final ClientIpAddress clientIpAddress;
+    private final ProfileCompress profileCompress;
 
-    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository, NicknameGenerator nicknameGenerator, AuthTokenCreate authTokenCreate, ClientIpAddress clientIpAddress) {
+    public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository, NicknameGenerator nicknameGenerator, AuthTokenCreate authTokenCreate, ClientIpAddress clientIpAddress, ProfileCompress profileCompress) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
         this.userRepository = userRepository;
         this.nicknameGenerator = nicknameGenerator;
         this.authTokenCreate = authTokenCreate;
         this.clientIpAddress = clientIpAddress;
+        this.profileCompress = profileCompress;
     }
 
     @Override
@@ -98,9 +102,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             userRepository.updateNicknameByEmail(email,Newnickname);
 
-            byte[] profile = getRandomProfile();
+            ProfileDTO profile = getRandomProfile();
 
-            userRepository.updateProfileByEmail(email,profile);
+            userRepository.updateProfileAndProfile_hdByEmail(email,profile.getProfile(),profile.getProfile_hd());
 
             response.sendRedirect(redirectUrl+"/redirect/without-nickname?authToken="+authToken);
         }
@@ -139,7 +143,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         refreshRepository.save(refreshEntity);
     }
 
-    public byte[] getRandomProfile() throws IOException {
+    public ProfileDTO getRandomProfile() throws IOException {
 
         String[] imageFiles = {
                 "profile_blue.png",
@@ -162,36 +166,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 이미지를 BufferedImage로 읽기
             BufferedImage image = ImageIO.read(inputStream);
 
-            // 이미지 해상도 축소 (예: 100x100으로 축소)
-            int targetWidth = 100;  // 타겟 너비
-            int targetHeight = 100; // 타겟 높이
-
-            Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-
-            // 새로운 크기에서 BufferedImage로 변환
-            BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = resizedImage.createGraphics();
-            g.drawImage(scaledImage, 0, 0, null);
-            g.dispose();  // 자원 해제
-
-            // 바이트 배열로 변환 (JPEG 형식으로 압축)
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-            // JPEGWriter와 압축 품질 설정
-            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
-            JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
-
-            jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            jpegParams.setCompressionQuality(0.1f);  // 품질을 0.1로 낮추어 더 강하게 압축
-            jpegParams.setOptimizeHuffmanTables(true);  // 허프만 테이블 최적화
-            jpegParams.setProgressiveMode(JPEGImageWriteParam.MODE_DEFAULT);  // 프로그레시브 압축
-
-            writer.setOutput(ImageIO.createImageOutputStream(byteArrayOutputStream));
-            writer.write(null, new IIOImage(resizedImage, null, null), jpegParams);
-            writer.dispose();
-
-            // 압축된 이미지 바이트 배열 리턴
-            return byteArrayOutputStream.toByteArray();
+            return profileCompress.compressImage(image);
         }
     }
 }

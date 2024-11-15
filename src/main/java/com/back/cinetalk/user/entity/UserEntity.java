@@ -47,6 +47,10 @@ public class UserEntity extends BaseEntity {
     @Column(columnDefinition = "BLOB")
     private byte[] profile;
 
+    @Lob
+    @Column(columnDefinition = "BLOB")
+    private byte[] profile_hd;
+
     private String provider;
 
     private String role;
@@ -107,8 +111,9 @@ public class UserEntity extends BaseEntity {
         this.birthday = dto.getBirthday();
     }
 
-    public void UpdateProfile(byte[] profile) {
+    public void UpdateProfile(byte[] profile,byte[] profile_hd) {
         this.profile = profile;
+        this.profile_hd = profile_hd;
     }
 
     public void DeleteUser(String email,String nickname){

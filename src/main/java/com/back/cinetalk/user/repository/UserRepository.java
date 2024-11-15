@@ -30,8 +30,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE UserEntity u SET u.profile = :profile WHERE u.email = :email")
-    void updateProfileByEmail(@Param("email") String email, @Param("profile") byte[] profile);
+    @Query("UPDATE UserEntity u SET u.profile = :profile,u.profile_hd = :profile_hd WHERE u.email = :email")
+    void updateProfileAndProfile_hdByEmail(@Param("email") String email, @Param("profile") byte[] profile, @Param("profile_hd") byte[] profile_hd);
 
     Boolean existsByNickname(String nickname);
 

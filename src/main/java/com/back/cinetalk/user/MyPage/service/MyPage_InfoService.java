@@ -5,10 +5,12 @@ import com.back.cinetalk.exception.errorCode.CommonErrorCode;
 import com.back.cinetalk.exception.exception.RestApiException;
 import com.back.cinetalk.user.MyPage.component.UserByAccess;
 import com.back.cinetalk.user.dto.NickNameMergeDTO;
+import com.back.cinetalk.user.dto.ProfileDTO;
 import com.back.cinetalk.user.dto.UserDTO;
 import com.back.cinetalk.user.entity.UserEntity;
 import com.back.cinetalk.user.repository.RefreshRepository;
 import com.back.cinetalk.user.repository.UserRepository;
+import com.back.cinetalk.user.service.ProfileCompress;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +41,7 @@ public class MyPage_InfoService {
     private final UserByAccess userByAccess;
     private final UserRepository userRepository;
     private final RefreshRepository refreshRepository;
+    private final ProfileCompress profileCompress;
 
     //TODO 유저의 정보 
     @Transactional(readOnly = true)
@@ -141,52 +144,13 @@ public class MyPage_InfoService {
         long MB = 1024 * 1024;
         long maxFileSize = 1 * MB;
 
-        byte[] imageBytes;
+        ProfileDTO profileDTO = new ProfileDTO();
         try {
             if (maxFileSize > fileSize) {
 
                 BufferedImage image = ImageIO.read(file.getInputStream());
 
-                // 원본 이미지의 너비와 높이
-                int originalWidth = image.getWidth();
-                int originalHeight = image.getHeight();
-
-                // 원본 비율 계산
-                double aspectRatio = (double) originalWidth / originalHeight;
-
-                // 가로를 100으로 설정
-                int targetWidth = 100;
-
-                // 비율에 맞춰 세로를 계산
-                int targetHeight = (int) (targetWidth / aspectRatio);
-
-                // 이미지 리사이징
-                Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-
-                // 새로운 크기에서 BufferedImage로 변환
-                BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-                Graphics2D g = resizedImage.createGraphics();
-                g.drawImage(scaledImage, 0, 0, null);
-                g.dispose();  // 자원 해제
-
-                // 바이트 배열로 변환 (JPEG 형식으로 압축)
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-                // JPEGWriter와 압축 품질 설정
-                ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
-                JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
-
-                jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                jpegParams.setCompressionQuality(0.1f);  // 품질을 0.1로 낮추어 더 강하게 압축
-                jpegParams.setOptimizeHuffmanTables(true);  // 허프만 테이블 최적화
-                jpegParams.setProgressiveMode(JPEGImageWriteParam.MODE_DEFAULT);  // 프로그레시브 압축
-
-                writer.setOutput(ImageIO.createImageOutputStream(byteArrayOutputStream));
-                writer.write(null, new IIOImage(resizedImage, null, null), jpegParams);
-                writer.dispose();
-
-                imageBytes = byteArrayOutputStream.toByteArray();
-
+                profileDTO = profileCompress.compressImage(image);
             } else {
                 throw new RestApiException(CommonErrorCode.USER_IMAGE_MAX);
             }
@@ -194,7 +158,7 @@ public class MyPage_InfoService {
             throw new RestApiException(CommonErrorCode.USER_IMAGE_ERROR);
         }
 
-        userEntity.UpdateProfile(imageBytes);
+        userEntity.UpdateProfile(profileDTO.getProfile(),profileDTO.getProfile_hd());
 
         return new StateRes(true);
     }
