@@ -147,10 +147,20 @@ public class MyPage_InfoService {
 
                 BufferedImage image = ImageIO.read(file.getInputStream());
 
-                // 이미지 해상도 축소 (예: 100x100으로 축소)
-                int targetWidth = 100;  // 타겟 너비
-                int targetHeight = 100; // 타겟 높이
+                // 원본 이미지의 너비와 높이
+                int originalWidth = image.getWidth();
+                int originalHeight = image.getHeight();
 
+                // 원본 비율 계산
+                double aspectRatio = (double) originalWidth / originalHeight;
+
+                // 가로를 100으로 설정
+                int targetWidth = 100;
+
+                // 비율에 맞춰 세로를 계산
+                int targetHeight = (int) (targetWidth / aspectRatio);
+
+                // 이미지 리사이징
                 Image scaledImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
 
                 // 새로운 크기에서 BufferedImage로 변환
@@ -167,7 +177,7 @@ public class MyPage_InfoService {
                 JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
 
                 jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                jpegParams.setCompressionQuality(0.1f);  // 품질을 0.2로 낮추어 더 강하게 압축
+                jpegParams.setCompressionQuality(0.7f);  // 품질을 0.1로 낮추어 더 강하게 압축
                 jpegParams.setOptimizeHuffmanTables(true);  // 허프만 테이블 최적화
                 jpegParams.setProgressiveMode(JPEGImageWriteParam.MODE_DEFAULT);  // 프로그레시브 압축
 
@@ -176,6 +186,7 @@ public class MyPage_InfoService {
                 writer.dispose();
 
                 imageBytes = byteArrayOutputStream.toByteArray();
+
             } else {
                 throw new RestApiException(CommonErrorCode.USER_IMAGE_MAX);
             }
