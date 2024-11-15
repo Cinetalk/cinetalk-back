@@ -177,7 +177,7 @@ public class MyPage_InfoService {
                 JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
 
                 jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                jpegParams.setCompressionQuality(0.3f);  // 품질을 0.1로 낮추어 더 강하게 압축
+                jpegParams.setCompressionQuality(0.1f);  // 품질을 0.1로 낮추어 더 강하게 압축
                 jpegParams.setOptimizeHuffmanTables(true);  // 허프만 테이블 최적화
                 jpegParams.setProgressiveMode(JPEGImageWriteParam.MODE_DEFAULT);  // 프로그레시브 압축
 
