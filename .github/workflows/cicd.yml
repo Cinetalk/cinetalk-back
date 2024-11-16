@@ -58,7 +58,7 @@ jobs:
             docker volume prune -f
             docker system prune -f
 
-#도커 오류시 자동 restart but 깃헙 액션 success 불가
+##도커 오류시 자동 restart but 깃헙 액션 success 불가
       - name: Docker Restart
         run: |
             while true; do
