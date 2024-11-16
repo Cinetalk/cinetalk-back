@@ -19,7 +19,7 @@ public class ProfileCompress {
     public ProfileDTO compressImage(BufferedImage image) throws IOException {
 
         return ProfileDTO.builder()
-                .profile(MakingImage(image,100,0.1f))
+                .profile(MakingImage(image,50,0.1f))
                 .profile_hd(MakingImage(image,200,1.0f))
                 .build();
     }
