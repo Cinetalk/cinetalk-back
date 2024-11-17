@@ -112,4 +112,11 @@ public class MovieController {
 
         return movieMainService.TopTenTalk(genreId);
     }
+
+    @GetMapping("/TotalMovieId")
+    @Operation(summary = "영화Id모음",description = "댓글 또는 키워드가 입력된 모든 영화의 id 반환")
+    public ResponseEntity<?> TotalMovieId(){
+
+        return movieMainService.TotalMovieId();
+    }
 }

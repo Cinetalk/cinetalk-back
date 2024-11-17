@@ -20,6 +20,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
@@ -764,6 +765,30 @@ public class MovieMainService {
     public long TotalReviewCount(){
 
         return reviewRepository.count();
+    }
+
+    //TODO 전체 MovieId 갯수
+    public ResponseEntity<?> TotalMovieId(){
+
+        List<Long> reviewList = queryFactory
+                .select(review.movieId)
+                .from(review)
+                .fetch();
+
+        List<Long> keywordList = queryFactory
+                .select(keyword.movieId)
+                .from(keyword)
+                .fetch();
+
+        HashSet<Long> result = new HashSet<>();
+        result.addAll(reviewList);
+        result.addAll(keywordList);
+
+        List<Long> resultList =new ArrayList<Long>(result);
+
+        Collections.sort(resultList);
+
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 /*
 
