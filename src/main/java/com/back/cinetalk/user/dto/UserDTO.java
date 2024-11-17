@@ -57,4 +57,25 @@ public class UserDTO {
                 .role(userEntity.getRole())
                 .build();
     }
+
+    public static UserDTO ToUserDTO1(UserEntity userEntity){
+
+        String profileBase64 = null;
+        byte[] profileBytes = userEntity.getProfile();
+        if (profileBytes != null) {
+            profileBase64 = Base64.getEncoder().encodeToString(profileBytes);
+        }
+
+        return UserDTO.builder()
+                .id(userEntity.getId())
+                .email(userEntity.getEmail())
+                //.name(userEntity.getName())
+                .nickname(userEntity.getNickname())
+                .gender(userEntity.getGender())
+                .birthday(userEntity.getBirthday())
+                .profile(profileBase64)
+                .provider(userEntity.getProvider())
+                .role(userEntity.getRole())
+                .build();
+    }
 }

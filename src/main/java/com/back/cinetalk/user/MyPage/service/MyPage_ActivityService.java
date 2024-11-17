@@ -169,10 +169,6 @@ public class MyPage_ActivityService {
 
             Map<String, Object> oneByID = movieMainService.getOneByID(reviewEntity.getMovieId());
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
-
-            String regDate = reviewEntity.getCreatedAt().format(formatter);
-
             ReviewByUserResponseDTO responseDTO = ReviewByUserResponseDTO.builder()
                     .review_id(reviewEntity.getId())
                     .movie_id(reviewEntity.getMovieId())
@@ -182,7 +178,7 @@ public class MyPage_ActivityService {
                     .content(reviewEntity.getContent())
                     .RateCount(rateCount)
                     .RereviewCount(RereviewCont)
-                    .regDate(regDate)
+                    .regDate(String.valueOf(reviewEntity.getCreatedAt()))
                     .build();
 
             result.add(responseDTO);
