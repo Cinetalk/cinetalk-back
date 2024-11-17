@@ -154,7 +154,7 @@ public class FindService {
 
             findReviewDTO.setReviewDTO(dto);
 
-            findReviewDTO.setUserDTO(UserDTO.ToUserDTO(reviewEntity.getUser()));
+            findReviewDTO.setUserDTO(UserDTO.ToUserDTO1(reviewEntity.getUser()));
 
             returnList.add(findReviewDTO);
         }
