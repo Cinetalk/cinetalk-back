@@ -144,7 +144,7 @@ public class MovieMainService {
                             .and(review.spoiler.eq(false))
                             .and(review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN))))
                     .groupBy(review.movieId)
-                    .orderBy(review.count().desc())
+                    .orderBy(review.count().desc(),review.movienm.asc())
                     .limit(10)
                     .fetch();
 
@@ -157,7 +157,7 @@ public class MovieMainService {
                             .and(reviewGenre.review.parentReview.isNull()
                                     .and(reviewGenre.review.createdAt.after(LocalDateTime.now().minusDays(30).with(LocalTime.MIN)))))
                     .groupBy(reviewGenre.review.movieId)
-                    .orderBy(reviewGenre.review.count().desc())
+                    .orderBy(reviewGenre.review.count().desc(),reviewGenre.review.movienm.asc())
                     .limit(10)
                     .fetch();
         }
