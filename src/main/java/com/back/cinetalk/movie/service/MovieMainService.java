@@ -195,7 +195,7 @@ public class MovieMainService {
                             .and(review.spoiler.eq(false))
                             .and(review.movieId.eq(movieId))
                             .and(review.content.notIn("")))
-                    .orderBy(likeCountSubquery.desc())
+                    .orderBy(likeCountSubquery.desc(),review.movienm.asc())
                     .limit(3)
                     .fetch();
 
