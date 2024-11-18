@@ -11,7 +11,7 @@ ssh:
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/innodb
+    url: jdbc:mariadb://database-1.cr06wigqodqc.ap-northeast-2.rds.amazonaws.com:3306/innodb
     username: admin
     password: qwer1234!
 
