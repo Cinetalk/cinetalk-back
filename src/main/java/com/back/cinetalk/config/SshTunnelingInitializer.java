@@ -30,7 +30,7 @@ public class SshTunnelingInitializer {
     @NotNull
     private int sshPort;
     @NotNull
-    private String privateKey;
+    private String password;
     @NotNull
     private int databasePort;
 
@@ -47,29 +47,30 @@ public class SshTunnelingInitializer {
         Integer forwardedPort = null;
 
         try {
-            log.info("{}@{}:{}:{} with privateKey",user, remoteJumpHost, sshPort, databasePort);
+            log.info("{}@{}:{}:{} with password", user, remoteJumpHost, sshPort, databasePort);
 
             log.info("start ssh tunneling..");
             JSch jSch = new JSch();
 
             log.info("creating ssh session");
-            jSch.addIdentity(privateKey);  // 개인키
             session = jSch.getSession(user, remoteJumpHost, sshPort);  // 세션 설정
+            session.setPassword(password);  // 비밀번호 인증 설정
+
             Properties config = new Properties();
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
             log.info("complete creating ssh session");
 
             log.info("start connecting ssh connection");
-            session.connect();  // ssh 연결
-            log.info("success connecting ssh connection ");
+            session.connect();  // SSH 연결
+            log.info("success connecting ssh connection");
 
-            // 로컬pc의 남는 포트 하나와 원격 접속한 pc의 db포트 연결
+            // 로컬 PC의 남는 포트와 원격 DB 포트 연결
             log.info("start forwarding");
-            forwardedPort = session.setPortForwardingL(3307, "localhost", databasePort);
+            forwardedPort = session.setPortForwardingL(3308, "localhost", databasePort);
             log.info("successfully connected to database");
 
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("fail to make ssh tunneling");
             this.closeSSH();
             e.printStackTrace();
