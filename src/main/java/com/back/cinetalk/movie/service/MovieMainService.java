@@ -341,26 +341,23 @@ public class MovieMainService {
 
             String keyword = entry.getKey();
 
-            List<MentionReviewDTO> reviewlist =
-                    queryFactory.select(Projections.constructor(MentionReviewDTO.class,
-                            review.id,
-                            review.movieId,
-                            review.movienm,
-                            review.star,
-                            review.content,
-                            Expressions.numberTemplate(Integer.class, "YEAR({0})", review.createdAt),
-                            review.user.profile,
-                            review.user.nickname)).from(review)
-                    .where(review.content.like("%"+keyword+"%")
-                            .and(review.parentReview.isNull())
-                            .and(review.spoiler.eq(false)))
-                            .orderBy(review.createdAt.asc())
-                            .limit(10)
-                            .fetch();
-
             MentionDTO mentionDTO = MentionDTO.builder()
                     .keyword(keyword)
-                    .reviewList(reviewlist)
+                    .reviewList(queryFactory.select(Projections.constructor(MentionReviewDTO.class,
+                                    review.id,
+                                    review.movieId,
+                                    review.movienm,
+                                    review.star,
+                                    review.content,
+                                    Expressions.numberTemplate(Integer.class, "YEAR({0})", review.createdAt),
+                                    review.user.profile,
+                                    review.user.nickname)).from(review)
+                            .where(review.content.like("%"+keyword+"%")
+                                    .and(review.parentReview.isNull())
+                                    .and(review.spoiler.eq(false)))
+                            .orderBy(review.createdAt.asc())
+                            .limit(10)
+                            .fetch())
                     .build();
 
             resultList.add(mentionDTO);
