@@ -131,6 +131,7 @@ public class MovieMainService {
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
+
     //TODO 영화톡 TOP10
     public ResponseEntity<?> TopTenTalk(Long genreId) throws IOException {
 
