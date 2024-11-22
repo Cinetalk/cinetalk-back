@@ -284,8 +284,25 @@ public class MovieMainService {
         return new ResponseEntity<>(resultlist, HttpStatus.OK);
     }
 
+    private List<MentionDTO> resultListMetionList = new ArrayList<>();
+    private LocalDateTime lastUpdateTime = null;
+
     //TODO 자주 언급 되는 키워드
     public ResponseEntity<?> MentionKeyword() {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // 마지막 업데이트 시간과 30초가 지났는지 확인
+        if (lastUpdateTime != null && lastUpdateTime.plusSeconds(30).isBefore(now)) {
+            // 30초 이상 지난 경우, 리스트 초기화
+            resultListMetionList.clear();
+        }
+
+        if(!resultListMetionList.isEmpty()){
+            log.info("기존에 있던거 쓰는중");
+            return new ResponseEntity<>(resultListMetionList, HttpStatus.OK);
+        }
+        log.info("아닌중");
 
         // 오늘 날짜 설정
         LocalDate currentDate = LocalDate.now();
@@ -333,7 +350,6 @@ public class MovieMainService {
             }
         }
 
-        List<MentionDTO> resultList = new ArrayList<>();
 
         for (int i = 0; i<5; i++) {
 
@@ -360,10 +376,10 @@ public class MovieMainService {
                             .fetch())
                     .build();
 
-            resultList.add(mentionDTO);
+            resultListMetionList.add(mentionDTO);
         }
-
-        return new ResponseEntity<>(resultList, HttpStatus.OK);
+        lastUpdateTime = LocalDateTime.now();
+        return new ResponseEntity<>(resultListMetionList, HttpStatus.OK);
     }
 
     public List<Map.Entry<String, Integer>> getKeywordList(List<String> reviewList){
