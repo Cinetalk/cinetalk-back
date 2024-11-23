@@ -47,13 +47,18 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: 22
           script: |
+            
             docker stop $(docker ps -a -q) || true
-            docker stop $(docker ps -a -q) || true
-            docker rmi $(docker images -q)
+            docker rm $(docker ps -a -q) || true
+            
+            docker rmi $(docker images -q | grep -v $(docker images -q --filter "reference=kto5294/cinetalk:latest"))
+            
             docker image prune -a -f
             docker volume prune -f
             docker system prune -f
+            
             docker pull kto5294/cinetalk:latest
+            
             docker run --memory="1g" --memory-swap="3g" --oom-kill-disable=true \
             --restart unless-stopped -d -p 80:80 \
             --health-cmd="curl --fail http://localhost/movie/MentionKeword || exit 1" \
