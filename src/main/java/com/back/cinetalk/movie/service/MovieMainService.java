@@ -285,7 +285,7 @@ public class MovieMainService {
         return new ResponseEntity<>(resultlist, HttpStatus.OK);
     }
 
-    private List<MentionDTO> resultListMetionList = new ArrayList<>();
+    private List<MentionDTO>   resultListMetionList = new ArrayList<>();
     private LocalDateTime lastUpdateTime = null;
 
     //TODO 자주 언급 되는 키워드
@@ -301,6 +301,11 @@ public class MovieMainService {
 
         if(!resultListMetionList.isEmpty()){
             log.info("기존에 있던거 쓰는중");
+
+            if(resultListMetionList.size() > 5){
+                resultListMetionList = resultListMetionList.subList(0, 5);
+            }
+
             return new ResponseEntity<>(resultListMetionList, HttpStatus.OK);
         }
         log.info("아닌중");
