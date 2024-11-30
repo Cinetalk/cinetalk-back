@@ -526,7 +526,7 @@ public class MovieMainService {
 
             if(access != null){
                 userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
-                                review.user.id,review.user.nickname,review.user.profile))
+                                review.user.id,review.user.nickname,review.user.profile_hd.as("profile")))
                         .from(review)
                         .where(review.parentReview.isNull()
                             .and(review.user.ne(byEmail)))
@@ -536,7 +536,7 @@ public class MovieMainService {
                         .fetch();
             }else{
                 userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
-                                review.user.id,review.user.nickname,review.user.profile))
+                                review.user.id,review.user.nickname,review.user.profile_hd.as("profile")))
                         .from(review)
                         .where(review.parentReview.isNull())
                         .groupBy(review.user.id)
@@ -550,7 +550,7 @@ public class MovieMainService {
         }else{
 
             userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
-                            review.user.id,review.user.nickname,review.user.profile))
+                            review.user.id,review.user.nickname,review.user.profile_hd.as("profile")))
                     .from(review)
                     .leftJoin(userBadge).on(review.user.eq(userBadge.user))
                     .where(review.parentReview.isNull()
@@ -564,7 +564,7 @@ public class MovieMainService {
 
             if(userList.isEmpty()){
                 userList = queryFactory.select(Projections.constructor(UserEqUserDTO.class,
-                                review.user.id,review.user.nickname,review.user.profile))
+                                review.user.id,review.user.nickname,review.user.profile_hd.as("profile")))
                         .from(review)
                         .where(review.parentReview.isNull()
                                 .and(review.user.ne(byEmail)))
