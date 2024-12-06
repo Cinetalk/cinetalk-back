@@ -475,9 +475,6 @@ public class MovieMainService {
 
 
             if(tag.contains("NN")){
-                System.out.println(content);
-                System.out.println(tag);
-                System.out.println("------------------------------");
                 wordFrequency.put(content, wordFrequency.getOrDefault(content, 0) + 1);
             }
         }
