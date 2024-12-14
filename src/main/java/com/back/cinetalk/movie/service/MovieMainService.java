@@ -390,9 +390,9 @@ public class MovieMainService {
 
     public List<Map.Entry<String, Integer>> getKeywordList(List<String> reviewList){
 
-        String Review = String.join("", reviewList);
+        String Review = String.join(".", reviewList);
 
-        String s = Review.replaceAll("[ㄱ-ㅣ\\s\\n\\r]", "");
+        String s = Review.replaceAll("[ㄱ-ㅣ\\s\\n\\r]", " ");
 
         if(s.isEmpty()){
             return null;
@@ -434,9 +434,9 @@ public class MovieMainService {
 
     public List<Map.Entry<String, Integer>> getKeywordListByAPI(List<String> reviewList){
 
-        String Review = String.join("", reviewList);
+        String Review = String.join(".", reviewList);
 
-        String s = Review.replaceAll("[ㄱ-ㅣ\\s\\n\\r.]", "");
+        String s = Review.replaceAll("[ㄱ-ㅣ\\s\\n\\r.]", " ");
 
         if(s.isEmpty()){
             return null;
