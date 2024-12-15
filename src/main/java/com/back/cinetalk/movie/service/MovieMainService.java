@@ -322,7 +322,7 @@ public class MovieMainService {
                         .and(review.content.notIn("")))
                 .fetch();
 
-        List<Map.Entry<String, Integer>> sortedList = getKeywordListByAPI(reviewList);
+        List<Map.Entry<String, Integer>> sortedList = getKeywordList(reviewList);
 
         if(sortedList == null){
             reviewList = queryFactory
