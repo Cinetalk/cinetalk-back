@@ -324,7 +324,7 @@ public class MovieMainService {
 
         List<Map.Entry<String, Integer>> sortedList = getKeywordListByAPI(reviewList);
 
-        if(sortedList.isEmpty()){
+        if(sortedList == null || sortedList.isEmpty()){
             reviewList = queryFactory
                     .select(review.content)
                     .from(review)
@@ -335,7 +335,7 @@ public class MovieMainService {
 
             sortedList = getKeywordListByAPI(reviewList);
 
-            if(sortedList.isEmpty()){
+            if(sortedList == null || sortedList.isEmpty()){
 
                 reviewList = queryFactory
                         .select(review.content)
@@ -347,7 +347,7 @@ public class MovieMainService {
 
                 sortedList = getKeywordListByAPI(reviewList);
 
-                if(sortedList == null){
+                if(sortedList == null || sortedList.isEmpty()){
 
                     StateRes stateRes = new StateRes(false);
 
